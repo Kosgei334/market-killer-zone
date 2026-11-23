@@ -15,65 +15,33 @@
       --red: #dc2626;
       --blue: #2563eb;
       --teal: #0d9488;
-      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body {
-      margin: 0;
-      padding: 14px;
-      background: var(--bg);
-      color: var(--text);
-    }
+    body { margin: 0; padding: 14px; background: var(--bg); color: var(--text); }
     .wrap { max-width: 540px; margin: 0 auto; }
     .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px; margin-bottom: 12px;
     }
     .title { font-weight: 800; font-size: 1rem; }
-    .clock {
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      margin-top: 3px;
-    }
+    .clock { font-family: monospace; font-size: 0.8rem; color: #cbd5e1; margin-top: 3px; }
     .acct-box { text-align: right; }
     .bal { font-weight: 800; font-size: 0.95rem; color: #4ade80; }
     .acct-id { font-size: 0.76rem; color: var(--muted); }
-
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px; margin-bottom: 12px;
     }
     h2 { margin: 0 0 8px; font-size: 1rem; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     label { display: block; font-size: 0.8rem; color: var(--muted); margin: 8px 0 4px; }
     select, input, button {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card2);
-      color: var(--text);
-      font-size: 0.92rem;
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 0.92rem;
     }
-    button {
-      margin-top: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      background: var(--blue);
-      border-color: #3b82f6;
-    }
+    button { margin-top: 10px; font-weight: 700; cursor: pointer; background: var(--blue); border-color: #3b82f6; }
     button.secondary { background: #1e293b; border-color: #334155; }
     button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
     button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
@@ -81,72 +49,33 @@
     button.under { background: #be123c; border-color: #f43f5e; margin-top: 0; }
     button.auto-off { background: #7f1d1d; border-color: #dc2626; }
     button.auto-on { background: #14532d; border-color: #22c55e; }
-
     .price-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-top: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; margin-top: 10px;
     }
     .price-val { font-size: 1.15rem; font-weight: 800; color: #4ade80; }
     .sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
     .digit-box {
-      background: #1e293b;
-      border: 1px solid #475569;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-weight: 800;
+      background: #1e293b; border: 1px solid #475569; border-radius: 8px;
+      padding: 6px 10px; font-weight: 800;
     }
-
-    .digits-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      margin-top: 10px;
-    }
+    .digits-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
     .d-card {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 4px;
-      text-align: center;
+      background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 4px; text-align: center;
     }
     .d-card.hit { border-color: #38bdf8; background: #172554; }
     .d-num { font-weight: 800; font-size: 0.9rem; }
     .d-pct { font-size: 0.7rem; color: var(--muted); }
-
-    .barrier-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .b-btn {
-      margin-top: 0;
-      padding: 8px 4px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      font-size: 0.88rem;
-    }
+    .barrier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; }
+    .b-btn { margin-top: 0; padding: 8px 4px; background: var(--card2); border: 1px solid var(--border); font-size: 0.88rem; }
     .b-btn.active { background: var(--blue); border-color: #60a5fa; }
-
     .guard-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
     .guard-list li { margin-bottom: 4px; }
-
     .log {
-      font-family: monospace;
-      font-size: 0.78rem;
-      background: #070a10;
-      color: #cbd5e1;
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 170px;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      font-family: monospace; font-size: 0.78rem; background: #070a10; color: #cbd5e1;
+      border-radius: 8px; padding: 10px; max-height: 170px; overflow-y: auto; white-space: pre-wrap;
     }
   </style>
 </head>
@@ -238,7 +167,7 @@
 
     <div class="card">
       <h2>Activity Log</h2>
-      <div id="logArea" class="log">Starting...</div>
+      <div id="logArea" class="log">Booting script...</div>
     </div>
   </div>
 
@@ -284,10 +213,14 @@
       logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
     }
 
-    setInterval(() => {
+    window.addEventListener("error", (e) => {
+      writeLog(`JS Error: ${e.message}`);
+    });
+
+    function tickClock() {
       const now = new Date();
       clockText.textContent = `${isAuthorized ? "Session Time" : "Time"}: ${now.toLocaleTimeString()}`;
-    }, 1000);
+    }
 
     function updatePnL() {
       const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
@@ -344,116 +277,5 @@
       }
       if (!list.length || !ws || ws.readyState !== WebSocket.OPEN) return;
 
-      const demoAcct = list.find(item => item.acct.startsWith("VRTC"));
-      const chosen = (!isRealMode && demoAcct) ? demoAcct : list[0];
-      writeLog(`Authorizing ${chosen.acct}...`);
-      ws.send(JSON.stringify({ authorize: chosen.token }));
-    }
-
-    function connectWS() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
-      const endpoint = `wss://ws.derivws.com/websockets/v3?app_id=${WS_APP_ID}`;
-      connLabel.textContent = "Socket: Connecting...";
-      writeLog(`Connecting to ${endpoint}`);
-      ws = new WebSocket(endpoint);
-
-      ws.onopen = () => {
-        connLabel.textContent = "Socket: Connected";
-        writeLog("WebSocket connected.");
-        subscribeSymbol(symbolSelect.value);
-        authFromUrl();
-      };
-
-      ws.onmessage = (ev) => {
-        const msg = JSON.parse(ev.data);
-        if (msg.error) {
-          writeLog(`Deriv error: ${msg.error.message}`);
-          return;
-        }
-
-        if (msg.tick && msg.tick.symbol === activeSymbol) {
-          const decimals = typeof msg.tick.pip_size === "number" ? msg.tick.pip_size : 2;
-          const num = Number(msg.tick.quote);
-          const formatted = num.toFixed(decimals);
-          const lastDigit = Number(formatted.slice(-1));
-
-          if (prevPrice !== null) {
-            const diff = num - prevPrice;
-            const sign = diff >= 0 ? "+" : "";
-            tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(decimals)}`;
-          }
-          prevPrice = num;
-
-          priceText.textContent = `${msg.tick.symbol}: ${formatted}`;
-          digitText.textContent = `Digit: ${lastDigit}`;
-
-          digitList.push(lastDigit);
-          if (digitList.length > 50) digitList.shift();
-          drawDigits(lastDigit);
-
-          if (autoEnabled && digitList.length >= 3) {
-            const tail3 = digitList.slice(-3);
-            if (tail3.every(d => d <= 2) && !activeSymbol.startsWith("frx")) {
-              digitList = [];
-              writeLog(`Auto rule triggered on [${tail3.join(", ")}] -> OVER 3`);
-              sendTrade("DIGITOVER", 3);
-            }
-          }
-        }
-
-        if (msg.authorize) {
-          const a = msg.authorize;
-          isAuthorized = true;
-          isVirtualAcct = Boolean(a.is_virtual);
-          const kind = isVirtualAcct ? "DEMO" : "REAL";
-          balText.textContent = `${Number(a.balance).toFixed(2)} ${a.currency}`;
-          acctText.textContent = `${a.loginid} (${kind})`;
-          writeLog(`Authorized ${a.loginid} [${kind}] — Balance: ${a.balance} ${a.currency}`);
-        }
-
-        if (msg.buy) {
-          const b = msg.buy;
-          writeLog(`Trade #${b.contract_id} opened | Stake: $${Number(b.buy_price).toFixed(2)}`);
-          ws.send(JSON.stringify({ proposal_open_contract: 1, contract_id: b.contract_id, subscribe: 1 }));
-        }
-
-        if (msg.proposal_open_contract && msg.proposal_open_contract.is_sold) {
-          const poc = msg.proposal_open_contract;
-          const pnl = Number(poc.profit);
-          sessionPnL += pnl;
-          updatePnL();
-          writeLog(`Trade #${poc.contract_id} settled: ${pnl >= 0 ? "WIN +" : "LOSS "}$${pnl.toFixed(2)}`);
-          ws.send(JSON.stringify({ forget: poc.id }));
-        }
-      };
-
-      ws.onclose = (ev) => {
-        connLabel.textContent = "Socket: Reconnecting";
-        writeLog(`WebSocket closed (code ${ev.code}). Reconnecting in 3s...`);
-        setTimeout(connectWS, 3000);
-      };
-    }
-
-    function sendTrade(contractType, barrier = null) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        writeLog("Cannot trade: WebSocket not connected.");
-        return;
-      }
-      if (!isAuthorized) {
-        writeLog("Cannot trade: Connect Deriv account first.");
-        return;
-      }
-      if (!isRealMode && !isVirtualAcct) {
-        writeLog("Blocked: Dashboard is in DEMO mode, but token is REAL.");
-        return;
-      }
-      if (isRealMode && isVirtualAcct) {
-        writeLog("Blocked: Dashboard is in REAL mode, but token is DEMO.");
-        return;
-      }
-
-      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
-      if (usedLoss >= MAX_DAILY_LOSS) {
-        autoEnabled = false;
-        auto
-  
+      const demoAcct = list.find(item => item.acct.starts
+    
