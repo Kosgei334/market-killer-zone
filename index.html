@@ -3,41 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MARKET KILLER ZONE — Deriv Dashboard</title>
+  <title>MARKET KILLER ZONE — Deriv Terminal</title>
   <style>
     :root {
       --bg: #0b0f17;
       --card: #131a26;
+      --card-2: #0e1420;
       --text: #eef2f7;
       --muted: #94a3b8;
       --accent: #22c55e;
       --warn: #f59e0b;
       --danger: #ef4444;
+      --blue: #2563eb;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body {
       margin: 0;
-      padding: 16px;
+      padding: 14px;
       background: var(--bg);
       color: var(--text);
     }
     .container { max-width: 540px; margin: 0 auto; }
+
+    /* Top Header Bar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .brand-title { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.3px; }
+    .clock-pill {
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 8px;
+      margin-top: 3px;
+      display: inline-block;
+    }
+    .bal-box { text-align: right; }
+    .bal-amount { font-weight: 800; font-size: 0.95rem; color: var(--accent); }
+    .bal-acct { font-size: 0.75rem; color: var(--muted); }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    h1 { margin: 0 0 6px; font-size: 1.25rem; }
-    h2 { margin: 0 0 8px; font-size: 1.05rem; }
-    .sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 12px; }
+    h2 { margin: 0 0 8px; font-size: 1rem; }
+    .sub { color: var(--muted); font-size: 0.82rem; margin: 6px 0 0; }
+
     .badge {
       display: inline-block;
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       background: rgba(245, 158, 11, 0.15);
       color: var(--warn);
@@ -48,66 +79,113 @@
       color: #fca5a5;
       border-color: rgba(239, 68, 68, 0.45);
     }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin: 10px 0 4px; }
+
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px; }
     select, input, button {
       width: 100%;
-      padding: 11px 12px;
+      padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: #0d131d;
+      background: var(--card-2);
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     button {
-      margin-top: 12px;
+      margin-top: 10px;
       cursor: pointer;
-      font-weight: 600;
-      background: #1d4ed8;
-      border-color: #2563eb;
+      font-weight: 700;
+      background: var(--blue);
+      border-color: #3b82f6;
     }
     button.secondary { background: #1e293b; border-color: #334155; }
     button.danger { background: #991b1b; border-color: #dc2626; }
-    button.rise { background: #15803d; border-color: #22c55e; }
-    button.fall { background: #b91c1c; border-color: #ef4444; }
-    button.over { background: #0369a1; border-color: #38bdf8; }
-    button.under { background: #7e22ce; border-color: #c084fc; }
+    button.rise { background: #15803d; border-color: #22c55e; margin-top: 0; }
+    button.fall { background: #b91c1c; border-color: #ef4444; margin-top: 0; }
+    button.over { background: #0f766e; border-color: #14b8a6; margin-top: 0; }
+    button.under { background: #be123c; border-color: #f43f5e; margin-top: 0; }
+
     .btn-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-top: 6px;
     }
-    .tick-box {
+
+    /* Price & Digit Readout */
+    .market-banner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 1.2rem;
-      font-weight: 700;
-      padding: 12px;
-      border-radius: 8px;
-      background: #0b0f17;
+      background: var(--card-2);
       border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
       margin-top: 10px;
-      color: var(--accent);
     }
-    .digit-pill {
-      font-size: 0.95rem;
-      padding: 4px 10px;
-      border-radius: 8px;
+    .price-main { font-size: 1.15rem; font-weight: 800; }
+    .delta-pos { color: var(--accent); font-size: 0.8rem; font-weight: 700; }
+    .delta-neg { color: #f87171; font-size: 0.8rem; font-weight: 700; }
+    .digit-badge {
       background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #334155;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
     }
-    .risk-list { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.85rem; }
-    .risk-list li { margin-bottom: 5px; }
+
+    /* 0-9 Digit Stats Grid */
+    .digits-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .digit-cell {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .digit-cell.active-digit {
+      border-color: #38bdf8;
+      background: #172554;
+    }
+    .d-num { font-weight: 800; font-size: 0.95rem; }
+    .d-pct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* Barrier Quick Picker 0-9 */
+    .barrier-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .b-btn {
+      margin-top: 0;
+      padding: 8px 4px;
+      font-size: 0.88rem;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+    }
+    .b-btn.selected {
+      background: #1d4ed8;
+      border-color: #60a5fa;
+      color: #fff;
+    }
+
+    .risk-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
+    .risk-list li { margin-bottom: 4px; }
+
     .log {
       font-family: monospace;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
-      background: #090d14;
+      background: #080c12;
       padding: 10px;
       border-radius: 8px;
-      max-height: 170px;
+      max-height: 165px;
       overflow-y: auto;
       white-space: pre-wrap;
     }
@@ -115,26 +193,38 @@
 </head>
 <body>
   <div class="container">
+    <!-- HEADER WITH LIVE TIME & BALANCE -->
+    <div class="topbar">
+      <div>
+        <div class="brand-title">MARKET KILLER ZONE</div>
+        <span id="liveClock" class="clock-pill">Time: --:--:--</span>
+      </div>
+      <div class="bal-box">
+        <div id="headerBalance" class="bal-amount">DEMO</div>
+        <div id="headerAcct" class="bal-acct">Not logged in</div>
+      </div>
+    </div>
+
     <!-- ACCOUNT & MODE -->
     <div class="card">
-      <h1>MARKET KILLER ZONE</h1>
-      <p class="sub">Deriv OAuth &amp; Live Market Stream ($50 Capital Guardrails)</p>
-      <span id="modeBadge" class="badge">MODE: DEMO (SAFE)</span>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="modeBadge" class="badge">MODE: DEMO (SAFE)</span>
+        <span id="wsStatusText" class="sub" style="margin:0;">WS: Connecting...</span>
+      </div>
 
       <button id="loginBtn" type="button">Connect Deriv Account (OAuth)</button>
       <button id="toggleModeBtn" class="secondary" type="button">Switch to Real Mode (Locked Until Tested)</button>
-      <p id="accountStatus" class="sub" style="margin-top:10px;">Status: Not connected yet.</p>
     </div>
 
-    <!-- MARKET & LIVE TICK -->
+    <!-- MARKET & DIGIT DISTRIBUTION -->
     <div class="card">
-      <h2>Market &amp; Live Tick Feed</h2>
-      <label for="marketSelect">Choose Market (Derived Indices or Forex)</label>
+      <h2>Market &amp; Last Digit Scanner</h2>
+      <label for="marketSelect">Select Index or Forex Pair</label>
       <select id="marketSelect">
-        <optgroup label="Derived Indices (Supports Rise/Fall & Over/Under)">
+        <optgroup label="Derived Indices (Rise/Fall & Over/Under)">
+          <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
           <option value="R_100">Volatility 100 Index (R_100)</option>
           <option value="R_50">Volatility 50 Index (R_50)</option>
-          <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
         </optgroup>
         <optgroup label="Forex (Rise/Fall Only)">
           <option value="frxEURUSD">EUR/USD (frxEURUSD)</option>
@@ -142,15 +232,20 @@
         </optgroup>
       </select>
 
-      <div class="tick-box">
-        <span id="liveTick">Connecting to live feed...</span>
-        <span class="digit-pill" id="lastDigitBox">Digit: -</span>
+      <div class="market-banner">
+        <div>
+          <div id="liveTick" class="price-main">Waiting for tick...</div>
+          <div id="tickDelta" class="sub" style="margin:2px 0 0;">Change: --</div>
+        </div>
+        <div id="lastDigitBox" class="digit-badge">Digit: -</div>
       </div>
+
+      <div id="digitsGrid" class="digits-grid"></div>
     </div>
 
-    <!-- TRADE EXECUTION: RISE/FALL & OVER/UNDER -->
+    <!-- RISE/FALL & OVER/UNDER EXECUTION -->
     <div class="card">
-      <h2>Trade Execution (Rise/Fall &amp; Over/Under)</h2>
+      <h2>Trade Execution</h2>
 
       <div class="btn-row">
         <div>
@@ -158,58 +253,51 @@
           <input id="stakeInput" type="number" step="0.10" min="0.35" max="1.00" value="0.50" />
         </div>
         <div>
-          <label for="durationInput">Duration (Ticks: 1–10)</label>
-          <input id="durationInput" type="number" min="1" max="10" value="5" />
+          <label for="durationInput">Ticks (1–10)</label>
+          <input id="durationInput" type="number" min="1" max="10" value="1" />
         </div>
       </div>
 
-      <label>1. Rise / Fall Contracts</label>
+      <label>Rise / Fall</label>
       <div class="btn-row">
-        <button id="riseBtn" class="rise" type="button">▲ RISE (CALL)</button>
-        <button id="fallBtn" class="fall" type="button">▼ FALL (PUT)</button>
+        <button id="riseBtn" class="rise" type="button">Rise</button>
+        <button id="fallBtn" class="fall" type="button">Fall</button>
       </div>
 
-      <label for="barrierSelect">2. Over / Under Digit Prediction (Derived Indices)</label>
-      <select id="barrierSelect">
-        <option value="0">Digit 0 (Over 0)</option>
-        <option value="1">Digit 1 (Over 1 / Under 1)</option>
-        <option value="2">Digit 2 (Over 2 / Under 2)</option>
-        <option value="3">Digit 3 (Over 3 / Under 3)</option>
-        <option value="4" selected>Digit 4 (Over 4 / Under 4)</option>
-        <option value="5">Digit 5 (Over 5 / Under 5)</option>
-        <option value="6">Digit 6 (Over 6 / Under 6)</option>
-        <option value="7">Digit 7 (Over 7 / Under 7)</option>
-        <option value="8">Digit 8 (Over 8 / Under 8)</option>
-        <option value="9">Digit 9 (Under 9)</option>
-      </select>
-      <div class="btn-row">
-        <button id="overBtn" class="over" type="button">OVER DIGIT</button>
-        <button id="underBtn" class="under" type="button">UNDER DIGIT</button>
+      <label>Over / Under Target Digit (0–9)</label>
+      <div id="barrierGrid" class="barrier-grid"></div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button id="overBtn" class="over" type="button">Over <span id="overTargetLabel">4</span></button>
+        <button id="underBtn" class="under" type="button">Under <span id="underTargetLabel">4</span></button>
       </div>
     </div>
 
-    <!-- $50 ACCOUNT RISK GUARDRAILS -->
+    <!-- $50 ACCOUNT GUARDRAILS -->
     <div class="card">
-      <h2>$50 Account Risk Guardrails</h2>
+      <h2>$50 Account Guardrails</h2>
       <ul class="risk-list">
-        <li><strong>Capital Target:</strong> $50.00 account — max stake locked at 2% ($1.00) per trade.</li>
-        <li><strong>Daily Loss Cap:</strong> $10.00 max daily loss before automatic execution lock.</li>
-        <li><strong>Mode Safety:</strong> Real mode requires explicit confirmation and authorized Real token.</li>
+        <li><strong>Max Stake:</strong> $1.00 hard cap (2% of $50 capital).</li>
+        <li><strong>Daily Loss Stop:</strong> $10.00 max drawdown lock.</li>
+        <li><strong>Demo First:</strong> Always verify signals &amp; execution on Demo before Real.</li>
       </ul>
-      <p id="pnlStatus" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Remaining Loss Buffer: $10.00</p>
-      <button id="armAutoBtn" class="danger" type="button">Auto-Bot Mode: OFF (Manual Click Only)</button>
+      <p id="pnlStatus" class="sub">Session P&amp;L: $0.00 | Remaining Loss Buffer: $10.00</p>
+      <button id="armAutoBtn" class="danger" type="button">Auto-Bot: OFF (Manual Only)</button>
     </div>
 
     <!-- ACTIVITY LOG -->
     <div class="card">
       <h2>Activity Log</h2>
-      <div id="logBox" class="log">Ready. WebSocket ID 1089 &amp; OAuth ID 352JgmiAsrWhGgFobFlSS loaded.</div>
+      <div id="logBox" class="log">Initializing MARKET KILLER ZONE...</div>
     </div>
   </div>
 
   <script>
     const DERIV_OAUTH_ID = "352JgmiAsrWhGgFobFlSS";
     const DERIV_WS_APP_ID = "1089";
+    const WS_ENDPOINTS = [
+      `wss://ws.derivws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`,
+      `wss://ws.binaryws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`
+    ];
     const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
     const MAX_STAKE_USD = 1.00;
     const MAX_DAILY_LOSS_USD = 10.00;
@@ -220,18 +308,28 @@
     let autoBotArmed = false;
     let sessionNetPnL = 0;
     let socket = null;
+    let endpointIndex = 0;
     let activeTickSymbol = null;
-    let recentDigits = [];
+    let lastQuote = null;
+    let selectedBarrier = 4;
+    let digitHistory = []; // last 50 digits for 0-9 distribution
 
+    const liveClock = document.getElementById("liveClock");
+    const headerBalance = document.getElementById("headerBalance");
+    const headerAcct = document.getElementById("headerAcct");
+    const wsStatusText = document.getElementById("wsStatusText");
     const logBox = document.getElementById("logBox");
     const modeBadge = document.getElementById("modeBadge");
-    const accountStatus = document.getElementById("accountStatus");
     const liveTick = document.getElementById("liveTick");
+    const tickDelta = document.getElementById("tickDelta");
     const lastDigitBox = document.getElementById("lastDigitBox");
+    const digitsGrid = document.getElementById("digitsGrid");
+    const barrierGrid = document.getElementById("barrierGrid");
+    const overTargetLabel = document.getElementById("overTargetLabel");
+    const underTargetLabel = document.getElementById("underTargetLabel");
     const marketSelect = document.getElementById("marketSelect");
     const stakeInput = document.getElementById("stakeInput");
     const durationInput = document.getElementById("durationInput");
-    const barrierSelect = document.getElementById("barrierSelect");
     const pnlStatus = document.getElementById("pnlStatus");
 
     function log(msg) {
@@ -239,244 +337,40 @@
       logBox.textContent = `[${time}] ${msg}\n` + logBox.textContent;
     }
 
-    function updatePnLDisplay() {
-      const lossUsed = sessionNetPnL < 0 ? Math.abs(sessionNetPnL) : 0;
-      const remaining = Math.max(0, MAX_DAILY_LOSS_USD - lossUsed);
-      pnlStatus.textContent = `Session P&L: $${sessionNetPnL.toFixed(2)} | Remaining Loss Buffer: $${remaining.toFixed(2)}`;
+    // Live clock after login (and tick timestamps)
+    setInterval(() => {
+      const now = new Date();
+      const prefix = isAuthorized ? "Session Time" : "Local Time";
+      liveClock.textContent = `${prefix}: ${now.toLocaleTimeString()}`;
+    }, 1000);
+
+    function renderDigitGrid(currentDigit = null) {
+      const total = digitHistory.length || 1;
+      let html = "";
+      for (let d = 0; d <= 9; d++) {
+        const count = digitHistory.filter(x => x === d).length;
+        const pct = digitHistory.length ? ((count / total) * 100).toFixed(1) : "0.0";
+        const activeClass = (d === currentDigit) ? "active-digit" : "";
+        html += `
+          <div class="digit-cell ${activeClass}">
+            <div class="d-num">${d}</div>
+            <div class="d-pct">${pct}%</div>
+          </div>
+        `;
+      }
+      digitsGrid.innerHTML = html;
     }
 
-    function connectSocket() {
-      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-        return;
+    function renderBarrierButtons() {
+      let html = "";
+      for (let d = 0; d <= 9; d++) {
+        const selClass = (d === selectedBarrier) ? "selected" : "";
+        html += `<button type="button" class="b-btn ${selClass}" data-digit="${d}">${d}</button>`;
       }
-      socket = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`);
+      barrierGrid.innerHTML = html;
+      overTargetLabel.textContent = selectedBarrier;
+      underTargetLabel.textContent = selectedBarrier;
 
-      socket.onopen = () => {
-        log("Connected to Deriv WebSocket feed.");
-        subscribeTicks(marketSelect.value);
-        checkOAuthTokenInUrl();
-      };
-
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.error) {
-          log(`Deriv API notice: ${data.error.message}`);
-          return;
-        }
-
-        if (data.tick && data.tick.symbol === activeTickSymbol) {
-          const quoteStr = Number(data.tick.quote).toFixed(data.tick.pip_size || 2);
-          const lastDigit = parseInt(quoteStr.slice(-1), 10);
-          liveTick.textContent = `${data.tick.symbol}: ${quoteStr}`;
-          lastDigitBox.textContent = `Digit: ${lastDigit}`;
-
-          recentDigits.push(lastDigit);
-          if (recentDigits.length > 5) recentDigits.shift();
-
-          if (autoBotArmed && recentDigits.length === 5) {
-            runSimpleAutoRule(lastDigit);
-          }
-        }
-
-        if (data.authorize) {
-          const acct = data.authorize;
-          isAuthorized = true;
-          accountIsVirtual = Boolean(acct.is_virtual);
-          const acctType = accountIsVirtual ? "DEMO" : "REAL";
-          accountStatus.textContent = `Connected (${acctType}): ${acct.loginid} | Balance: ${acct.balance} ${acct.currency}`;
-          log(`Authorized ${acctType} account ${acct.loginid} (${acct.currency} ${acct.balance}).`);
-        }
-
-        if (data.buy) {
-          const b = data.buy;
-          log(`ORDER OPENED: Contract #${b.contract_id} | Cost: $${Number(b.buy_price).toFixed(2)} | Payout: $${Number(b.payout).toFixed(2)}`);
-          socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: b.contract_id, subscribe: 1 }));
-        }
-
-        if (data.proposal_open_contract && data.proposal_open_contract.is_sold) {
-          const poc = data.proposal_open_contract;
-          const profit = Number(poc.profit);
-          sessionNetPnL += profit;
-          updatePnLDisplay();
-          log(`SETTLED (#${poc.contract_id}): ${profit >= 0 ? "WIN +" : "LOSS "}$${profit.toFixed(2)}`);
-          socket.send(JSON.stringify({ forget: poc.id }));
-        }
-      };
-
-      socket.onclose = () => {
-        log("WebSocket closed. Reconnecting in 3s...");
-        setTimeout(connectSocket, 3000);
-      };
-    }
-
-    function subscribeTicks(symbol) {
-      activeTickSymbol = symbol;
-      recentDigits = [];
-      if (!socket || socket.readyState !== WebSocket.OPEN) return;
-      socket.send(JSON.stringify({ forget_all: "ticks" }));
-      socket.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
-      log(`Subscribed to live ticks: ${symbol}`);
-    }
-
-    function checkOAuthTokenInUrl() {
-      const params = new URLSearchParams(window.location.search);
-      // Use Demo token by default unless Real mode is active
-      const tokens = [];
-      for (let i = 1; i <= 5; i++) {
-        const acct = params.get(`acct${i}`);
-        const token = params.get(`token${i}`);
-        if (acct && token) tokens.push({ acct, token });
-      }
-      if (tokens.length > 0 && socket && socket.readyState === WebSocket.OPEN) {
-        const demoEntry = tokens.find(t => t.acct.startsWith("VRTC"));
-        const selected = (!isRealMode && demoEntry) ? demoEntry : tokens[0];
-        log(`OAuth token found for ${selected.acct}. Authorizing...`);
-        socket.send(JSON.stringify({ authorize: selected.token }));
-      }
-    }
-
-    function placeContract(contractType, barrier = null) {
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        log("Blocked: WebSocket is not connected yet.");
-        return;
-      }
-      if (!isAuthorized) {
-        log("Blocked: Tap 'Connect Deriv Account (OAuth)' first to authorize your Demo/Real account.");
-        return;
-      }
-      if (!isRealMode && !accountIsVirtual) {
-        log("Blocked: Dashboard is in DEMO mode, but a REAL account token is loaded. Switch mode or reconnect Demo.");
-        return;
-      }
-      if (isRealMode && accountIsVirtual) {
-        log("Blocked: Dashboard is in REAL mode, but a DEMO account token is loaded.");
-        return;
-      }
-
-      const lossUsed = sessionNetPnL < 0 ? Math.abs(sessionNetPnL) : 0;
-      if (lossUsed >= MAX_DAILY_LOSS_USD) {
-        autoBotArmed = false;
-        document.getElementById("armAutoBtn").textContent = "Auto-Bot Mode: LOCKED (Daily Loss Limit)";
-        log(`LOCKED: Daily loss cap ($${MAX_DAILY_LOSS_USD.toFixed(2)}) reached.`);
-        return;
-      }
-
-      let stake = parseFloat(stakeInput.value);
-      if (isNaN(stake) || stake < 0.35) {
-        log("Blocked: Minimum stake is $0.35.");
-        return;
-      }
-      if (stake > MAX_STAKE_USD) {
-        stake = MAX_STAKE_USD;
-        stakeInput.value = MAX_STAKE_USD.toFixed(2);
-        log(`Guardrail: Stake capped to $${MAX_STAKE_USD.toFixed(2)} for $50 capital protection.`);
-      }
-
-      const symbol = marketSelect.value;
-      const isDigitContract = (contractType === "DIGITOVER" || contractType === "DIGITUNDER");
-      if (isDigitContract && symbol.startsWith("frx")) {
-        log("Blocked: Over/Under digit contracts only work on Derived Indices (e.g., Volatility 100), not Forex.");
-        return;
-      }
-
-      const duration = Math.min(10, Math.max(1, parseInt(durationInput.value, 10) || 5));
-      const parameters = {
-        amount: stake,
-        basis: "stake",
-        contract_type: contractType,
-        currency: "USD",
-        duration: duration,
-        duration_unit: "t",
-        symbol: symbol
-      };
-
-      if (isDigitContract && barrier !== null) {
-        parameters.barrier = String(barrier);
-      }
-
-      log(`Sending ${contractType}${barrier !== null ? " (" + barrier + ")" : ""} | $${stake.toFixed(2)} | ${duration} ticks on ${symbol}...`);
-      socket.send(JSON.stringify({
-        buy: 1,
-        price: stake,
-        parameters: parameters
-      }));
-    }
-
-    // Example auto-rule: triggers Over 4 if last 3 digits were all <= 3 (only when armed)
-    function runSimpleAutoRule(latestDigit) {
-      const lastThree = recentDigits.slice(-3);
-      if (lastThree.length === 3 && lastThree.every(d => d <= 3) && !marketSelect.value.startsWith("frx")) {
-        log(`Auto-Signal: Last 3 digits [${lastThree.join(", ")}] <= 3. Executing OVER 4...`);
-        recentDigits = []; // cooldown
-        placeContract("DIGITOVER", 4);
-      }
-    }
-
-    // Manual Buttons
-    document.getElementById("riseBtn").addEventListener("click", () => placeContract("CALL"));
-    document.getElementById("fallBtn").addEventListener("click", () => placeContract("PUT"));
-    document.getElementById("overBtn").addEventListener("click", () => {
-      const barrier = parseInt(barrierSelect.value, 10);
-      if (barrier === 9) {
-        log("Blocked: Cannot trade OVER 9 (digits only go 0–9). Choose 0–8 for Over.");
-        return;
-      }
-      placeContract("DIGITOVER", barrier);
-    });
-    document.getElementById("underBtn").addEventListener("click", () => {
-      const barrier = parseInt(barrierSelect.value, 10);
-      if (barrier === 0) {
-        log("Blocked: Cannot trade UNDER 0 (digits only go 0–9). Choose 1–9 for Under.");
-        return;
-      }
-      placeContract("DIGITUNDER", barrier);
-    });
-
-    // OAuth & Mode Toggles
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${encodeURIComponent(DERIV_OAUTH_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-      window.location.href = oauthUrl;
-    });
-
-    document.getElementById("toggleModeBtn").addEventListener("click", () => {
-      if (!isRealMode) {
-        const ok = confirm("WARNING: Switch to REAL mode ($50 account)? Verify everything on Demo first. Continue?");
-        if (!ok) return;
-        isRealMode = true;
-        modeBadge.textContent = "MODE: REAL ($50 GUARDED)";
-        modeBadge.classList.add("real");
-        log("Switched to REAL mode. Re-authorizing token if available...");
-        checkOAuthTokenInUrl();
-      } else {
-        isRealMode = false;
-        autoBotArmed = false;
-        document.getElementById("armAutoBtn").textContent = "Auto-Bot Mode: OFF (Manual Click Only)";
-        modeBadge.textContent = "MODE: DEMO (SAFE)";
-        modeBadge.classList.remove("real");
-        log("Switched back to DEMO mode.");
-        checkOAuthTokenInUrl();
-      }
-    });
-
-    marketSelect.addEventListener("change", () => subscribeTicks(marketSelect.value));
-
-    document.getElementById("armAutoBtn").addEventListener("click", (e) => {
-      if (!autoBotArmed) {
-        const ok = confirm("Arm Auto-Bot Mode? It will place trades automatically using your $1.00 max stake and $10.00 daily loss cap. Test on DEMO first!");
-        if (!ok) return;
-        autoBotArmed = true;
-        e.target.textContent = "Auto-Bot Mode: ON (Running Guarded)";
-        log("Auto-Bot Mode ARMED.");
-      } else {
-        autoBotArmed = false;
-        e.target.textContent = "Auto-Bot Mode: OFF (Manual Click Only)";
-        log("Auto-Bot Mode DISARMED.");
-      }
-    });
-
-    connectSocket();
-  </script>
-</body>
-  </html>
-  
+      barrierGrid.querySelectorAll(".b-btn").forEach(btn => {
+        btn.addEventListener("click",
+    
