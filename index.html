@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>MARKET KILLER ZONE</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--line:#26354d;--muted:#9aabc2;--text:#f4f7fb;--green:#19c37d;--red:#ff657a;--blue:#6ea8fe}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0b1220,#101b2d);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:900px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.4px}.mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#16a36a,#087e9c);display:grid;place-items:center;font-size:21px}
+.pill{border:1px solid #42614f;color:#9bf0c5;border-radius:30px;padding:6px 10px;font-size:12px}
+h1{font-size:clamp(26px,6vw,42px);margin:4px 0 8px;letter-spacing:-1px}p{color:var(--muted);line-height:1.5}.sub{margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{background:rgba(18,29,48,.94);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:13px}
+.label{font-size:12px;color:var(--muted);margin-bottom:7px}.value{font-size:25px;font-weight:750}.small{font-size:12px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:#8795a9}
+button{border:0;border-radius:12px;padding:13px 15px;font-weight:700;font-size:14px;cursor:pointer}
+.primary{background:var(--green);color:#052116;width:100%}.secondary{background:#1d2b42;color:var(--text);border:1px solid #344761;width:100%}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+select,input{width:100%;background:#0c1728;border:1px solid #344761;color:var(--text);padding:12px;border-radius:10px;font:inherit}
+.field{margin:12px 0}.notice{border-left:3px solid #e0ad4d;background:#2a2418;padding:12px;border-radius:8px;color:#f4dba9;font-size:13px;line-height:1.5}
+footer{text-align:center;color:#71829b;font-size:12px;padding:20px 0}
+@media(max-width:560px){main{padding:15px}.grid{grid-template-columns:1fr}.top{align-items:flex-start}.value{font-size:23px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+ <div class="brand"><div class="mark">⌁</div><div>MARKET KILLER ZONE<div class="small">AUTOMATED TRADING DASHBOARD</div></div></div>
+ <span class="pill">DEMO PREVIEW</span>
+</header>
+<h1>Trade with a plan.</h1>
+<p class="sub">A mobile-first control panel for your Deriv trading automation.</p>
+<div class="grid">
+ <section class="card"><div class="label">ACCOUNT CONNECTION</div><div class="value" id="connection">Not connected</div><div class="small">Deriv OAuth setup required</div></section>
+ <section class="card"><div class="label">BOT STATUS</div><div class="value" id="botstatus">Stopped</div><div class="small">Automatic execution disabled</div></section>
+ <section class="card"><div class="label">PLANNED CAPITAL</div><div class="value">$50.00</div><div class="small">Your intended starting amount</div></section>
+ <section class="card"><div class="label">TRADING MODE</div><div class="value">Demo first</div><div class="small">Live trading locked during setup</div></section>
+</div>
+<section class="card">
+ <h3>Markets & strategy</h3>
+ <div class="row"><span>Forex</span><span class="small">Selected</span></div>
+ <div class="row"><span>Derived Indices</span><span class="small">Selected</span></div>
+ <div class="row"><span>EMA</span><strong>20 / 50</strong></div>
+ <div class="row"><span>RSI</span><strong>14</strong></div>
+ <div class="row"><span>ATR</span><strong>14</strong></div>
+</section>
+<section class="card">
+ <h3>Risk controls</h3>
+ <div class="row"><span>Target maximum stake per trade</span><strong>$0.50</strong></div>
+ <div class="row"><span>Daily stop threshold</span><strong>$1.50</strong></div>
+ <div class="row"><span>Maximum open contracts</span><strong>2</strong></div>
+ <p class="small">For fixed-payout contracts, stake is generally the amount at risk. These are proposed demo settings, not a guarantee or a calculated Forex position size.</p>
+</section>
+<section class="card">
+ <h3>Connection setup</h3>
+ <p>Connect only after the website has been deployed over HTTPS and its Deriv OAuth application has been registered with the exact callback URL.</p>
+ <button class="secondary" disabled>Connect Deriv — setup pending</button>
+ <p class="small">No password or API token should be entered into this preview.</p>
+</section>
+<section class="card">
+ <h3>Bot controls</h3>
+ <div class="notice">Trading is deliberately disabled. This starter dashboard does not yet contain a live trading engine, OAuth callback, or server-side token storage.</div>
+ <div class="field"><label class="small" for="mode">Environment</label><select id="mode"><option>Demo only</option><option disabled>Live — locked until verified</option></select></div>
+ <button class="primary" disabled>Start automatic trading</button>
+ <p class="small">Enable these controls only after API compatibility, demo execution, and risk limits have been verified.</p>
+</section>
+<footer>MARKET KILLER ZONE · Independent project · Trading involves risk.</footer>
+</main>
+</body></html>
