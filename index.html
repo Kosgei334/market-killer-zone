@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MARKET KILLER ZONE — Personal Practice Terminal</title>
+  <title>MARKET KILLER ZONE — Deriv Connected</title>
   <style>
     :root {
       --bg: #0b0f17;
@@ -15,7 +15,6 @@
       --red: #dc2626;
       --blue: #2563eb;
       --teal: #0d9488;
-      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
@@ -57,6 +56,7 @@
     }
     h2 { margin: 0 0 8px; font-size: 1rem; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     label { display: block; font-size: 0.8rem; color: var(--muted); margin: 8px 0 4px; }
     select, input, button {
       width: 100%;
@@ -75,6 +75,8 @@
       border-color: #3b82f6;
     }
     button.secondary { background: #1e293b; border-color: #334155; }
+    button.preset { margin-top: 0; padding: 7px 6px; font-size: 0.82rem; background: #1e293b; border-color: #334155; }
+    button.preset.active { background: var(--blue); border-color: #60a5fa; }
     button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
     button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
     button.over { background: var(--teal); border-color: #14b8a6; margin-top: 0; }
@@ -152,43 +154,44 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- HEADER: LIVE CLOCK & PERSONAL PRACTICE BANKROLL -->
     <div class="topbar">
       <div>
         <div class="title">MARKET KILLER ZONE</div>
-        <div id="clockText" class="clock">Session Time: --:--:--</div>
+        <div id="clockText" class="clock">Time: --:--:--</div>
       </div>
       <div class="acct-box">
-        <div id="balText" class="bal">$50.00</div>
-        <div id="acctText" class="acct-id">Personal Practice Ledger</div>
+        <div id="balText" class="bal">DEMO MODE</div>
+        <div id="acctText" class="acct-id">Not connected</div>
       </div>
     </div>
 
-    <!-- ENGINE CONTROLS -->
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:#38bdf8; font-size:0.85rem;">STANDALONE LOCAL ENGINE</strong>
-        <span id="simStatus" class="sub" style="margin:0;">Feed: Active (Simulated)</span>
+        <strong id="modeLabel" style="color:#fbbf24; font-size:0.85rem;">MODE: DEMO (SAFE)</strong>
+        <span id="connLabel" class="sub" style="margin:0;">Socket: Connecting...</span>
       </div>
-      <div class="row2">
-        <button id="pauseBtn" class="secondary" type="button">Pause Feed</button>
-        <button id="resetBankrollBtn" class="secondary" type="button">Reset $50 Bankroll</button>
-      </div>
+      <button id="oauthBtn" type="button">Connect Deriv Account (OAuth)</button>
+      <button id="modeBtn" class="secondary" type="button">Switch to Real Mode ($50 Guarded)</button>
     </div>
 
-    <!-- MARKET & DIGIT SCANNER -->
     <div class="card">
       <h2>Market &amp; Digit Scanner</h2>
-      <label for="symbolSelect">Practice Feed</label>
+      <label for="symbolSelect">Market</label>
       <select id="symbolSelect">
-        <option value="SIM_V100">Simulated Index 100 (2 decimals)</option>
-        <option value="SIM_V100_1S">Simulated Index 100 Fast (2 decimals)</option>
-        <option value="SIM_FX">Simulated Pair (4 decimals)</option>
+        <optgroup label="Derived Indices">
+          <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
+          <option value="R_100">Volatility 100 Index (R_100)</option>
+          <option value="R_50">Volatility 50 Index (R_50)</option>
+        </optgroup>
+        <optgroup label="Forex (Rise/Fall Only)">
+          <option value="frxEURUSD">EUR/USD (frxEURUSD)</option>
+          <option value="frxGBPUSD">GBP/USD (frxGBPUSD)</option>
+        </optgroup>
       </select>
 
       <div class="price-box">
         <div>
-          <div id="priceText" class="price-val">Initializing...</div>
+          <div id="priceText" class="price-val">Waiting for tick...</div>
           <div id="tickMeta" class="sub">Tick change: --</div>
         </div>
         <div id="digitText" class="digit-box">Digit: -</div>
@@ -197,18 +200,27 @@
       <div id="digitsGrid" class="digits-grid"></div>
     </div>
 
-    <!-- RISE / FALL & OVER / UNDER -->
     <div class="card">
-      <h2>Practice Trade Execution</h2>
+      <h2>Trade Execution</h2>
       <div class="row2">
         <div>
-          <label for="stakeInput">Stake (Max $1.00)</label>
-          <input id="stakeInput" type="number" step="0.10" min="0.35" max="1.00" value="0.50" />
+          <label for="stakeInput">Stake USD ($0.35 – $1.00)</label>
+          <input id="stakeInput" type="number" step="0.05" min="0.35" max="1.00" value="0.50" />
         </div>
         <div>
           <label for="ticksInput">Duration (1–10 Ticks)</label>
-          <input id="ticksInput" type="number" min="1" max="10" value="3" />
+          <input id="ticksInput" type="number" min="1" max="10" value="1" />
         </div>
+      </div>
+
+      <div class="row2" style="margin-top:8px;">
+        <button id="stepDownBtn" class="preset" type="button">- $0.05</button>
+        <button id="stepUpBtn" class="preset" type="button">+ $0.05 (Max $1.00)</button>
+      </div>
+      <div class="row3">
+        <button class="preset" data-stake="0.35" type="button">$0.35 Min</button>
+        <button class="preset active" data-stake="0.50" type="button">$0.50 (1%)</button>
+        <button class="preset" data-stake="1.00" type="button">$1.00 Max</button>
       </div>
 
       <label>Rise / Fall</label>
@@ -225,281 +237,305 @@
       </div>
     </div>
 
-    <!-- $50 ACCOUNT GUARDRAILS -->
     <div class="card">
       <h2>$50 Account Guardrails</h2>
       <ul class="guard-list">
-        <li><strong>Max Stake:</strong> $1.00 hard cap (2% of $50 starting bankroll).</li>
-        <li><strong>Daily Stop:</strong> $10.00 max loss before automatic session lock.</li>
-        <li><strong>Practice Notice:</strong> Local simulation for strategy &amp; discipline tracking (not connected to a live broker).</li>
+        <li><strong>Capital:</strong> $50.00 target — max stake capped at $1.00.</li>
+        <li><strong>Daily Stop:</strong> $10.00 max loss before auto-lock.</li>
+        <li><strong>Rule:</strong> Verify execution on Demo before Real trading.</li>
       </ul>
       <div id="pnlText" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Loss Buffer Left: $10.00</div>
-      <button id="autoBtn" class="auto-off" type="button">Auto-Rule: OFF (Manual Only)</button>
+      <button id="autoBtn" class="auto-off" type="button">Auto-Bot: OFF (Manual Only)</button>
     </div>
 
-    <!-- ACTIVITY LOG -->
     <div class="card">
-      <h2>Trade &amp; Session Log</h2>
-      <div id="logArea" class="log">Starting personal practice terminal...</div>
+      <h2>Activity Log</h2>
+      <div id="logArea" class="log">Starting...</div>
     </div>
   </div>
 
   <script>
-    const START_BANKROLL = 50.00;
-    const MAX_STAKE = 1.00;
-    const MAX_DAILY_LOSS = 10.00;
+    (function () {
+      const OAUTH_APP_ID = "352JgmiAsrWhGgFobFlSS";
+      const WS_APP_ID = "1089";
+      const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
+      const MIN_STAKE = 0.35;
+      const MAX_STAKE = 1.00;
+      const STAKE_STEP = 0.05;
+      const MAX_DAILY_LOSS = 10.00;
 
-    let bankroll = START_BANKROLL;
-    let sessionPnL = 0;
-    let isPaused = false;
-    let autoEnabled = false;
-    let activeSymbol = "SIM_V100";
-    let currentPrice = 1000.00;
-    let prevPrice = null;
-    let barrierDigit = 4;
-    let digitList = [];
-    let tradeCounter = 1;
-    let openTrades = [];
+      let ws = null;
+      let reconnectTimer = null;
+      let isRealMode = false;
+      let isAuthorized = false;
+      let isVirtualAcct = true;
+      let autoEnabled = false;
+      let sessionPnL = 0;
+      let activeSymbol = null;
+      let prevPrice = null;
+      let barrierDigit = 4;
+      let digitList = [];
 
-    const clockText = document.getElementById("clockText");
-    const balText = document.getElementById("balText");
-    const simStatus = document.getElementById("simStatus");
-    const symbolSelect = document.getElementById("symbolSelect");
-    const priceText = document.getElementById("priceText");
-    const tickMeta = document.getElementById("tickMeta");
-    const digitText = document.getElementById("digitText");
-    const digitsGrid = document.getElementById("digitsGrid");
-    const barrierGrid = document.getElementById("barrierGrid");
-    const overLbl = document.getElementById("overLbl");
-    const underLbl = document.getElementById("underLbl");
-    const stakeInput = document.getElementById("stakeInput");
-    const ticksInput = document.getElementById("ticksInput");
-    const pnlText = document.getElementById("pnlText");
-    const autoBtn = document.getElementById("autoBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const logArea = document.getElementById("logArea");
+      const clockText = document.getElementById("clockText");
+      const balText = document.getElementById("balText");
+      const acctText = document.getElementById("acctText");
+      const modeLabel = document.getElementById("modeLabel");
+      const connLabel = document.getElementById("connLabel");
+      const symbolSelect = document.getElementById("symbolSelect");
+      const priceText = document.getElementById("priceText");
+      const tickMeta = document.getElementById("tickMeta");
+      const digitText = document.getElementById("digitText");
+      const digitsGrid = document.getElementById("digitsGrid");
+      const barrierGrid = document.getElementById("barrierGrid");
+      const overLbl = document.getElementById("overLbl");
+      const underLbl = document.getElementById("underLbl");
+      const stakeInput = document.getElementById("stakeInput");
+      const ticksInput = document.getElementById("ticksInput");
+      const pnlText = document.getElementById("pnlText");
+      const autoBtn = document.getElementById("autoBtn");
+      const logArea = document.getElementById("logArea");
 
-    function writeLog(msg) {
-      const t = new Date().toLocaleTimeString();
-      logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
-    }
-
-    function getDecimals() {
-      return activeSymbol === "SIM_FX" ? 4 : 2;
-    }
-
-    function updateHeaderAndPnL() {
-      balText.textContent = `$${bankroll.toFixed(2)}`;
-      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
-      const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
-      pnlText.textContent = `Session P&L: ${sessionPnL >= 0 ? "+" : ""}$${sessionPnL.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
-    }
-
-    function drawDigits(lastD = null) {
-      const n = digitList.length || 1;
-      let out = "";
-      for (let d = 0; d <= 9; d++) {
-        const cnt = digitList.filter(v => v === d).length;
-        const pct = digitList.length ? ((cnt / n) * 100).toFixed(1) : "0.0";
-        out += `<div class="d-card ${d === lastD ? "hit" : ""}"><div class="d-num">${d}</div><div class="d-pct">${pct}%</div></div>`;
+      function writeLog(msg) {
+        if (!logArea) return;
+        const t = new Date().toLocaleTimeString();
+        logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
       }
-      digitsGrid.innerHTML = out;
-    }
 
-    function drawBarriers() {
-      let out = "";
-      for (let d = 0; d <= 9; d++) {
-        out += `<button type="button" class="b-btn ${d === barrierDigit ? "active" : ""}" data-d="${d}">${d}</button>`;
-      }
-      barrierGrid.innerHTML = out;
-      overLbl.textContent = barrierDigit;
-      underLbl.textContent = barrierDigit;
-
-      barrierGrid.querySelectorAll(".b-btn").forEach(el => {
-        el.addEventListener("click", () => {
-          barrierDigit = Number(el.dataset.d);
-          drawBarriers();
+      function highlightPreset(val) {
+        document.querySelectorAll("button.preset[data-stake]").forEach(btn => {
+          const btnVal = Number(btn.dataset.stake);
+          btn.classList.toggle("active", Math.abs(btnVal - val) < 0.001);
         });
-      });
-    }
+      }
 
-    function evaluateOpenTrades(newPrice, lastDigit) {
-      const remaining = [];
-      for (const tr of openTrades) {
-        tr.ticksLeft -= 1;
-        if (tr.ticksLeft > 0) {
-          remaining.push(tr);
-          continue;
+      function setStake(rawVal, announce = false) {
+        let num = Number(rawVal);
+        if (!Number.isFinite(num)) num = 0.50;
+        if (num < MIN_STAKE) {
+          num = MIN_STAKE;
+          if (announce) writeLog(`Stake raised to minimum $${MIN_STAKE.toFixed(2)}.`);
+        }
+        if (num > MAX_STAKE) {
+          num = MAX_STAKE;
+          if (announce) writeLog(`Stake capped at $${MAX_STAKE.toFixed(2)} ($50 account limit).`);
+        }
+        const rounded = Number((Math.round(num * 100) / 100).toFixed(2));
+        stakeInput.value = rounded.toFixed(2);
+        highlightPreset(rounded);
+        return rounded;
+      }
+
+      function updateClock() {
+        const now = new Date();
+        clockText.textContent = `${isAuthorized ? "Session Time" : "Time"}: ${now.toLocaleTimeString()}`;
+      }
+
+      function updatePnL() {
+        const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
+        const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
+        pnlText.textContent = `Session P&L: $${sessionPnL.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
+      }
+
+      function drawDigits(lastD = null) {
+        const n = digitList.length || 1;
+        let out = "";
+        for (let d = 0; d <= 9; d++) {
+          const cnt = digitList.filter(v => v === d).length;
+          const pct = digitList.length ? ((cnt / n) * 100).toFixed(1) : "0.0";
+          out += `<div class="d-card ${d === lastD ? "hit" : ""}"><div class="d-num">${d}</div><div class="d-pct">${pct}%</div></div>`;
+        }
+        digitsGrid.innerHTML = out;
+      }
+
+      function drawBarriers() {
+        let out = "";
+        for (let d = 0; d <= 9; d++) {
+          out += `<button type="button" class="b-btn ${d === barrierDigit ? "active" : ""}" data-d="${d}">${d}</button>`;
+        }
+        barrierGrid.innerHTML = out;
+        overLbl.textContent = barrierDigit;
+        underLbl.textContent = barrierDigit;
+
+        barrierGrid.querySelectorAll(".b-btn").forEach(el => {
+          el.addEventListener("click", () => {
+            barrierDigit = Number(el.dataset.d);
+            drawBarriers();
+          });
+        });
+      }
+
+      function subscribeSymbol(sym) {
+        activeSymbol = sym;
+        prevPrice = null;
+        digitList = [];
+        drawDigits(null);
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ forget_all: "ticks" }));
+        ws.send(JSON.stringify({ ticks: sym, subscribe: 1 }));
+        writeLog(`Subscribed to ${sym}`);
+      }
+
+      function authFromUrl() {
+        const q = new URLSearchParams(window.location.search);
+        const list = [];
+        for (let i = 1; i <= 5; i++) {
+          const acct = q.get(`acct${i}`);
+          const token = q.get(`token${i}`);
+          if (acct && token) list.push({ acct, token });
+        }
+        if (!list.length || !ws || ws.readyState !== WebSocket.OPEN) return;
+
+        const demoAcct = list.find(item => item.acct.startsWith("VRTC"));
+        const chosen = (!isRealMode && demoAcct) ? demoAcct : list[0];
+        writeLog(`Authorizing ${chosen.acct}...`);
+        ws.send(JSON.stringify({ authorize: chosen.token }));
+      }
+
+      function connectWS() {
+        if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+        const endpoint = `wss://ws.derivws.com/websockets/v3?app_id=${WS_APP_ID}`;
+        connLabel.textContent = "Socket: Connecting...";
+        writeLog(`Connecting to ${endpoint}`);
+        ws = new WebSocket(endpoint);
+
+        ws.onopen = () => {
+          connLabel.textContent = "Socket: Connected";
+          writeLog("WebSocket connected.");
+          subscribeSymbol(symbolSelect.value);
+          authFromUrl();
+        };
+
+        ws.onmessage = (ev) => {
+          try {
+            const msg = JSON.parse(ev.data);
+            if (msg.error) {
+              writeLog(`Deriv error: ${msg.error.message}`);
+              return;
+            }
+
+            if (msg.tick && msg.tick.symbol === activeSymbol) {
+              const decimals = typeof msg.tick.pip_size === "number" ? msg.tick.pip_size : 2;
+              const num = Number(msg.tick.quote);
+              const formatted = num.toFixed(decimals);
+              const lastDigit = Number(formatted.slice(-1));
+
+              if (prevPrice !== null) {
+                const diff = num - prevPrice;
+                const sign = diff >= 0 ? "+" : "";
+                tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(decimals)}`;
+              }
+              prevPrice = num;
+
+              priceText.textContent = `${msg.tick.symbol}: ${formatted}`;
+              digitText.textContent = `Digit: ${lastDigit}`;
+
+              digitList.push(lastDigit);
+              if (digitList.length > 50) digitList.shift();
+              drawDigits(lastDigit);
+
+              if (autoEnabled && digitList.length >= 3) {
+                const tail3 = digitList.slice(-3);
+                if (tail3.every(d => d <= 2) && !activeSymbol.startsWith("frx")) {
+                  digitList = [];
+                  writeLog(`Auto rule triggered on [${tail3.join(", ")}] -> OVER 3`);
+                  sendTrade("DIGITOVER", 3);
+                }
+              }
+            }
+
+            if (msg.authorize) {
+              const a = msg.authorize;
+              isAuthorized = true;
+              isVirtualAcct = Boolean(a.is_virtual);
+              const kind = isVirtualAcct ? "DEMO" : "REAL";
+              balText.textContent = `${Number(a.balance).toFixed(2)} ${a.currency}`;
+              acctText.textContent = `${a.loginid} (${kind})`;
+              writeLog(`Authorized ${a.loginid} [${kind}] — Balance: ${a.balance} ${a.currency}`);
+            }
+
+            if (msg.buy) {
+              const b = msg.buy;
+              writeLog(`Trade #${b.contract_id} opened | Stake: $${Number(b.buy_price).toFixed(2)}`);
+              ws.send(JSON.stringify({ proposal_open_contract: 1, contract_id: b.contract_id, subscribe: 1 }));
+            }
+
+            if (msg.proposal_open_contract && msg.proposal_open_contract.is_sold) {
+              const poc = msg.proposal_open_contract;
+              const pnl = Number(poc.profit);
+              sessionPnL += pnl;
+              updatePnL();
+              writeLog(`Trade #${poc.contract_id} settled: ${pnl >= 0 ? "WIN +" : "LOSS "}$${pnl.toFixed(2)}`);
+              ws.send(JSON.stringify({ forget: poc.id }));
+            }
+          } catch (err) {
+            writeLog(`Message error: ${err.message}`);
+          }
+        };
+
+        ws.onclose = (ev) => {
+          connLabel.textContent = "Socket: Reconnecting";
+          writeLog(`WebSocket closed (code ${ev.code}). Reconnecting in 3s...`);
+          clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(connectWS, 3000);
+        };
+      }
+
+      function sendTrade(contractType, barrier = null) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          writeLog("Cannot trade: WebSocket not connected.");
+          return;
+        }
+        if (!isAuthorized) {
+          writeLog("Cannot trade: Connect Deriv account first.");
+          return;
+        }
+        if (!isRealMode && !isVirtualAcct) {
+          writeLog("Blocked: Dashboard is in DEMO mode, but token is REAL.");
+          return;
+        }
+        if (isRealMode && isVirtualAcct) {
+          writeLog("Blocked: Dashboard is in REAL mode, but token is DEMO.");
+          return;
         }
 
-        let won = false;
-        let payoutMultiplier = 1.9;
-
-        if (tr.type === "CALL") {
-          won = newPrice > tr.entryPrice;
-        } else if (tr.type === "PUT") {
-          won = newPrice < tr.entryPrice;
-        } else if (tr.type === "DIGITOVER") {
-          won = lastDigit > tr.barrier;
-          payoutMultiplier = 1.85;
-        } else if (tr.type === "DIGITUNDER") {
-          won = lastDigit < tr.barrier;
-          payoutMultiplier = 1.85;
+        const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
+        if (usedLoss >= MAX_DAILY_LOSS) {
+          autoEnabled = false;
+          autoBtn.className = "auto-off";
+          autoBtn.textContent = "Auto-Bot: LOCKED ($10 Stop Hit)";
+          writeLog("Daily loss stop ($10.00) reached. Trading locked.");
+          return;
         }
 
-        const net = won ? Number((tr.stake * (payoutMultiplier - 1)).toFixed(2)) : -tr.stake;
-        bankroll = Number((bankroll + net).toFixed(2));
-        sessionPnL = Number((sessionPnL + net).toFixed(2));
-        updateHeaderAndPnL();
-
-        writeLog(`#${tr.id} ${tr.label} settled: ${won ? "WIN +" : "LOSS "}$${Math.abs(net).toFixed(2)} (Balance: $${bankroll.toFixed(2)})`);
-      }
-      openTrades = remaining;
-    }
-
-    function stepTick() {
-      clockText.textContent = `Session Time: ${new Date().toLocaleTimeString()}`;
-      if (isPaused) return;
-
-      const dec = getDecimals();
-      const stepSize = activeSymbol === "SIM_FX" ? 0.0005 : 0.35;
-      const delta = (Math.random() * 2 - 1) * stepSize;
-      prevPrice = currentPrice;
-      currentPrice = Math.max(1, currentPrice + delta);
-
-      const formatted = currentPrice.toFixed(dec);
-      const lastDigit = Number(formatted.slice(-1));
-      const diff = prevPrice !== null ? currentPrice - prevPrice : 0;
-      const sign = diff >= 0 ? "+" : "";
-
-      priceText.textContent = `${activeSymbol}: ${formatted}`;
-      tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(dec)}`;
-      digitText.textContent = `Digit: ${lastDigit}`;
-
-      digitList.push(lastDigit);
-      if (digitList.length > 50) digitList.shift();
-      drawDigits(lastDigit);
-
-      evaluateOpenTrades(currentPrice, lastDigit);
-
-      if (autoEnabled && digitList.length >= 3) {
-        const tail3 = digitList.slice(-3);
-        if (tail3.every(d => d <= 2)) {
-          digitList = [];
-          writeLog(`Auto-rule triggered on [${tail3.join(", ")}] -> OVER 3`);
-          placePracticeTrade("DIGITOVER", 3);
+        const stake = setStake(stakeInput.value, true);
+        const sym = symbolSelect.value;
+        const isDigit = contractType === "DIGITOVER" || contractType === "DIGITUNDER";
+        if (isDigit && sym.startsWith("frx")) {
+          writeLog("Over/Under only supports Derived Indices, not Forex.");
+          return;
         }
-      }
-    }
 
-    function placePracticeTrade(type, barrier = null) {
-      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
-      if (usedLoss >= MAX_DAILY_LOSS) {
-        autoEnabled = false;
-        autoBtn.className = "auto-off";
-        autoBtn.textContent = "Auto-Rule: LOCKED ($10 Loss Cap)";
-        writeLog("Blocked: Daily loss cap ($10.00) reached for this session.");
-        return;
-      }
+        const duration = Math.min(10, Math.max(1, parseInt(ticksInput.value, 10) || 1));
+        ticksInput.value = String(duration);
 
-      let stake = Number(stakeInput.value);
-      if (!Number.isFinite(stake) || stake < 0.35) {
-        writeLog("Blocked: Minimum practice stake is $0.35.");
-        return;
-      }
-      if (stake > MAX_STAKE) {
-        stake = MAX_STAKE;
-        stakeInput.value = MAX_STAKE.toFixed(2);
-        writeLog("Guardrail: Stake capped to $1.00 ($50 bankroll rule).");
-      }
-      if (stake > bankroll) {
-        writeLog("Blocked: Stake exceeds current practice bankroll.");
-        return;
+        const params = {
+          amount: stake,
+          basis: "stake",
+          contract_type: contractType,
+          currency: "USD",
+          duration,
+          duration_unit: "t",
+          symbol: sym
+        };
+        if (isDigit && barrier !== null) {
+          params.barrier = String(barrier);
+        }
+
+        writeLog(`Sending ${contractType}${barrier !== null ? " (" + barrier + ")" : ""} on ${sym} for $${stake.toFixed(2)} (${duration}t)`);
+        ws.send(JSON.stringify({ buy: 1, price: stake, parameters: params }));
       }
 
-      const duration = Math.min(10, Math.max(1, parseInt(ticksInput.value, 10) || 3));
-      const label = barrier !== null ? `${type} ${barrier}` : type;
-      const id = tradeCounter++;
-
-      openTrades.push({
-        id,
-        type,
-        barrier,
-        label,
-        stake,
-        entryPrice: currentPrice,
-        ticksLeft: duration
-      });
-
-      writeLog(`#${id} Opened ${label} | Stake: $${stake.toFixed(2)} | ${duration}t @ ${currentPrice.toFixed(getDecimals())}`);
-    }
-
-    symbolSelect.addEventListener("change", () => {
-      activeSymbol = symbolSelect.value;
-      currentPrice = activeSymbol === "SIM_FX" ? 1.0850 : 1000.00;
-      prevPrice = null;
-      digitList = [];
-      openTrades = [];
-      drawDigits(null);
-      writeLog(`Switched practice feed to ${activeSymbol}`);
-    });
-
-    pauseBtn.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "Resume Feed" : "Pause Feed";
-      simStatus.textContent = isPaused ? "Feed: Paused" : "Feed: Active (Simulated)";
-      writeLog(isPaused ? "Practice feed paused." : "Practice feed resumed.");
-    });
-
-    document.getElementById("resetBankrollBtn").addEventListener("click", () => {
-      bankroll = START_BANKROLL;
-      sessionPnL = 0;
-      openTrades = [];
-      autoEnabled = false;
-      autoBtn.className = "auto-off";
-      autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
-      updateHeaderAndPnL();
-      writeLog("Bankroll reset to $50.00 and daily loss lock cleared.");
-    });
-
-    document.getElementById("riseBtn").addEventListener("click", () => placePracticeTrade("CALL"));
-    document.getElementById("fallBtn").addEventListener("click", () => placePracticeTrade("PUT"));
-    document.getElementById("overBtn").addEventListener("click", () => {
-      if (barrierDigit === 9) {
-        writeLog("Blocked: Over 9 is not valid for digits 0–9.");
-        return;
-      }
-      placePracticeTrade("DIGITOVER", barrierDigit);
-    });
-    document.getElementById("underBtn").addEventListener("click", () => {
-      if (barrierDigit === 0) {
-        writeLog("Blocked: Under 0 is not valid for digits 0–9.");
-        return;
-      }
-      placePracticeTrade("DIGITUNDER", barrierDigit);
-    });
-
-    autoBtn.addEventListener("click", () => {
-      if (!autoEnabled) {
-        autoEnabled = true;
-        autoBtn.className = "auto-on";
-        autoBtn.textContent = "Auto-Rule: ON (Guarded)";
-        writeLog("Auto-Rule enabled (3 digits <= 2 triggers OVER 3).");
-      } else {
-        autoEnabled = false;
-        autoBtn.className = "auto-off";
-        autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
-        writeLog("Auto-Rule disabled.");
-      }
-    });
-
-    drawDigits(null);
-    drawBarriers();
-    updateHeaderAndPnL();
-    stepTick();
-    setInterval(stepTick, 1000);
-    writeLog("Personal practice terminal ready ($50.00 bankroll, $1.00 max stake, $10.00 daily stop).");
-  </script>
-</body>
-  </html>
-        
+      stakeInput.addEventListener("change", () => {
+        const s = setStake(stakeInput.value, true);
+        writeLog(`Stake set to $${s.toFixed(2)}`);
+      
