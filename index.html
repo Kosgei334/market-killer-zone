@@ -74,6 +74,7 @@
       background: #0b0f17;
       border: 1px solid var(--border);
       margin-top: 10px;
+      color: var(--accent);
     }
     .risk-list { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.85rem; }
     .risk-list li { margin-bottom: 5px; }
@@ -117,7 +118,7 @@
         </optgroup>
       </select>
 
-      <div class="tick-box" id="liveTick">Waiting for live price...</div>
+      <div class="tick-box" id="liveTick">Connecting to live feed...</div>
     </div>
 
     <div class="card">
@@ -137,12 +138,13 @@
 
     <div class="card">
       <h2 style="margin:0 0 6px; font-size:1.05rem;">Activity Log</h2>
-      <div id="logBox" class="log">Ready. App ID 352JgmiAsrWhGgFobFlSS configured.</div>
+      <div id="logBox" class="log">Ready. WebSocket ID 1089 &amp; OAuth ID 352JgmiAsrWhGgFobFlSS loaded.</div>
     </div>
   </div>
 
   <script>
-    const DERIV_APP_ID = "352JgmiAsrWhGgFobFlSS";
+    const DERIV_OAUTH_ID = "352JgmiAsrWhGgFobFlSS";
+    const DERIV_WS_APP_ID = "1089";
     const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
     const MAX_STAKE_USD = 1.00;
     const MAX_DAILY_LOSS_USD = 10.00;
@@ -169,11 +171,12 @@
       if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
         return;
       }
-      socket = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${DERIV_APP_ID}`);
+      socket = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`);
 
       socket.onopen = () => {
         log("Connected to Deriv WebSocket feed.");
         subscribeTicks(marketSelect.value);
+        checkOAuthTokenInUrl();
       };
 
       socket.onmessage = (event) => {
@@ -187,8 +190,9 @@
         }
         if (data.authorize) {
           const acct = data.authorize;
-          accountStatus.textContent = `Connected: ${acct.loginid} | Balance: ${acct.balance} ${acct.currency}`;
-          log(`Authorized account ${acct.loginid} (${acct.currency} ${acct.balance}).`);
+          const acctType = acct.is_virtual ? "DEMO" : "REAL";
+          accountStatus.textContent = `Connected (${acctType}): ${acct.loginid} | Balance: ${acct.balance} ${acct.currency}`;
+          log(`Authorized ${acctType} account ${acct.loginid} (${acct.currency} ${acct.balance}).`);
         }
       };
 
@@ -210,21 +214,14 @@
       const params = new URLSearchParams(window.location.search);
       const token1 = params.get("token1");
       const acct1 = params.get("acct1");
-      if (token1) {
+      if (token1 && socket && socket.readyState === WebSocket.OPEN) {
         log(`OAuth token received for ${acct1 || "account"}. Authorizing...`);
-        const authorizeNow = () => {
-          if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ authorize: token1 }));
-          } else {
-            setTimeout(authorizeNow, 400);
-          }
-        };
-        authorizeNow();
+        socket.send(JSON.stringify({ authorize: token1 }));
       }
     }
 
     document.getElementById("loginBtn").addEventListener("click", () => {
-      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${encodeURIComponent(DERIV_APP_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${encodeURIComponent(DERIV_OAUTH_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
       window.location.href = oauthUrl;
     });
 
@@ -283,8 +280,7 @@
     });
 
     connectSocket();
-    checkOAuthTokenInUrl();
   </script>
 </body>
- </html>
- 
+        </html>
+  
