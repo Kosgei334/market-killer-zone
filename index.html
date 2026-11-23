@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MARKET KILLER ZONE</title>
+  <title>MARKET KILLER ZONE — Personal Practice Terminal</title>
   <style>
     :root {
       --bg: #0b0f17;
@@ -15,33 +15,65 @@
       --red: #dc2626;
       --blue: #2563eb;
       --teal: #0d9488;
+      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0; padding: 14px; background: var(--bg); color: var(--text); }
+    body {
+      margin: 0;
+      padding: 14px;
+      background: var(--bg);
+      color: var(--text);
+    }
     .wrap { max-width: 540px; margin: 0 auto; }
     .topbar {
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px; margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
     }
     .title { font-weight: 800; font-size: 1rem; }
-    .clock { font-family: monospace; font-size: 0.8rem; color: #cbd5e1; margin-top: 3px; }
+    .clock {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      margin-top: 3px;
+    }
     .acct-box { text-align: right; }
-    .bal { font-weight: 800; font-size: 0.95rem; color: #4ade80; }
+    .bal { font-weight: 800; font-size: 0.98rem; color: #4ade80; }
     .acct-id { font-size: 0.76rem; color: var(--muted); }
+
     .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px; margin-bottom: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
     h2 { margin: 0 0 8px; font-size: 1rem; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     label { display: block; font-size: 0.8rem; color: var(--muted); margin: 8px 0 4px; }
     select, input, button {
-      width: 100%; padding: 10px 12px; border-radius: 8px;
-      border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 0.92rem;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      font-size: 0.92rem;
     }
-    button { margin-top: 10px; font-weight: 700; cursor: pointer; background: var(--blue); border-color: #3b82f6; }
+    button {
+      margin-top: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--blue);
+      border-color: #3b82f6;
+    }
     button.secondary { background: #1e293b; border-color: #334155; }
     button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
     button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
@@ -49,76 +81,114 @@
     button.under { background: #be123c; border-color: #f43f5e; margin-top: 0; }
     button.auto-off { background: #7f1d1d; border-color: #dc2626; }
     button.auto-on { background: #14532d; border-color: #22c55e; }
+
     .price-box {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px; margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
     }
     .price-val { font-size: 1.15rem; font-weight: 800; color: #4ade80; }
     .sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
     .digit-box {
-      background: #1e293b; border: 1px solid #475569; border-radius: 8px;
-      padding: 6px 10px; font-weight: 800;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-weight: 800;
     }
-    .digits-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+
+    .digits-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
     .d-card {
-      background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
-      padding: 7px 4px; text-align: center;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 4px;
+      text-align: center;
     }
     .d-card.hit { border-color: #38bdf8; background: #172554; }
     .d-num { font-weight: 800; font-size: 0.9rem; }
     .d-pct { font-size: 0.7rem; color: var(--muted); }
-    .barrier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; }
-    .b-btn { margin-top: 0; padding: 8px 4px; background: var(--card2); border: 1px solid var(--border); font-size: 0.88rem; }
+
+    .barrier-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .b-btn {
+      margin-top: 0;
+      padding: 8px 4px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
     .b-btn.active { background: var(--blue); border-color: #60a5fa; }
+
     .guard-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
     .guard-list li { margin-bottom: 4px; }
+
     .log {
-      font-family: monospace; font-size: 0.78rem; background: #070a10; color: #cbd5e1;
-      border-radius: 8px; padding: 10px; max-height: 170px; overflow-y: auto; white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 0.78rem;
+      background: #070a10;
+      color: #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <!-- HEADER: LIVE CLOCK & PERSONAL PRACTICE BANKROLL -->
     <div class="topbar">
       <div>
         <div class="title">MARKET KILLER ZONE</div>
-        <div id="clockText" class="clock">Time: --:--:--</div>
+        <div id="clockText" class="clock">Session Time: --:--:--</div>
       </div>
       <div class="acct-box">
-        <div id="balText" class="bal">DEMO MODE</div>
-        <div id="acctText" class="acct-id">Not connected</div>
+        <div id="balText" class="bal">$50.00</div>
+        <div id="acctText" class="acct-id">Personal Practice Ledger</div>
       </div>
     </div>
 
+    <!-- ENGINE CONTROLS -->
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong id="modeLabel" style="color:#fbbf24; font-size:0.85rem;">MODE: DEMO (SAFE)</strong>
-        <span id="connLabel" class="sub" style="margin:0;">Socket: Connecting...</span>
+        <strong style="color:#38bdf8; font-size:0.85rem;">STANDALONE LOCAL ENGINE</strong>
+        <span id="simStatus" class="sub" style="margin:0;">Feed: Active (Simulated)</span>
       </div>
-      <button id="oauthBtn" type="button">Connect Deriv Account (OAuth)</button>
-      <button id="modeBtn" class="secondary" type="button">Switch to Real Mode ($50 Guarded)</button>
+      <div class="row2">
+        <button id="pauseBtn" class="secondary" type="button">Pause Feed</button>
+        <button id="resetBankrollBtn" class="secondary" type="button">Reset $50 Bankroll</button>
+      </div>
     </div>
 
+    <!-- MARKET & DIGIT SCANNER -->
     <div class="card">
       <h2>Market &amp; Digit Scanner</h2>
-      <label for="symbolSelect">Market</label>
+      <label for="symbolSelect">Practice Feed</label>
       <select id="symbolSelect">
-        <optgroup label="Derived Indices">
-          <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
-          <option value="R_100">Volatility 100 Index (R_100)</option>
-          <option value="R_50">Volatility 50 Index (R_50)</option>
-        </optgroup>
-        <optgroup label="Forex (Rise/Fall Only)">
-          <option value="frxEURUSD">EUR/USD (frxEURUSD)</option>
-          <option value="frxGBPUSD">GBP/USD (frxGBPUSD)</option>
-        </optgroup>
+        <option value="SIM_V100">Simulated Index 100 (2 decimals)</option>
+        <option value="SIM_V100_1S">Simulated Index 100 Fast (2 decimals)</option>
+        <option value="SIM_FX">Simulated Pair (4 decimals)</option>
       </select>
 
       <div class="price-box">
         <div>
-          <div id="priceText" class="price-val">Waiting for tick...</div>
+          <div id="priceText" class="price-val">Initializing...</div>
           <div id="tickMeta" class="sub">Tick change: --</div>
         </div>
         <div id="digitText" class="digit-box">Digit: -</div>
@@ -127,8 +197,9 @@
       <div id="digitsGrid" class="digits-grid"></div>
     </div>
 
+    <!-- RISE / FALL & OVER / UNDER -->
     <div class="card">
-      <h2>Rise / Fall &amp; Over / Under</h2>
+      <h2>Practice Trade Execution</h2>
       <div class="row2">
         <div>
           <label for="stakeInput">Stake (Max $1.00)</label>
@@ -136,7 +207,7 @@
         </div>
         <div>
           <label for="ticksInput">Duration (1–10 Ticks)</label>
-          <input id="ticksInput" type="number" min="1" max="10" value="1" />
+          <input id="ticksInput" type="number" min="1" max="10" value="3" />
         </div>
       </div>
 
@@ -154,46 +225,45 @@
       </div>
     </div>
 
+    <!-- $50 ACCOUNT GUARDRAILS -->
     <div class="card">
       <h2>$50 Account Guardrails</h2>
       <ul class="guard-list">
-        <li><strong>Capital:</strong> $50.00 target — max stake capped at $1.00.</li>
-        <li><strong>Daily Stop:</strong> $10.00 max loss before auto-lock.</li>
-        <li><strong>Rule:</strong> Verify execution on Demo before Real trading.</li>
+        <li><strong>Max Stake:</strong> $1.00 hard cap (2% of $50 starting bankroll).</li>
+        <li><strong>Daily Stop:</strong> $10.00 max loss before automatic session lock.</li>
+        <li><strong>Practice Notice:</strong> Local simulation for strategy &amp; discipline tracking (not connected to a live broker).</li>
       </ul>
       <div id="pnlText" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Loss Buffer Left: $10.00</div>
-      <button id="autoBtn" class="auto-off" type="button">Auto-Bot: OFF (Manual Only)</button>
+      <button id="autoBtn" class="auto-off" type="button">Auto-Rule: OFF (Manual Only)</button>
     </div>
 
+    <!-- ACTIVITY LOG -->
     <div class="card">
-      <h2>Activity Log</h2>
-      <div id="logArea" class="log">Booting script...</div>
+      <h2>Trade &amp; Session Log</h2>
+      <div id="logArea" class="log">Starting personal practice terminal...</div>
     </div>
   </div>
 
   <script>
-    const OAUTH_APP_ID = "352JgmiAsrWhGgFobFlSS";
-    const WS_APP_ID = "1089";
-    const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
+    const START_BANKROLL = 50.00;
     const MAX_STAKE = 1.00;
     const MAX_DAILY_LOSS = 10.00;
 
-    let ws = null;
-    let isRealMode = false;
-    let isAuthorized = false;
-    let isVirtualAcct = true;
-    let autoEnabled = false;
+    let bankroll = START_BANKROLL;
     let sessionPnL = 0;
-    let activeSymbol = null;
+    let isPaused = false;
+    let autoEnabled = false;
+    let activeSymbol = "SIM_V100";
+    let currentPrice = 1000.00;
     let prevPrice = null;
     let barrierDigit = 4;
     let digitList = [];
+    let tradeCounter = 1;
+    let openTrades = [];
 
     const clockText = document.getElementById("clockText");
     const balText = document.getElementById("balText");
-    const acctText = document.getElementById("acctText");
-    const modeLabel = document.getElementById("modeLabel");
-    const connLabel = document.getElementById("connLabel");
+    const simStatus = document.getElementById("simStatus");
     const symbolSelect = document.getElementById("symbolSelect");
     const priceText = document.getElementById("priceText");
     const tickMeta = document.getElementById("tickMeta");
@@ -206,6 +276,7 @@
     const ticksInput = document.getElementById("ticksInput");
     const pnlText = document.getElementById("pnlText");
     const autoBtn = document.getElementById("autoBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
     const logArea = document.getElementById("logArea");
 
     function writeLog(msg) {
@@ -213,19 +284,15 @@
       logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
     }
 
-    window.addEventListener("error", (e) => {
-      writeLog(`JS Error: ${e.message}`);
-    });
-
-    function tickClock() {
-      const now = new Date();
-      clockText.textContent = `${isAuthorized ? "Session Time" : "Time"}: ${now.toLocaleTimeString()}`;
+    function getDecimals() {
+      return activeSymbol === "SIM_FX" ? 4 : 2;
     }
 
-    function updatePnL() {
+    function updateHeaderAndPnL() {
+      balText.textContent = `$${bankroll.toFixed(2)}`;
       const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
       const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
-      pnlText.textContent = `Session P&L: $${sessionPnL.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
+      pnlText.textContent = `Session P&L: ${sessionPnL >= 0 ? "+" : ""}$${sessionPnL.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
     }
 
     function drawDigits(lastD = null) {
@@ -256,26 +323,182 @@
       });
     }
 
-    function subscribeSymbol(sym) {
-      activeSymbol = sym;
-      prevPrice = null;
-      digitList = [];
-      drawDigits(null);
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({ forget_all: "ticks" }));
-      ws.send(JSON.stringify({ ticks: sym, subscribe: 1 }));
-      writeLog(`Subscribed to ${sym}`);
+    function evaluateOpenTrades(newPrice, lastDigit) {
+      const remaining = [];
+      for (const tr of openTrades) {
+        tr.ticksLeft -= 1;
+        if (tr.ticksLeft > 0) {
+          remaining.push(tr);
+          continue;
+        }
+
+        let won = false;
+        let payoutMultiplier = 1.9;
+
+        if (tr.type === "CALL") {
+          won = newPrice > tr.entryPrice;
+        } else if (tr.type === "PUT") {
+          won = newPrice < tr.entryPrice;
+        } else if (tr.type === "DIGITOVER") {
+          won = lastDigit > tr.barrier;
+          payoutMultiplier = 1.85;
+        } else if (tr.type === "DIGITUNDER") {
+          won = lastDigit < tr.barrier;
+          payoutMultiplier = 1.85;
+        }
+
+        const net = won ? Number((tr.stake * (payoutMultiplier - 1)).toFixed(2)) : -tr.stake;
+        bankroll = Number((bankroll + net).toFixed(2));
+        sessionPnL = Number((sessionPnL + net).toFixed(2));
+        updateHeaderAndPnL();
+
+        writeLog(`#${tr.id} ${tr.label} settled: ${won ? "WIN +" : "LOSS "}$${Math.abs(net).toFixed(2)} (Balance: $${bankroll.toFixed(2)})`);
+      }
+      openTrades = remaining;
     }
 
-    function authFromUrl() {
-      const q = new URLSearchParams(window.location.search);
-      const list = [];
-      for (let i = 1; i <= 5; i++) {
-        const acct = q.get(`acct${i}`);
-        const token = q.get(`token${i}`);
-        if (acct && token) list.push({ acct, token });
-      }
-      if (!list.length || !ws || ws.readyState !== WebSocket.OPEN) return;
+    function stepTick() {
+      clockText.textContent = `Session Time: ${new Date().toLocaleTimeString()}`;
+      if (isPaused) return;
 
-      const demoAcct = list.find(item => item.acct.starts
-    
+      const dec = getDecimals();
+      const stepSize = activeSymbol === "SIM_FX" ? 0.0005 : 0.35;
+      const delta = (Math.random() * 2 - 1) * stepSize;
+      prevPrice = currentPrice;
+      currentPrice = Math.max(1, currentPrice + delta);
+
+      const formatted = currentPrice.toFixed(dec);
+      const lastDigit = Number(formatted.slice(-1));
+      const diff = prevPrice !== null ? currentPrice - prevPrice : 0;
+      const sign = diff >= 0 ? "+" : "";
+
+      priceText.textContent = `${activeSymbol}: ${formatted}`;
+      tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(dec)}`;
+      digitText.textContent = `Digit: ${lastDigit}`;
+
+      digitList.push(lastDigit);
+      if (digitList.length > 50) digitList.shift();
+      drawDigits(lastDigit);
+
+      evaluateOpenTrades(currentPrice, lastDigit);
+
+      if (autoEnabled && digitList.length >= 3) {
+        const tail3 = digitList.slice(-3);
+        if (tail3.every(d => d <= 2)) {
+          digitList = [];
+          writeLog(`Auto-rule triggered on [${tail3.join(", ")}] -> OVER 3`);
+          placePracticeTrade("DIGITOVER", 3);
+        }
+      }
+    }
+
+    function placePracticeTrade(type, barrier = null) {
+      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
+      if (usedLoss >= MAX_DAILY_LOSS) {
+        autoEnabled = false;
+        autoBtn.className = "auto-off";
+        autoBtn.textContent = "Auto-Rule: LOCKED ($10 Loss Cap)";
+        writeLog("Blocked: Daily loss cap ($10.00) reached for this session.");
+        return;
+      }
+
+      let stake = Number(stakeInput.value);
+      if (!Number.isFinite(stake) || stake < 0.35) {
+        writeLog("Blocked: Minimum practice stake is $0.35.");
+        return;
+      }
+      if (stake > MAX_STAKE) {
+        stake = MAX_STAKE;
+        stakeInput.value = MAX_STAKE.toFixed(2);
+        writeLog("Guardrail: Stake capped to $1.00 ($50 bankroll rule).");
+      }
+      if (stake > bankroll) {
+        writeLog("Blocked: Stake exceeds current practice bankroll.");
+        return;
+      }
+
+      const duration = Math.min(10, Math.max(1, parseInt(ticksInput.value, 10) || 3));
+      const label = barrier !== null ? `${type} ${barrier}` : type;
+      const id = tradeCounter++;
+
+      openTrades.push({
+        id,
+        type,
+        barrier,
+        label,
+        stake,
+        entryPrice: currentPrice,
+        ticksLeft: duration
+      });
+
+      writeLog(`#${id} Opened ${label} | Stake: $${stake.toFixed(2)} | ${duration}t @ ${currentPrice.toFixed(getDecimals())}`);
+    }
+
+    symbolSelect.addEventListener("change", () => {
+      activeSymbol = symbolSelect.value;
+      currentPrice = activeSymbol === "SIM_FX" ? 1.0850 : 1000.00;
+      prevPrice = null;
+      digitList = [];
+      openTrades = [];
+      drawDigits(null);
+      writeLog(`Switched practice feed to ${activeSymbol}`);
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? "Resume Feed" : "Pause Feed";
+      simStatus.textContent = isPaused ? "Feed: Paused" : "Feed: Active (Simulated)";
+      writeLog(isPaused ? "Practice feed paused." : "Practice feed resumed.");
+    });
+
+    document.getElementById("resetBankrollBtn").addEventListener("click", () => {
+      bankroll = START_BANKROLL;
+      sessionPnL = 0;
+      openTrades = [];
+      autoEnabled = false;
+      autoBtn.className = "auto-off";
+      autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
+      updateHeaderAndPnL();
+      writeLog("Bankroll reset to $50.00 and daily loss lock cleared.");
+    });
+
+    document.getElementById("riseBtn").addEventListener("click", () => placePracticeTrade("CALL"));
+    document.getElementById("fallBtn").addEventListener("click", () => placePracticeTrade("PUT"));
+    document.getElementById("overBtn").addEventListener("click", () => {
+      if (barrierDigit === 9) {
+        writeLog("Blocked: Over 9 is not valid for digits 0–9.");
+        return;
+      }
+      placePracticeTrade("DIGITOVER", barrierDigit);
+    });
+    document.getElementById("underBtn").addEventListener("click", () => {
+      if (barrierDigit === 0) {
+        writeLog("Blocked: Under 0 is not valid for digits 0–9.");
+        return;
+      }
+      placePracticeTrade("DIGITUNDER", barrierDigit);
+    });
+
+    autoBtn.addEventListener("click", () => {
+      if (!autoEnabled) {
+        autoEnabled = true;
+        autoBtn.className = "auto-on";
+        autoBtn.textContent = "Auto-Rule: ON (Guarded)";
+        writeLog("Auto-Rule enabled (3 digits <= 2 triggers OVER 3).");
+      } else {
+        autoEnabled = false;
+        autoBtn.className = "auto-off";
+        autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
+        writeLog("Auto-Rule disabled.");
+      }
+    });
+
+    drawDigits(null);
+    drawBarriers();
+    updateHeaderAndPnL();
+    stepTick();
+    setInterval(stepTick, 1000);
+    writeLog("Personal practice terminal ready ($50.00 bankroll, $1.00 max stake, $10.00 daily stop).");
+  </script>
+</body>
+</html>
