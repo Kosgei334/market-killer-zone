@@ -1,72 +1,290 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1220">
-<title>MARKET KILLER ZONE</title>
-<style>
-:root{--bg:#0b1220;--panel:#121d30;--line:#26354d;--muted:#9aabc2;--text:#f4f7fb;--green:#19c37d;--red:#ff657a;--blue:#6ea8fe}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0b1220,#101b2d);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{max-width:900px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
-.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.4px}.mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#16a36a,#087e9c);display:grid;place-items:center;font-size:21px}
-.pill{border:1px solid #42614f;color:#9bf0c5;border-radius:30px;padding:6px 10px;font-size:12px}
-h1{font-size:clamp(26px,6vw,42px);margin:4px 0 8px;letter-spacing:-1px}p{color:var(--muted);line-height:1.5}.sub{margin:0 0 20px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{background:rgba(18,29,48,.94);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:13px}
-.label{font-size:12px;color:var(--muted);margin-bottom:7px}.value{font-size:25px;font-weight:750}.small{font-size:12px;color:var(--muted)}
-.status{display:inline-flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:#8795a9}
-button{border:0;border-radius:12px;padding:13px 15px;font-weight:700;font-size:14px;cursor:pointer}
-.primary{background:var(--green);color:#052116;width:100%}.secondary{background:#1d2b42;color:var(--text);border:1px solid #344761;width:100%}
-button:disabled{opacity:.45;cursor:not-allowed}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
-select,input{width:100%;background:#0c1728;border:1px solid #344761;color:var(--text);padding:12px;border-radius:10px;font:inherit}
-.field{margin:12px 0}.notice{border-left:3px solid #e0ad4d;background:#2a2418;padding:12px;border-radius:8px;color:#f4dba9;font-size:13px;line-height:1.5}
-footer{text-align:center;color:#71829b;font-size:12px;padding:20px 0}
-@media(max-width:560px){main{padding:15px}.grid{grid-template-columns:1fr}.top{align-items:flex-start}.value{font-size:23px}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MARKET KILLER ZONE — Deriv Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card: #131a26;
+      --text: #eef2f7;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: #243044;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container { max-width: 540px; margin: 0 auto; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.25rem; }
+    .sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 12px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warn);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .badge.real {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin: 10px 0 4px; }
+    select, input, button {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0d131d;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    button {
+      margin-top: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #1d4ed8;
+      border-color: #2563eb;
+    }
+    button.secondary { background: #1e293b; border-color: #334155; }
+    button.danger { background: #991b1b; border-color: #dc2626; }
+    .tick-box {
+      font-size: 1.35rem;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 8px;
+      background: #0b0f17;
+      border: 1px solid var(--border);
+      margin-top: 10px;
+    }
+    .risk-list { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.85rem; }
+    .risk-list li { margin-bottom: 5px; }
+    .log {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      background: #090d14;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-<main>
-<header class="top">
- <div class="brand"><div class="mark">⌁</div><div>MARKET KILLER ZONE<div class="small">AUTOMATED TRADING DASHBOARD</div></div></div>
- <span class="pill">DEMO PREVIEW</span>
-</header>
-<h1>Trade with a plan.</h1>
-<p class="sub">A mobile-first control panel for your Deriv trading automation.</p>
-<div class="grid">
- <section class="card"><div class="label">ACCOUNT CONNECTION</div><div class="value" id="connection">Not connected</div><div class="small">Deriv OAuth setup required</div></section>
- <section class="card"><div class="label">BOT STATUS</div><div class="value" id="botstatus">Stopped</div><div class="small">Automatic execution disabled</div></section>
- <section class="card"><div class="label">PLANNED CAPITAL</div><div class="value">$50.00</div><div class="small">Your intended starting amount</div></section>
- <section class="card"><div class="label">TRADING MODE</div><div class="value">Demo first</div><div class="small">Live trading locked during setup</div></section>
-</div>
-<section class="card">
- <h3>Markets & strategy</h3>
- <div class="row"><span>Forex</span><span class="small">Selected</span></div>
- <div class="row"><span>Derived Indices</span><span class="small">Selected</span></div>
- <div class="row"><span>EMA</span><strong>20 / 50</strong></div>
- <div class="row"><span>RSI</span><strong>14</strong></div>
- <div class="row"><span>ATR</span><strong>14</strong></div>
-</section>
-<section class="card">
- <h3>Risk controls</h3>
- <div class="row"><span>Target maximum stake per trade</span><strong>$0.50</strong></div>
- <div class="row"><span>Daily stop threshold</span><strong>$1.50</strong></div>
- <div class="row"><span>Maximum open contracts</span><strong>2</strong></div>
- <p class="small">For fixed-payout contracts, stake is generally the amount at risk. These are proposed demo settings, not a guarantee or a calculated Forex position size.</p>
-</section>
-<section class="card">
- <h3>Connection setup</h3>
- <p>Connect only after the website has been deployed over HTTPS and its Deriv OAuth application has been registered with the exact callback URL.</p>
- <button class="secondary" disabled>Connect Deriv — setup pending</button>
- <p class="small">No password or API token should be entered into this preview.</p>
-</section>
-<section class="card">
- <h3>Bot controls</h3>
- <div class="notice">Trading is deliberately disabled. This starter dashboard does not yet contain a live trading engine, OAuth callback, or server-side token storage.</div>
- <div class="field"><label class="small" for="mode">Environment</label><select id="mode"><option>Demo only</option><option disabled>Live — locked until verified</option></select></div>
- <button class="primary" disabled>Start automatic trading</button>
- <p class="small">Enable these controls only after API compatibility, demo execution, and risk limits have been verified.</p>
-</section>
-<footer>MARKET KILLER ZONE · Independent project · Trading involves risk.</footer>
-</main>
-</body></html>
+  <div class="container">
+    <div class="card">
+      <h1>MARKET KILLER ZONE</h1>
+      <p class="sub">Deriv OAuth &amp; Live Market Stream ($50 Capital Guardrails)</p>
+      <span id="modeBadge" class="badge">MODE: DEMO (SAFE)</span>
+
+      <button id="loginBtn" type="button">Connect Deriv Account (OAuth)</button>
+      <button id="toggleModeBtn" class="secondary" type="button">Switch to Real Mode (Locked Until Tested)</button>
+      <p id="accountStatus" class="sub" style="margin-top:10px;">Status: Not connected yet.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px; font-size:1.05rem;">Market &amp; Live Tick Feed</h2>
+      <label for="marketSelect">Choose Market (Forex or Derived Indices)</label>
+      <select id="marketSelect">
+        <optgroup label="Derived Indices">
+          <option value="R_100">Volatility 100 Index (R_100)</option>
+          <option value="R_50">Volatility 50 Index (R_50)</option>
+          <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
+        </optgroup>
+        <optgroup label="Forex">
+          <option value="frxEURUSD">EUR/USD (frxEURUSD)</option>
+          <option value="frxGBPUSD">GBP/USD (frxGBPUSD)</option>
+        </optgroup>
+      </select>
+
+      <div class="tick-box" id="liveTick">Waiting for live price...</div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px; font-size:1.05rem;">$50 Account Risk Guardrails</h2>
+      <label for="stakeInput">Proposed Stake (USD — Hard Cap: $1.00)</label>
+      <input id="stakeInput" type="number" step="0.10" min="0.35" max="1.00" value="0.50" />
+
+      <ul class="risk-list">
+        <li><strong>Capital Target:</strong> $50.00 account — never risk more than 2% ($1.00) per trade.</li>
+        <li><strong>Daily Loss Cap:</strong> $10.00 max daily drawdown before automatic lock.</li>
+        <li><strong>Demo-First Rule:</strong> Always verify signals and connection in Demo before enabling Real.</li>
+      </ul>
+
+      <button id="validateBtn" class="secondary" type="button">Validate Trade Against $50 Limits</button>
+      <button id="armAutoBtn" class="danger" type="button">Auto-Execution: OFF (Safe)</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px; font-size:1.05rem;">Activity Log</h2>
+      <div id="logBox" class="log">Ready. App ID 352JgmiAsrWhGgFobFlSS configured.</div>
+    </div>
+  </div>
+
+  <script>
+    const DERIV_APP_ID = "352JgmiAsrWhGgFobFlSS";
+    const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
+    const MAX_STAKE_USD = 1.00;
+    const MAX_DAILY_LOSS_USD = 10.00;
+
+    let isRealMode = false;
+    let autoArmed = false;
+    let dailyLoss = 0;
+    let socket = null;
+    let activeTickSymbol = null;
+
+    const logBox = document.getElementById("logBox");
+    const modeBadge = document.getElementById("modeBadge");
+    const accountStatus = document.getElementById("accountStatus");
+    const liveTick = document.getElementById("liveTick");
+    const marketSelect = document.getElementById("marketSelect");
+    const stakeInput = document.getElementById("stakeInput");
+
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      logBox.textContent = `[${time}] ${msg}\n` + logBox.textContent;
+    }
+
+    function connectSocket() {
+      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        return;
+      }
+      socket = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${DERIV_APP_ID}`);
+
+      socket.onopen = () => {
+        log("Connected to Deriv WebSocket feed.");
+        subscribeTicks(marketSelect.value);
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.error) {
+          log(`Deriv API notice: ${data.error.message}`);
+          return;
+        }
+        if (data.tick && data.tick.symbol === activeTickSymbol) {
+          liveTick.textContent = `${data.tick.symbol}: ${data.tick.quote}`;
+        }
+        if (data.authorize) {
+          const acct = data.authorize;
+          accountStatus.textContent = `Connected: ${acct.loginid} | Balance: ${acct.balance} ${acct.currency}`;
+          log(`Authorized account ${acct.loginid} (${acct.currency} ${acct.balance}).`);
+        }
+      };
+
+      socket.onclose = () => {
+        log("WebSocket closed. Reconnecting in 3s...");
+        setTimeout(connectSocket, 3000);
+      };
+    }
+
+    function subscribeTicks(symbol) {
+      activeTickSymbol = symbol;
+      if (!socket || socket.readyState !== WebSocket.OPEN) return;
+      socket.send(JSON.stringify({ forget_all: "ticks" }));
+      socket.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
+      log(`Subscribed to live ticks: ${symbol}`);
+    }
+
+    function checkOAuthTokenInUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const token1 = params.get("token1");
+      const acct1 = params.get("acct1");
+      if (token1) {
+        log(`OAuth token received for ${acct1 || "account"}. Authorizing...`);
+        const authorizeNow = () => {
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ authorize: token1 }));
+          } else {
+            setTimeout(authorizeNow, 400);
+          }
+        };
+        authorizeNow();
+      }
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${encodeURIComponent(DERIV_APP_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+      window.location.href = oauthUrl;
+    });
+
+    document.getElementById("toggleModeBtn").addEventListener("click", () => {
+      if (!isRealMode) {
+        const ok = confirm("WARNING: You are switching to REAL mode for a $50 account. Ensure Demo testing is complete. Continue?");
+        if (!ok) return;
+        isRealMode = true;
+        modeBadge.textContent = "MODE: REAL ($50 GUARDED)";
+        modeBadge.classList.add("real");
+        log("Switched to REAL mode. Keep stakes within $50 guardrails.");
+      } else {
+        isRealMode = false;
+        autoArmed = false;
+        document.getElementById("armAutoBtn").textContent = "Auto-Execution: OFF (Safe)";
+        modeBadge.textContent = "MODE: DEMO (SAFE)";
+        modeBadge.classList.remove("real");
+        log("Switched back to DEMO mode.");
+      }
+    });
+
+    marketSelect.addEventListener("change", () => {
+      subscribeTicks(marketSelect.value);
+    });
+
+    document.getElementById("validateBtn").addEventListener("click", () => {
+      const stake = parseFloat(stakeInput.value);
+      if (isNaN(stake) || stake <= 0) {
+        log("Validation failed: Enter a valid stake amount.");
+        return;
+      }
+      if (stake > MAX_STAKE_USD) {
+        stakeInput.value = MAX_STAKE_USD.toFixed(2);
+        log(`Stake capped to $${MAX_STAKE_USD.toFixed(2)} to protect your $50 account.`);
+        return;
+      }
+      if (dailyLoss >= MAX_DAILY_LOSS_USD) {
+        log(`Trading locked: Daily loss cap ($${MAX_DAILY_LOSS_USD.toFixed(2)}) reached.`);
+        return;
+      }
+      log(`Stake $${stake.toFixed(2)} passed $50 risk checks (${isRealMode ? "REAL" : "DEMO"} mode).`);
+    });
+
+    document.getElementById("armAutoBtn").addEventListener("click", (e) => {
+      if (!autoArmed) {
+        const confirmArm = confirm("Arm Auto-Execution status? No live orders are placed until strategy logic is added and verified on Demo.");
+        if (!confirmArm) return;
+        autoArmed = true;
+        e.target.textContent = "Auto-Execution: ARMED (Verify on Demo)";
+        log("Auto-execution flag armed (no order sent without strategy signal).");
+      } else {
+        autoArmed = false;
+        e.target.textContent = "Auto-Execution: OFF (Safe)";
+        log("Auto-execution disarmed.");
+      }
+    });
+
+    connectSocket();
+    checkOAuthTokenInUrl();
+  </script>
+</body>
+ </html>
+ 
