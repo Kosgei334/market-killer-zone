@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MARKET KILLER ZONE — Deriv Terminal</title>
+  <title>MARKET KILLER ZONE</title>
   <style>
     :root {
       --bg: #0b0f17;
       --card: #131a26;
-      --card-2: #0e1420;
-      --text: #eef2f7;
+      --card2: #0d131e;
+      --text: #f1f5f9;
       --muted: #94a3b8;
-      --accent: #22c55e;
-      --warn: #f59e0b;
-      --danger: #ef4444;
+      --green: #16a34a;
+      --red: #dc2626;
       --blue: #2563eb;
+      --teal: #0d9488;
+      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
@@ -24,35 +25,28 @@
       background: var(--bg);
       color: var(--text);
     }
-    .container { max-width: 540px; margin: 0 auto; }
-
-    /* Top Header Bar */
+    .wrap { max-width: 540px; margin: 0 auto; }
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 12px;
       margin-bottom: 12px;
     }
-    .brand-title { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.3px; }
-    .clock-pill {
+    .title { font-weight: 800; font-size: 1rem; }
+    .clock {
       font-family: monospace;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: #cbd5e1;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      padding: 4px 8px;
-      border-radius: 8px;
       margin-top: 3px;
-      display: inline-block;
     }
-    .bal-box { text-align: right; }
-    .bal-amount { font-weight: 800; font-size: 0.95rem; color: var(--accent); }
-    .bal-acct { font-size: 0.75rem; color: var(--muted); }
+    .acct-box { text-align: right; }
+    .bal { font-weight: 800; font-size: 0.95rem; color: #4ade80; }
+    .acct-id { font-size: 0.76rem; color: var(--muted); }
 
     .card {
       background: var(--card);
@@ -62,100 +56,69 @@
       margin-bottom: 12px;
     }
     h2 { margin: 0 0 8px; font-size: 1rem; }
-    .sub { color: var(--muted); font-size: 0.82rem; margin: 6px 0 0; }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--warn);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-    }
-    .badge.real {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.45);
-    }
-
-    label { display: block; font-size: 0.82rem; color: var(--muted); margin: 10px 0 4px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin: 8px 0 4px; }
     select, input, button {
       width: 100%;
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: var(--card-2);
+      background: var(--card2);
       color: var(--text);
       font-size: 0.92rem;
     }
     button {
       margin-top: 10px;
-      cursor: pointer;
       font-weight: 700;
+      cursor: pointer;
       background: var(--blue);
       border-color: #3b82f6;
     }
     button.secondary { background: #1e293b; border-color: #334155; }
-    button.danger { background: #991b1b; border-color: #dc2626; }
-    button.rise { background: #15803d; border-color: #22c55e; margin-top: 0; }
-    button.fall { background: #b91c1c; border-color: #ef4444; margin-top: 0; }
-    button.over { background: #0f766e; border-color: #14b8a6; margin-top: 0; }
+    button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
+    button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
+    button.over { background: var(--teal); border-color: #14b8a6; margin-top: 0; }
     button.under { background: #be123c; border-color: #f43f5e; margin-top: 0; }
+    button.auto-off { background: #7f1d1d; border-color: #dc2626; }
+    button.auto-on { background: #14532d; border-color: #22c55e; }
 
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    /* Price & Digit Readout */
-    .market-banner {
+    .price-box {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-2);
+      background: var(--card2);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 11px 12px;
+      padding: 12px;
       margin-top: 10px;
     }
-    .price-main { font-size: 1.15rem; font-weight: 800; }
-    .delta-pos { color: var(--accent); font-size: 0.8rem; font-weight: 700; }
-    .delta-neg { color: #f87171; font-size: 0.8rem; font-weight: 700; }
-    .digit-badge {
+    .price-val { font-size: 1.15rem; font-weight: 800; color: #4ade80; }
+    .sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .digit-box {
       background: #1e293b;
       border: 1px solid #475569;
       border-radius: 8px;
       padding: 6px 10px;
       font-weight: 800;
-      font-size: 0.9rem;
     }
 
-    /* 0-9 Digit Stats Grid */
     .digits-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      gap: 6px;
       margin-top: 10px;
     }
-    .digit-cell {
-      background: var(--card-2);
+    .d-card {
+      background: var(--card2);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 4px;
+      border-radius: 8px;
+      padding: 7px 4px;
       text-align: center;
     }
-    .digit-cell.active-digit {
-      border-color: #38bdf8;
-      background: #172554;
-    }
-    .d-num { font-weight: 800; font-size: 0.95rem; }
-    .d-pct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .d-card.hit { border-color: #38bdf8; background: #172554; }
+    .d-num { font-weight: 800; font-size: 0.9rem; }
+    .d-pct { font-size: 0.7rem; color: var(--muted); }
 
-    /* Barrier Quick Picker 0-9 */
     .barrier-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -165,63 +128,55 @@
     .b-btn {
       margin-top: 0;
       padding: 8px 4px;
-      font-size: 0.88rem;
-      background: var(--card-2);
+      background: var(--card2);
       border: 1px solid var(--border);
+      font-size: 0.88rem;
     }
-    .b-btn.selected {
-      background: #1d4ed8;
-      border-color: #60a5fa;
-      color: #fff;
-    }
+    .b-btn.active { background: var(--blue); border-color: #60a5fa; }
 
-    .risk-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
-    .risk-list li { margin-bottom: 4px; }
+    .guard-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
+    .guard-list li { margin-bottom: 4px; }
 
     .log {
       font-family: monospace;
       font-size: 0.78rem;
+      background: #070a10;
       color: #cbd5e1;
-      background: #080c12;
-      padding: 10px;
       border-radius: 8px;
-      max-height: 165px;
+      padding: 10px;
+      max-height: 170px;
       overflow-y: auto;
       white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- HEADER WITH LIVE TIME & BALANCE -->
+  <div class="wrap">
     <div class="topbar">
       <div>
-        <div class="brand-title">MARKET KILLER ZONE</div>
-        <span id="liveClock" class="clock-pill">Time: --:--:--</span>
+        <div class="title">MARKET KILLER ZONE</div>
+        <div id="clockText" class="clock">Time: --:--:--</div>
       </div>
-      <div class="bal-box">
-        <div id="headerBalance" class="bal-amount">DEMO</div>
-        <div id="headerAcct" class="bal-acct">Not logged in</div>
+      <div class="acct-box">
+        <div id="balText" class="bal">DEMO MODE</div>
+        <div id="acctText" class="acct-id">Not connected</div>
       </div>
     </div>
 
-    <!-- ACCOUNT & MODE -->
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span id="modeBadge" class="badge">MODE: DEMO (SAFE)</span>
-        <span id="wsStatusText" class="sub" style="margin:0;">WS: Connecting...</span>
+        <strong id="modeLabel" style="color:#fbbf24; font-size:0.85rem;">MODE: DEMO (SAFE)</strong>
+        <span id="connLabel" class="sub" style="margin:0;">Socket: Connecting...</span>
       </div>
-
-      <button id="loginBtn" type="button">Connect Deriv Account (OAuth)</button>
-      <button id="toggleModeBtn" class="secondary" type="button">Switch to Real Mode (Locked Until Tested)</button>
+      <button id="oauthBtn" type="button">Connect Deriv Account (OAuth)</button>
+      <button id="modeBtn" class="secondary" type="button">Switch to Real Mode ($50 Guarded)</button>
     </div>
 
-    <!-- MARKET & DIGIT DISTRIBUTION -->
     <div class="card">
-      <h2>Market &amp; Last Digit Scanner</h2>
-      <label for="marketSelect">Select Index or Forex Pair</label>
-      <select id="marketSelect">
-        <optgroup label="Derived Indices (Rise/Fall & Over/Under)">
+      <h2>Market &amp; Digit Scanner</h2>
+      <label for="symbolSelect">Market</label>
+      <select id="symbolSelect">
+        <optgroup label="Derived Indices">
           <option value="1HZ100V">Volatility 100 (1s) Index (1HZ100V)</option>
           <option value="R_100">Volatility 100 Index (R_100)</option>
           <option value="R_50">Volatility 50 Index (R_50)</option>
@@ -232,334 +187,273 @@
         </optgroup>
       </select>
 
-      <div class="market-banner">
+      <div class="price-box">
         <div>
-          <div id="liveTick" class="price-main">Waiting for tick...</div>
-          <div id="tickDelta" class="sub" style="margin:2px 0 0;">Change: --</div>
+          <div id="priceText" class="price-val">Waiting for tick...</div>
+          <div id="tickMeta" class="sub">Tick change: --</div>
         </div>
-        <div id="lastDigitBox" class="digit-badge">Digit: -</div>
+        <div id="digitText" class="digit-box">Digit: -</div>
       </div>
 
       <div id="digitsGrid" class="digits-grid"></div>
     </div>
 
-    <!-- RISE/FALL & OVER/UNDER EXECUTION -->
     <div class="card">
-      <h2>Trade Execution</h2>
-
-      <div class="btn-row">
+      <h2>Rise / Fall &amp; Over / Under</h2>
+      <div class="row2">
         <div>
-          <label for="stakeInput">Stake (USD — Max $1.00)</label>
+          <label for="stakeInput">Stake (Max $1.00)</label>
           <input id="stakeInput" type="number" step="0.10" min="0.35" max="1.00" value="0.50" />
         </div>
         <div>
-          <label for="durationInput">Ticks (1–10)</label>
-          <input id="durationInput" type="number" min="1" max="10" value="1" />
+          <label for="ticksInput">Duration (1–10 Ticks)</label>
+          <input id="ticksInput" type="number" min="1" max="10" value="1" />
         </div>
       </div>
 
       <label>Rise / Fall</label>
-      <div class="btn-row">
+      <div class="row2">
         <button id="riseBtn" class="rise" type="button">Rise</button>
         <button id="fallBtn" class="fall" type="button">Fall</button>
       </div>
 
-      <label>Over / Under Target Digit (0–9)</label>
+      <label>Over / Under Digit Barrier (0–9)</label>
       <div id="barrierGrid" class="barrier-grid"></div>
-      <div class="btn-row" style="margin-top:10px;">
-        <button id="overBtn" class="over" type="button">Over <span id="overTargetLabel">4</span></button>
-        <button id="underBtn" class="under" type="button">Under <span id="underTargetLabel">4</span></button>
+      <div class="row2" style="margin-top:10px;">
+        <button id="overBtn" class="over" type="button">Over <span id="overLbl">4</span></button>
+        <button id="underBtn" class="under" type="button">Under <span id="underLbl">4</span></button>
       </div>
     </div>
 
-    <!-- $50 ACCOUNT GUARDRAILS -->
     <div class="card">
       <h2>$50 Account Guardrails</h2>
-      <ul class="risk-list">
-        <li><strong>Max Stake:</strong> $1.00 hard cap (2% of $50 capital).</li>
-        <li><strong>Daily Loss Stop:</strong> $10.00 max drawdown lock.</li>
-        <li><strong>Demo First:</strong> Always verify signals &amp; execution on Demo before Real.</li>
+      <ul class="guard-list">
+        <li><strong>Capital:</strong> $50.00 target — max stake capped at $1.00.</li>
+        <li><strong>Daily Stop:</strong> $10.00 max loss before auto-lock.</li>
+        <li><strong>Rule:</strong> Verify execution on Demo before Real trading.</li>
       </ul>
-      <p id="pnlStatus" class="sub">Session P&amp;L: $0.00 | Remaining Loss Buffer: $10.00</p>
-      <button id="armAutoBtn" class="danger" type="button">Auto-Bot: OFF (Manual Only)</button>
+      <div id="pnlText" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Loss Buffer Left: $10.00</div>
+      <button id="autoBtn" class="auto-off" type="button">Auto-Bot: OFF (Manual Only)</button>
     </div>
 
-    <!-- ACTIVITY LOG -->
     <div class="card">
       <h2>Activity Log</h2>
-      <div id="logBox" class="log">Initializing MARKET KILLER ZONE...</div>
+      <div id="logArea" class="log">Starting...</div>
     </div>
   </div>
 
   <script>
-    const DERIV_OAUTH_ID = "352JgmiAsrWhGgFobFlSS";
-    const DERIV_WS_APP_ID = "1089";
-    const WS_ENDPOINTS = [
-      `wss://ws.derivws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`,
-      `wss://ws.binaryws.com/websockets/v3?app_id=${DERIV_WS_APP_ID}`
-    ];
+    const OAUTH_APP_ID = "352JgmiAsrWhGgFobFlSS";
+    const WS_APP_ID = "1089";
     const REDIRECT_URI = "https://kosgei334.github.io/market-killer-zone/";
-    const MAX_STAKE_USD = 1.00;
-    const MAX_DAILY_LOSS_USD = 10.00;
+    const MAX_STAKE = 1.00;
+    const MAX_DAILY_LOSS = 10.00;
 
+    let ws = null;
     let isRealMode = false;
     let isAuthorized = false;
-    let accountIsVirtual = true;
-    let autoBotArmed = false;
-    let sessionNetPnL = 0;
-    let socket = null;
-    let endpointIndex = 0;
-    let activeTickSymbol = null;
-    let lastQuote = null;
-    let selectedBarrier = 4;
-    let digitHistory = []; // last 50 digits for 0-9 distribution
+    let isVirtualAcct = true;
+    let autoEnabled = false;
+    let sessionPnL = 0;
+    let activeSymbol = null;
+    let prevPrice = null;
+    let barrierDigit = 4;
+    let digitList = [];
 
-    const liveClock = document.getElementById("liveClock");
-    const headerBalance = document.getElementById("headerBalance");
-    const headerAcct = document.getElementById("headerAcct");
-    const wsStatusText = document.getElementById("wsStatusText");
-    const logBox = document.getElementById("logBox");
-    const modeBadge = document.getElementById("modeBadge");
-    const liveTick = document.getElementById("liveTick");
-    const tickDelta = document.getElementById("tickDelta");
-    const lastDigitBox = document.getElementById("lastDigitBox");
+    const clockText = document.getElementById("clockText");
+    const balText = document.getElementById("balText");
+    const acctText = document.getElementById("acctText");
+    const modeLabel = document.getElementById("modeLabel");
+    const connLabel = document.getElementById("connLabel");
+    const symbolSelect = document.getElementById("symbolSelect");
+    const priceText = document.getElementById("priceText");
+    const tickMeta = document.getElementById("tickMeta");
+    const digitText = document.getElementById("digitText");
     const digitsGrid = document.getElementById("digitsGrid");
     const barrierGrid = document.getElementById("barrierGrid");
-    const overTargetLabel = document.getElementById("overTargetLabel");
-    const underTargetLabel = document.getElementById("underTargetLabel");
-    const marketSelect = document.getElementById("marketSelect");
+    const overLbl = document.getElementById("overLbl");
+    const underLbl = document.getElementById("underLbl");
     const stakeInput = document.getElementById("stakeInput");
-    const durationInput = document.getElementById("durationInput");
-    const pnlStatus = document.getElementById("pnlStatus");
+    const ticksInput = document.getElementById("ticksInput");
+    const pnlText = document.getElementById("pnlText");
+    const autoBtn = document.getElementById("autoBtn");
+    const logArea = document.getElementById("logArea");
 
-    function log(msg) {
-      const time = new Date().toLocaleTimeString();
-      logBox.textContent = `[${time}] ${msg}\n` + logBox.textContent;
+    function writeLog(msg) {
+      const t = new Date().toLocaleTimeString();
+      logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
     }
 
-    // Live clock after login (and tick timestamps)
     setInterval(() => {
       const now = new Date();
-      const prefix = isAuthorized ? "Session Time" : "Local Time";
-      liveClock.textContent = `${prefix}: ${now.toLocaleTimeString()}`;
+      clockText.textContent = `${isAuthorized ? "Session Time" : "Time"}: ${now.toLocaleTimeString()}`;
     }, 1000);
 
-    function renderDigitGrid(currentDigit = null) {
-      const total = digitHistory.length || 1;
-      let html = "";
-      for (let d = 0; d <= 9; d++) {
-        const count = digitHistory.filter(x => x === d).length;
-        const pct = digitHistory.length ? ((count / total) * 100).toFixed(1) : "0.0";
-        const activeClass = (d === currentDigit) ? "active-digit" : "";
-        html += `
-          <div class="digit-cell ${activeClass}">
-            <div class="d-num">${d}</div>
-            <div class="d-pct">${pct}%</div>
-          </div>
-        `;
-      }
-      digitsGrid.innerHTML = html;
+    function updatePnL() {
+      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
+      const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
+      pnlText.textContent = `Session P&L: $${sessionPnL.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
     }
 
-    function renderBarrierButtons() {
-      let html = "";
+    function drawDigits(lastD = null) {
+      const n = digitList.length || 1;
+      let out = "";
       for (let d = 0; d <= 9; d++) {
-        const selClass = (d === selectedBarrier) ? "selected" : "";
-        html += `<button type="button" class="b-btn ${selClass}" data-digit="${d}">${d}</button>`;
+        const cnt = digitList.filter(v => v === d).length;
+        const pct = digitList.length ? ((cnt / n) * 100).toFixed(1) : "0.0";
+        out += `<div class="d-card ${d === lastD ? "hit" : ""}"><div class="d-num">${d}</div><div class="d-pct">${pct}%</div></div>`;
       }
-      barrierGrid.innerHTML = html;
-      overTargetLabel.textContent = selectedBarrier;
-      underTargetLabel.textContent = selectedBarrier;
+      digitsGrid.innerHTML = out;
+    }
 
-      barrierGrid.querySelectorAll(".b-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          selectedBarrier = parseInt(btn.getAttribute("data-digit"), 10);
-          renderBarrierButtons();
+    function drawBarriers() {
+      let out = "";
+      for (let d = 0; d <= 9; d++) {
+        out += `<button type="button" class="b-btn ${d === barrierDigit ? "active" : ""}" data-d="${d}">${d}</button>`;
+      }
+      barrierGrid.innerHTML = out;
+      overLbl.textContent = barrierDigit;
+      underLbl.textContent = barrierDigit;
+
+      barrierGrid.querySelectorAll(".b-btn").forEach(el => {
+        el.addEventListener("click", () => {
+          barrierDigit = Number(el.dataset.d);
+          drawBarriers();
         });
       });
     }
 
-    function updatePnLDisplay() {
-      const lossUsed = sessionNetPnL < 0 ? Math.abs(sessionNetPnL) : 0;
-      const remaining = Math.max(0, MAX_DAILY_LOSS_USD - lossUsed);
-      pnlStatus.textContent = `Session P&L: $${sessionNetPnL.toFixed(2)} | Remaining Loss Buffer: $${remaining.toFixed(2)}`;
+    function subscribeSymbol(sym) {
+      activeSymbol = sym;
+      prevPrice = null;
+      digitList = [];
+      drawDigits(null);
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ forget_all: "ticks" }));
+      ws.send(JSON.stringify({ ticks: sym, subscribe: 1 }));
+      writeLog(`Subscribed to ${sym}`);
     }
 
-    function connectSocket() {
-      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-        return;
+    function authFromUrl() {
+      const q = new URLSearchParams(window.location.search);
+      const list = [];
+      for (let i = 1; i <= 5; i++) {
+        const acct = q.get(`acct${i}`);
+        const token = q.get(`token${i}`);
+        if (acct && token) list.push({ acct, token });
       }
-      const url = WS_ENDPOINTS[endpointIndex % WS_ENDPOINTS.length];
-      wsStatusText.textContent = "WS: Connecting...";
-      log(`Connecting WebSocket (${url})...`);
-      socket = new WebSocket(url);
+      if (!list.length || !ws || ws.readyState !== WebSocket.OPEN) return;
 
-      socket.onopen = () => {
-        wsStatusText.textContent = "WS: Live";
-        log("Connected to Deriv WebSocket feed.");
-        subscribeTicks(marketSelect.value);
-        checkOAuthTokenInUrl();
+      const demoAcct = list.find(item => item.acct.startsWith("VRTC"));
+      const chosen = (!isRealMode && demoAcct) ? demoAcct : list[0];
+      writeLog(`Authorizing ${chosen.acct}...`);
+      ws.send(JSON.stringify({ authorize: chosen.token }));
+    }
+
+    function connectWS() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+      const endpoint = `wss://ws.derivws.com/websockets/v3?app_id=${WS_APP_ID}`;
+      connLabel.textContent = "Socket: Connecting...";
+      writeLog(`Connecting to ${endpoint}`);
+      ws = new WebSocket(endpoint);
+
+      ws.onopen = () => {
+        connLabel.textContent = "Socket: Connected";
+        writeLog("WebSocket connected.");
+        subscribeSymbol(symbolSelect.value);
+        authFromUrl();
       };
 
-      socket.onerror = () => {
-        wsStatusText.textContent = "WS: Error";
-        log("WebSocket error encountered; rotating endpoint if needed.");
-      };
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.error) {
+          writeLog(`Deriv error: ${msg.error.message}`);
+          return;
+        }
 
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.error) {
-            log(`Deriv API notice: ${data.error.message}`);
-            return;
+        if (msg.tick && msg.tick.symbol === activeSymbol) {
+          const decimals = typeof msg.tick.pip_size === "number" ? msg.tick.pip_size : 2;
+          const num = Number(msg.tick.quote);
+          const formatted = num.toFixed(decimals);
+          const lastDigit = Number(formatted.slice(-1));
+
+          if (prevPrice !== null) {
+            const diff = num - prevPrice;
+            const sign = diff >= 0 ? "+" : "";
+            tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(decimals)}`;
           }
+          prevPrice = num;
 
-          if (data.tick && data.tick.symbol === activeTickSymbol) {
-            const pip = (typeof data.tick.pip_size === "number") ? data.tick.pip_size : 2;
-            const quoteNum = Number(data.tick.quote);
-            const quoteStr = quoteNum.toFixed(pip);
-            const lastDigit = parseInt(quoteStr.slice(-1), 10);
+          priceText.textContent = `${msg.tick.symbol}: ${formatted}`;
+          digitText.textContent = `Digit: ${lastDigit}`;
 
-            if (lastQuote !== null) {
-              const diff = quoteNum - lastQuote;
-              const sign = diff >= 0 ? "+" : "";
-              tickDelta.className = diff >= 0 ? "delta-pos" : "delta-neg";
-              tickDelta.textContent = `Tick: ${sign}${diff.toFixed(pip)} | Epoch: ${data.tick.epoch}`;
-            }
-            lastQuote = quoteNum;
+          digitList.push(lastDigit);
+          if (digitList.length > 50) digitList.shift();
+          drawDigits(lastDigit);
 
-            liveTick.textContent = `${data.tick.symbol}: ${quoteStr}`;
-            lastDigitBox.textContent = `Digit: ${lastDigit}`;
-
-            digitHistory.push(lastDigit);
-            if (digitHistory.length > 50) digitHistory.shift();
-            renderDigitGrid(lastDigit);
-
-            if (autoBotArmed && digitHistory.length >= 3) {
-              runSimpleAutoRule();
+          if (autoEnabled && digitList.length >= 3) {
+            const tail3 = digitList.slice(-3);
+            if (tail3.every(d => d <= 2) && !activeSymbol.startsWith("frx")) {
+              digitList = [];
+              writeLog(`Auto rule triggered on [${tail3.join(", ")}] -> OVER 3`);
+              sendTrade("DIGITOVER", 3);
             }
           }
+        }
 
-          if (data.authorize) {
-            const acct = data.authorize;
-            isAuthorized = true;
-            accountIsVirtual = Boolean(acct.is_virtual);
-            const acctType = accountIsVirtual ? "DEMO" : "REAL";
-            headerBalance.textContent = `${Number(acct.balance).toFixed(2)} ${acct.currency}`;
-            headerAcct.textContent = `${acct.loginid} (${acctType})`;
-            log(`Logged in: ${acct.loginid} [${acctType}] | Balance: ${acct.balance} ${acct.currency}`);
-          }
+        if (msg.authorize) {
+          const a = msg.authorize;
+          isAuthorized = true;
+          isVirtualAcct = Boolean(a.is_virtual);
+          const kind = isVirtualAcct ? "DEMO" : "REAL";
+          balText.textContent = `${Number(a.balance).toFixed(2)} ${a.currency}`;
+          acctText.textContent = `${a.loginid} (${kind})`;
+          writeLog(`Authorized ${a.loginid} [${kind}] — Balance: ${a.balance} ${a.currency}`);
+        }
 
-          if (data.buy) {
-            const b = data.buy;
-            log(`OPENED #${b.contract_id} | Stake: $${Number(b.buy_price).toFixed(2)} | Payout: $${Number(b.payout).toFixed(2)}`);
-            socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: b.contract_id, subscribe: 1 }));
-          }
+        if (msg.buy) {
+          const b = msg.buy;
+          writeLog(`Trade #${b.contract_id} opened | Stake: $${Number(b.buy_price).toFixed(2)}`);
+          ws.send(JSON.stringify({ proposal_open_contract: 1, contract_id: b.contract_id, subscribe: 1 }));
+        }
 
-          if (data.proposal_open_contract && data.proposal_open_contract.is_sold) {
-            const poc = data.proposal_open_contract;
-            const profit = Number(poc.profit);
-            sessionNetPnL += profit;
-            updatePnLDisplay();
-            log(`SETTLED #${poc.contract_id}: ${profit >= 0 ? "WIN +" : "LOSS "}$${profit.toFixed(2)}`);
-            socket.send(JSON.stringify({ forget: poc.id }));
-          }
-        } catch (err) {
-          log(`Parse error: ${err.message}`);
+        if (msg.proposal_open_contract && msg.proposal_open_contract.is_sold) {
+          const poc = msg.proposal_open_contract;
+          const pnl = Number(poc.profit);
+          sessionPnL += pnl;
+          updatePnL();
+          writeLog(`Trade #${poc.contract_id} settled: ${pnl >= 0 ? "WIN +" : "LOSS "}$${pnl.toFixed(2)}`);
+          ws.send(JSON.stringify({ forget: poc.id }));
         }
       };
 
-      socket.onclose = (event) => {
-        wsStatusText.textContent = "WS: Reconnecting";
-        endpointIndex += 1;
-        log(`WebSocket closed (code ${event.code}). Reconnecting in 3s...`);
-        setTimeout(connectSocket, 3000);
+      ws.onclose = (ev) => {
+        connLabel.textContent = "Socket: Reconnecting";
+        writeLog(`WebSocket closed (code ${ev.code}). Reconnecting in 3s...`);
+        setTimeout(connectWS, 3000);
       };
     }
 
-    function subscribeTicks(symbol) {
-      activeTickSymbol = symbol;
-      lastQuote = null;
-      digitHistory = [];
-      renderDigitGrid(null);
-      if (!socket || socket.readyState !== WebSocket.OPEN) return;
-      socket.send(JSON.stringify({ forget_all: "ticks" }));
-      socket.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
-      log(`Subscribed to ${symbol}`);
-    }
-
-    function checkOAuthTokenInUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const tokens = [];
-      for (let i = 1; i <= 5; i++) {
-        const acct = params.get(`acct${i}`);
-        const token = params.get(`token${i}`);
-        if (acct && token) tokens.push({ acct, token });
-      }
-      if (tokens.length > 0 && socket && socket.readyState === WebSocket.OPEN) {
-        const demoEntry = tokens.find(t => t.acct.startsWith("VRTC"));
-        const selected = (!isRealMode && demoEntry) ? demoEntry : tokens[0];
-        log(`Authorizing ${selected.acct}...`);
-        socket.send(JSON.stringify({ authorize: selected.token }));
-      }
-    }
-
-    function placeContract(contractType, barrier = null) {
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        log("Blocked: WebSocket not connected.");
+    function sendTrade(contractType, barrier = null) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        writeLog("Cannot trade: WebSocket not connected.");
         return;
       }
       if (!isAuthorized) {
-        log("Blocked: Connect Deriv Account (OAuth) first.");
+        writeLog("Cannot trade: Connect Deriv account first.");
         return;
       }
-      if (!isRealMode && !accountIsVirtual) {
-        log("Blocked: In DEMO mode, but a REAL account token is active.");
+      if (!isRealMode && !isVirtualAcct) {
+        writeLog("Blocked: Dashboard is in DEMO mode, but token is REAL.");
         return;
       }
-      if (isRealMode && accountIsVirtual) {
-        log("Blocked: In REAL mode, but a DEMO account token is active.");
-        return;
-      }
-
-      const lossUsed = sessionNetPnL < 0 ? Math.abs(sessionNetPnL) : 0;
-      if (lossUsed >= MAX_DAILY_LOSS_USD) {
-        autoBotArmed = false;
-        document.getElementById("armAutoBtn").textContent = "Auto-Bot: LOCKED ($10 Loss Cap)";
-        log("LOCKED: Daily loss cap ($10.00) reached.");
+      if (isRealMode && isVirtualAcct) {
+        writeLog("Blocked: Dashboard is in REAL mode, but token is DEMO.");
         return;
       }
 
-      let stake = parseFloat(stakeInput.value);
-      if (isNaN(stake) || stake < 0.35) {
-        log("Blocked: Minimum stake is $0.35.");
-        return;
-      }
-      if (stake > MAX_STAKE_USD) {
-        stake = MAX_STAKE_USD;
-        stakeInput.value = MAX_STAKE_USD.toFixed(2);
-        log("Guardrail: Stake capped to $1.00 ($50 capital rule).");
-      }
-
-      const symbol = marketSelect.value;
-      const isDigitContract = (contractType === "DIGITOVER" || contractType === "DIGITUNDER");
-      if (isDigitContract && symbol.startsWith("frx")) {
-        log("Blocked: Over/Under requires a Derived Index, not Forex.");
-        return;
-      }
-
-      const duration = Math.min(10, Math.max(1, parseInt(durationInput.value, 10) || 1));
-      const parameters = {
-        amount: stake,
-        basis: "stake",
-        contract_type: contractType,
-        currency: "USD",
-        duration: duration,
-        duration_unit: "t",
-        symbol: symbol
-      };
-      if (isDigitContract && barrier !== null) {
-        parameters.barrier = String(barrier);
-      }
-
-      log(`Placing ${contractType}${barrier !== null ? " (" + barrier + ")" : ""} | $${stake.toFixed(2)} | ${duration}t on ${symbol}`)
+      const usedLoss = sessionPnL < 0 ? Math.abs(sessionPnL) : 0;
+      if (usedLoss >= MAX_DAILY_LOSS) {
+        autoEnabled = false;
+        auto
+  
