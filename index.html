@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MARKET KILLER ZONE — Personal Terminal</title>
+  <title>MARKET KILLER ZONE — Personal Ledger Terminal</title>
   <style>
     :root {
       --bg: #0b0f17;
@@ -15,7 +15,6 @@
       --red: #dc2626;
       --blue: #2563eb;
       --teal: #0d9488;
-      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
@@ -77,6 +76,8 @@
     button.secondary { background: #1e293b; border-color: #334155; }
     button.real-switch { background: #7f1d1d; border-color: #ef4444; }
     button.demo-switch { background: #14532d; border-color: #22c55e; }
+    button.deposit-btn { background: #15803d; border-color: #22c55e; margin-top: 0; }
+    button.withdraw-btn { background: #b45309; border-color: #f59e0b; margin-top: 0; }
     button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
     button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
     button.over { background: var(--teal); border-color: #14b8a6; margin-top: 0; }
@@ -188,16 +189,23 @@
       </div>
     </div>
 
-    <!-- ACCOUNT SWITCHER: DEMO ($10,000 MAX) & REAL ($50 LEDGER) -->
+    <!-- ACCOUNT & PERSONAL CASHIER LEDGER -->
     <div class="card">
       <div class="pill-row">
         <span id="modePill" class="mode-pill">ACCOUNT: DEMO (MAX $10,000)</span>
-        <span id="simStatus" class="sub" style="margin:0;">Feed: Active</span>
+        <span id="simStatus" class="sub" style="margin:0;">Personal Leisure</span>
       </div>
 
       <div class="row2">
         <button id="switchAcctBtn" class="real-switch" type="button">Switch to Real Account</button>
         <button id="topUpDemoBtn" class="secondary" type="button">Top Up Demo ($10k Max)</button>
+      </div>
+
+      <label for="cashierAmountInput">Personal Deposit / Withdraw Amount (USD)</label>
+      <input id="cashierAmountInput" type="number" step="1.00" min="1.00" value="10.00" />
+      <div class="row2" style="margin-top:8px;">
+        <button id="depositBtn" class="deposit-btn" type="button">+ Deposit to Ledger</button>
+        <button id="withdrawBtn" class="withdraw-btn" type="button">- Withdraw to Bank/Wallet</button>
       </div>
 
       <div class="row2">
@@ -257,11 +265,12 @@
 
     <!-- ACCOUNT RISK GUARDRAILS -->
     <div class="card">
-      <h2>Risk Guardrails</h2>
+      <h2>Personal Risk Guardrails</h2>
       <ul class="guard-list">
         <li><strong>Demo Cap:</strong> Maximum Demo balance capped at $10,000.00.</li>
         <li><strong>Real Ledger:</strong> Starts at $50.00 — max stake locked at $1.00.</li>
         <li><strong>Daily Stop:</strong> $10.00 max session loss before automatic lock.</li>
+        <li><strong>Personal Use:</strong> Standalone browser ledger; real bank transfers happen in your broker cashier.</li>
       </ul>
       <div id="pnlText" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Loss Buffer Left: $10.00</div>
       <button id="autoBtn" class="auto-off" type="button">Auto-Rule: OFF (Manual Only)</button>
@@ -270,7 +279,7 @@
     <!-- LOG -->
     <div class="card">
       <h2>Activity Log</h2>
-      <div id="logArea" class="log">Starting personal terminal...</div>
+      <div id="logArea" class="log">Starting personal leisure terminal...</div>
     </div>
   </div>
 
@@ -301,6 +310,7 @@
     const modePill = document.getElementById("modePill");
     const switchAcctBtn = document.getElementById("switchAcctBtn");
     const topUpDemoBtn = document.getElementById("topUpDemoBtn");
+    const cashierAmountInput = document.getElementById("cashierAmountInput");
     const simStatus = document.getElementById("simStatus");
     const symbolSelect = document.getElementById("symbolSelect");
     const priceText = document.getElementById("priceText");
@@ -517,64 +527,36 @@
       writeLog(`[${acctKey.toUpperCase()}] #${id} Opened ${label} | $${stake.toFixed(2)} | ${duration}t`);
     }
 
-    switchAcctBtn.addEventListener("click", () => {
-      if (!isRealAccount) {
-        if (!confirm("Switch to REAL account ledger ($50.00 starting balance, $1.00 max stake)?")) return;
-        isRealAccount = true;
-        autoEnabled = false;
-        autoBtn.className = "auto-off";
-        autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
-        syncAccountUI();
-        writeLog("Switched to REAL account ledger ($50.00).");
-      } else {
-        isRealAccount = false;
-        syncAccountUI();
-        writeLog("Switched to DEMO account ledger (Max $10,000.00).");
+    document.getElementById("depositBtn").addEventListener("click", () => {
+      const amt = Number(cashierAmountInput.value);
+      if (!Number.isFinite(amt) || amt <= 0) {
+        writeLog("Enter a valid deposit amount greater than $0.00.");
+        return;
       }
-    });
-
-    topUpDemoBtn.addEventListener("click", () => {
-      if (isRealAccount) return;
-      accounts.demo.balance = DEMO_MAX_BALANCE;
-      syncAccountUI();
-      writeLog("Demo balance set to $10,000.00 maximum.");
-    });
-
-    pauseBtn.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "Resume Feed" : "Pause Feed";
-      simStatus.textContent = isPaused ? "Feed: Paused" : "Feed: Active";
-      writeLog(isPaused ? "Feed paused." : "Feed resumed.");
-    });
-
-    document.getElementById("resetAcctBtn").addEventListener("click", () => {
-      if (isRealAccount) {
-        accounts.real.balance = REAL_START_BALANCE;
-        accounts.real.pnl = 0;
-        accounts.real.openTrades = [];
-        writeLog("REAL ledger reset to $50.00.");
-      } else {
-        accounts.demo.balance = DEMO_MAX_BALANCE;
-        accounts.demo.pnl = 0;
-        accounts.demo.openTrades = [];
-        writeLog("DEMO ledger reset to $10,000.00.");
+      const acctKey = isRealAccount ? "real" : "demo";
+      const acct = accounts[acctKey];
+      let nextBal = Number((acct.balance + amt).toFixed(2));
+      if (!isRealAccount && nextBal > DEMO_MAX_BALANCE) {
+        nextBal = DEMO_MAX_BALANCE;
+        writeLog("Demo balance capped at $10,000.00 maximum.");
       }
-      autoEnabled = false;
-      autoBtn.className = "auto-off";
-      autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
+      acct.balance = nextBal;
       syncAccountUI();
+      writeLog(`[${acctKey.toUpperCase()}] Logged deposit of +$${amt.toFixed(2)} | New Balance: $${formatMoney(acct.balance)}`);
     });
 
-    symbolSelect.addEventListener("change", () => {
-      activeSymbol = symbolSelect.value;
-      currentPrice = activeSymbol === "SIM_FX" ? 1.0850 : 1000.00;
-      prevPrice = null;
-      digitList = [];
-      accounts.demo.openTrades = [];
-      accounts.real.openTrades = [];
-      drawDigits(null);
-      writeLog(`Feed switched to ${activeSymbol}`);
-    });
-
-    document.getElementById("riseBtn").addEventListener("click", () => placeTrade("CALL"));
-    document.getElementById("fallBt
+    document.getElementById("withdrawBtn").addEventListener("click", () => {
+      const amt = Number(cashierAmountInput.value);
+      if (!Number.isFinite(amt) || amt <= 0) {
+        writeLog("Enter a valid withdrawal amount greater than $5.00.");
+        return;
+      }
+      const acctKey = isRealAccount ? "real" : "demo";
+      const acct = accounts[acctKey];
+      if (amt > acct.balance) {
+        writeLog(`: Withdrawal ($${amt.toFixed(2)}) is more than ${acctKey.toUpperCase()} balance ($${formatMoney(acct.balance)}).`);
+        return;
+      }
+      acct.balance = Number((acct.balance - amt).toFixed(2));
+      syncAccountUI();
+     
