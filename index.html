@@ -15,7 +15,6 @@
       --red: #dc2626;
       --blue: #2563eb;
       --teal: #0d9488;
-      --amber: #d97706;
       --border: #243044;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
@@ -77,6 +76,8 @@
     button.secondary { background: #1e293b; border-color: #334155; }
     button.real-switch { background: #7f1d1d; border-color: #ef4444; }
     button.demo-switch { background: #14532d; border-color: #22c55e; }
+    button.deposit-btn { background: #15803d; border-color: #22c55e; margin-top: 0; }
+    button.withdraw-btn { background: #b45309; border-color: #f59e0b; margin-top: 0; }
     button.rise { background: var(--green); border-color: #22c55e; margin-top: 0; }
     button.fall { background: var(--red); border-color: #ef4444; margin-top: 0; }
     button.over { background: var(--teal); border-color: #14b8a6; margin-top: 0; }
@@ -176,7 +177,6 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- TOP HEADER -->
     <div class="topbar">
       <div>
         <div class="title">MARKET KILLER ZONE</div>
@@ -188,16 +188,22 @@
       </div>
     </div>
 
-    <!-- ACCOUNT SWITCHER: DEMO ($10,000 MAX) & REAL ($50 LEDGER) -->
     <div class="card">
       <div class="pill-row">
         <span id="modePill" class="mode-pill">ACCOUNT: DEMO (MAX $10,000)</span>
-        <span id="simStatus" class="sub" style="margin:0;">Feed: Active</span>
+        <span id="simStatus" class="sub" style="margin:0;">Personal Leisure</span>
       </div>
 
       <div class="row2">
         <button id="switchAcctBtn" class="real-switch" type="button">Switch to Real Account</button>
         <button id="topUpDemoBtn" class="secondary" type="button">Top Up Demo ($10k Max)</button>
+      </div>
+
+      <label for="cashierAmountInput">Personal Deposit / Withdraw Amount (USD)</label>
+      <input id="cashierAmountInput" type="number" step="1.00" min="1.00" value="10.00" />
+      <div class="row2" style="margin-top:8px;">
+        <button id="depositBtn" class="deposit-btn" type="button">+ Deposit to Ledger</button>
+        <button id="withdrawBtn" class="withdraw-btn" type="button">- Withdraw to Bank/Wallet</button>
       </div>
 
       <div class="row2">
@@ -206,7 +212,6 @@
       </div>
     </div>
 
-    <!-- MARKET & DIGIT SCANNER -->
     <div class="card">
       <h2>Market &amp; Digit Scanner</h2>
       <label for="symbolSelect">Practice Feed</label>
@@ -227,7 +232,6 @@
       <div id="digitsGrid" class="digits-grid"></div>
     </div>
 
-    <!-- RISE / FALL & OVER / UNDER -->
     <div class="card">
       <h2>Trade Execution</h2>
       <div class="row2">
@@ -255,19 +259,18 @@
       </div>
     </div>
 
-    <!-- ACCOUNT RISK GUARDRAILS -->
     <div class="card">
-      <h2>Risk Guardrails</h2>
+      <h2>Personal Risk Guardrails</h2>
       <ul class="guard-list">
         <li><strong>Demo Cap:</strong> Maximum Demo balance capped at $10,000.00.</li>
         <li><strong>Real Ledger:</strong> Starts at $50.00 — max stake locked at $1.00.</li>
         <li><strong>Daily Stop:</strong> $10.00 max session loss before automatic lock.</li>
+        <li><strong>Personal Use:</strong> Standalone browser ledger; real bank transfers happen in your broker cashier.</li>
       </ul>
       <div id="pnlText" class="sub" style="margin-top:8px;">Session P&amp;L: $0.00 | Loss Buffer Left: $10.00</div>
       <button id="autoBtn" class="auto-off" type="button">Auto-Rule: OFF (Manual Only)</button>
     </div>
 
-    <!-- LOG -->
     <div class="card">
       <h2>Activity Log</h2>
       <div id="logArea" class="log">Starting personal terminal...</div>
@@ -275,306 +278,274 @@
   </div>
 
   <script>
-    const DEMO_MAX_BALANCE = 10000.00;
-    const REAL_START_BALANCE = 50.00;
-    const MAX_STAKE = 1.00;
-    const MAX_DAILY_LOSS = 10.00;
+    (function () {
+      const DEMO_MAX_BALANCE = 10000.00;
+      const REAL_START_BALANCE = 50.00;
+      const MAX_STAKE = 1.00;
+      const MAX_DAILY_LOSS = 10.00;
 
-    let isRealAccount = false;
-    const accounts = {
-      demo: { balance: DEMO_MAX_BALANCE, pnl: 0, openTrades: [] },
-      real: { balance: REAL_START_BALANCE, pnl: 0, openTrades: [] }
-    };
+      let isRealAccount = false;
+      const accounts = {
+        demo: { balance: DEMO_MAX_BALANCE, pnl: 0, openTrades: [] },
+        real: { balance: REAL_START_BALANCE, pnl: 0, openTrades: [] }
+      };
 
-    let isPaused = false;
-    let autoEnabled = false;
-    let activeSymbol = "SIM_V100";
-    let currentPrice = 1000.00;
-    let prevPrice = null;
-    let barrierDigit = 4;
-    let digitList = [];
-    let tradeCounter = 1;
+      let isPaused = false;
+      let autoEnabled = false;
+      let activeSymbol = "SIM_V100";
+      let currentPrice = 1000.00;
+      let prevPrice = null;
+      let barrierDigit = 4;
+      let digitList = [];
+      let tradeCounter = 1;
 
-    const clockText = document.getElementById("clockText");
-    const balText = document.getElementById("balText");
-    const acctText = document.getElementById("acctText");
-    const modePill = document.getElementById("modePill");
-    const switchAcctBtn = document.getElementById("switchAcctBtn");
-    const topUpDemoBtn = document.getElementById("topUpDemoBtn");
-    const simStatus = document.getElementById("simStatus");
-    const symbolSelect = document.getElementById("symbolSelect");
-    const priceText = document.getElementById("priceText");
-    const tickMeta = document.getElementById("tickMeta");
-    const digitText = document.getElementById("digitText");
-    const digitsGrid = document.getElementById("digitsGrid");
-    const barrierGrid = document.getElementById("barrierGrid");
-    const overLbl = document.getElementById("overLbl");
-    const underLbl = document.getElementById("underLbl");
-    const stakeInput = document.getElementById("stakeInput");
-    const ticksInput = document.getElementById("ticksInput");
-    const pnlText = document.getElementById("pnlText");
-    const autoBtn = document.getElementById("autoBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const logArea = document.getElementById("logArea");
+      const clockText = document.getElementById("clockText");
+      const balText = document.getElementById("balText");
+      const acctText = document.getElementById("acctText");
+      const modePill = document.getElementById("modePill");
+      const switchAcctBtn = document.getElementById("switchAcctBtn");
+      const topUpDemoBtn = document.getElementById("topUpDemoBtn");
+      const cashierAmountInput = document.getElementById("cashierAmountInput");
+      const simStatus = document.getElementById("simStatus");
+      const symbolSelect = document.getElementById("symbolSelect");
+      const priceText = document.getElementById("priceText");
+      const tickMeta = document.getElementById("tickMeta");
+      const digitText = document.getElementById("digitText");
+      const digitsGrid = document.getElementById("digitsGrid");
+      const barrierGrid = document.getElementById("barrierGrid");
+      const overLbl = document.getElementById("overLbl");
+      const underLbl = document.getElementById("underLbl");
+      const stakeInput = document.getElementById("stakeInput");
+      const ticksInput = document.getElementById("ticksInput");
+      const pnlText = document.getElementById("pnlText");
+      const autoBtn = document.getElementById("autoBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const logArea = document.getElementById("logArea");
 
-    function activeAcct() {
-      return isRealAccount ? accounts.real : accounts.demo;
-    }
-
-    function writeLog(msg) {
-      const t = new Date().toLocaleTimeString();
-      logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
-    }
-
-    function getDecimals() {
-      return activeSymbol === "SIM_FX" ? 4 : 2;
-    }
-
-    function formatMoney(val) {
-      return Number(val).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    function syncAccountUI() {
-      const acct = activeAcct();
-      if (!isRealAccount && acct.balance > DEMO_MAX_BALANCE) {
-        acct.balance = DEMO_MAX_BALANCE;
+      function activeAcct() {
+        return isRealAccount ? accounts.real : accounts.demo;
       }
 
-      balText.textContent = `$${formatMoney(acct.balance)}`;
-      if (isRealAccount) {
-        acctText.textContent = "REAL Ledger ($50 Guarded)";
-        modePill.textContent = "ACCOUNT: REAL ($50 GUARDED)";
-        modePill.className = "mode-pill real";
-        switchAcctBtn.textContent = "Switch to Demo ($10k Max)";
-        switchAcctBtn.className = "demo-switch";
-        topUpDemoBtn.disabled = true;
-      } else {
-        acctText.textContent = "DEMO Ledger (Max $10,000)";
-        modePill.textContent = "ACCOUNT: DEMO (MAX $10,000)";
-        modePill.className = "mode-pill";
-        switchAcctBtn.textContent = "Switch to Real Account";
-        switchAcctBtn.className = "real-switch";
-        topUpDemoBtn.disabled = false;
+      function writeLog(msg) {
+        if (!logArea) return;
+        const t = new Date().toLocaleTimeString();
+        logArea.textContent = `[${t}] ${msg}\n` + logArea.textContent;
       }
 
-      const usedLoss = acct.pnl < 0 ? Math.abs(acct.pnl) : 0;
-      const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
-      pnlText.textContent = `Session P&L: ${acct.pnl >= 0 ? "+" : ""}$${acct.pnl.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
-    }
-
-    function drawDigits(lastD = null) {
-      const n = digitList.length || 1;
-      let out = "";
-      for (let d = 0; d <= 9; d++) {
-        const cnt = digitList.filter(v => v === d).length;
-        const pct = digitList.length ? ((cnt / n) * 100).toFixed(1) : "0.0";
-        out += `<div class="d-card ${d === lastD ? "hit" : ""}"><div class="d-num">${d}</div><div class="d-pct">${pct}%</div></div>`;
+      function getDecimals() {
+        return activeSymbol === "SIM_FX" ? 4 : 2;
       }
-      digitsGrid.innerHTML = out;
-    }
 
-    function drawBarriers() {
-      let out = "";
-      for (let d = 0; d <= 9; d++) {
-        out += `<button type="button" class="b-btn ${d === barrierDigit ? "active" : ""}" data-d="${d}">${d}</button>`;
-      }
-      barrierGrid.innerHTML = out;
-      overLbl.textContent = barrierDigit;
-      underLbl.textContent = barrierDigit;
-
-      barrierGrid.querySelectorAll(".b-btn").forEach(el => {
-        el.addEventListener("click", () => {
-          barrierDigit = Number(el.dataset.d);
-          drawBarriers();
+      function formatMoney(val) {
+        return Number(val).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
         });
-      });
-    }
+      }
 
-    function evaluateTradesForAccount(acctKey, newPrice, lastDigit) {
-      const acct = accounts[acctKey];
-      const maxCap = acctKey === "demo" ? DEMO_MAX_BALANCE : Infinity;
-      const remaining = [];
-
-      for (const tr of acct.openTrades) {
-        tr.ticksLeft -= 1;
-        if (tr.ticksLeft > 0) {
-          remaining.push(tr);
-          continue;
+      function syncAccountUI() {
+        const acct = activeAcct();
+        if (!isRealAccount && acct.balance > DEMO_MAX_BALANCE) {
+          acct.balance = DEMO_MAX_BALANCE;
         }
 
-        let won = false;
-        let payoutMultiplier = 1.9;
-        if (tr.type === "CALL") won = newPrice > tr.entryPrice;
-        else if (tr.type === "PUT") won = newPrice < tr.entryPrice;
-        else if (tr.type === "DIGITOVER") {
-          won = lastDigit > tr.barrier;
-          payoutMultiplier = 1.85;
-        } else if (tr.type === "DIGITUNDER") {
-          won = lastDigit < tr.barrier;
-          payoutMultiplier = 1.85;
+        balText.textContent = `$${formatMoney(acct.balance)}`;
+        if (isRealAccount) {
+          acctText.textContent = "REAL Ledger ($50 Guarded)";
+          modePill.textContent = "ACCOUNT: REAL ($50 GUARDED)";
+          modePill.className = "mode-pill real";
+          switchAcctBtn.textContent = "Switch to Demo ($10k Max)";
+          switchAcctBtn.className = "demo-switch";
+          topUpDemoBtn.disabled = true;
+        } else {
+          acctText.textContent = "DEMO Ledger (Max $10,000)";
+          modePill.textContent = "ACCOUNT: DEMO (MAX $10,000)";
+          modePill.className = "mode-pill";
+          switchAcctBtn.textContent = "Switch to Real Account";
+          switchAcctBtn.className = "real-switch";
+          topUpDemoBtn.disabled = false;
         }
 
-        let net = won ? Number((tr.stake * (payoutMultiplier - 1)).toFixed(2)) : -tr.stake;
-        let nextBal = Number((acct.balance + net).toFixed(2));
-        if (nextBal > maxCap) {
-          net = Number((maxCap - acct.balance).toFixed(2));
-          nextBal = maxCap;
-        }
-        if (nextBal < 0) nextBal = 0;
+        const usedLoss = acct.pnl < 0 ? Math.abs(acct.pnl) : 0;
+        const left = Math.max(0, MAX_DAILY_LOSS - usedLoss);
+        pnlText.textContent = `Session P&L: ${acct.pnl >= 0 ? "+" : ""}$${acct.pnl.toFixed(2)} | Loss Buffer Left: $${left.toFixed(2)}`;
+      }
 
+      function drawDigits(lastD = null) {
+        const n = digitList.length || 1;
+        let out = "";
+        for (let d = 0; d <= 9; d++) {
+          const cnt = digitList.filter(v => v === d).length;
+          const pct = digitList.length ? ((cnt / n) * 100).toFixed(1) : "0.0";
+          out += `<div class="d-card ${d === lastD ? "hit" : ""}"><div class="d-num">${d}</div><div class="d-pct">${pct}%</div></div>`;
+        }
+        digitsGrid.innerHTML = out;
+      }
+
+      function drawBarriers() {
+        let out = "";
+        for (let d = 0; d <= 9; d++) {
+          out += `<button type="button" class="b-btn ${d === barrierDigit ? "active" : ""}" data-d="${d}">${d}</button>`;
+        }
+        barrierGrid.innerHTML = out;
+        overLbl.textContent = barrierDigit;
+        underLbl.textContent = barrierDigit;
+
+        barrierGrid.querySelectorAll(".b-btn").forEach(el => {
+          el.addEventListener("click", () => {
+            barrierDigit = Number(el.dataset.d);
+            drawBarriers();
+          });
+        });
+      }
+
+      function evaluateTradesForAccount(acctKey, newPrice, lastDigit) {
+        const acct = accounts[acctKey];
+        const maxCap = acctKey === "demo" ? DEMO_MAX_BALANCE : Infinity;
+        const remaining = [];
+
+        for (const tr of acct.openTrades) {
+          tr.ticksLeft -= 1;
+          if (tr.ticksLeft > 0) {
+            remaining.push(tr);
+            continue;
+          }
+
+          let won = false;
+          let payoutMultiplier = 1.9;
+          if (tr.type === "CALL") won = newPrice > tr.entryPrice;
+          else if (tr.type === "PUT") won = newPrice < tr.entryPrice;
+          else if (tr.type === "DIGITOVER") {
+            won = lastDigit > tr.barrier;
+            payoutMultiplier = 1.85;
+          } else if (tr.type === "DIGITUNDER") {
+            won = lastDigit < tr.barrier;
+            payoutMultiplier = 1.85;
+          }
+
+          let net = won ? Number((tr.stake * (payoutMultiplier - 1)).toFixed(2)) : -tr.stake;
+          let nextBal = Number((acct.balance + net).toFixed(2));
+          if (nextBal > maxCap) {
+            net = Number((maxCap - acct.balance).toFixed(2));
+            nextBal = maxCap;
+          }
+          if (nextBal < 0) nextBal = 0;
+
+          acct.balance = nextBal;
+          acct.pnl = Number((acct.pnl + net).toFixed(2));
+
+          if ((acctKey === "real" && isRealAccount) || (acctKey === "demo" && !isRealAccount)) {
+            syncAccountUI();
+            writeLog(`[${acctKey.toUpperCase()}] #${tr.id} ${tr.label}: ${won ? "WIN +" : "LOSS "}$${Math.abs(net).toFixed(2)} | Bal: $${formatMoney(acct.balance)}`);
+          }
+        }
+        acct.openTrades = remaining;
+      }
+
+      function stepTick() {
+        clockText.textContent = `Session Time: ${new Date().toLocaleTimeString()}`;
+        if (isPaused) return;
+
+        const dec = getDecimals();
+        const stepSize = activeSymbol === "SIM_FX" ? 0.0005 : 0.35;
+        const delta = (Math.random() * 2 - 1) * stepSize;
+        prevPrice = currentPrice;
+        currentPrice = Math.max(1, currentPrice + delta);
+
+        const formatted = currentPrice.toFixed(dec);
+        const lastDigit = Number(formatted.slice(-1));
+        const diff = prevPrice !== null ? currentPrice - prevPrice : 0;
+        const sign = diff >= 0 ? "+" : "";
+
+        priceText.textContent = `${activeSymbol}: ${formatted}`;
+        tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(dec)}`;
+        digitText.textContent = `Digit: ${lastDigit}`;
+
+        digitList.push(lastDigit);
+        if (digitList.length > 50) digitList.shift();
+        drawDigits(lastDigit);
+
+        evaluateTradesForAccount("demo", currentPrice, lastDigit);
+        evaluateTradesForAccount("real", currentPrice, lastDigit);
+
+        if (autoEnabled && digitList.length >= 3) {
+          const tail3 = digitList.slice(-3);
+          if (tail3.every(d => d <= 2)) {
+            digitList = [];
+            writeLog(`Auto-rule triggered on [${tail3.join(", ")}] -> OVER 3`);
+            placeTrade("DIGITOVER", 3);
+          }
+        }
+      }
+
+      function placeTrade(type, barrier = null) {
+        const acctKey = isRealAccount ? "real" : "demo";
+        const acct = accounts[acctKey];
+
+        const usedLoss = acct.pnl < 0 ? Math.abs(acct.pnl) : 0;
+        if (usedLoss >= MAX_DAILY_LOSS) {
+          autoEnabled = false;
+          autoBtn.className = "auto-off";
+          autoBtn.textContent = "Auto-Rule: LOCKED ($10 Loss Cap)";
+          writeLog(`Blocked on ${acctKey.toUpperCase()}: $10.00 daily loss limit reached.`);
+          return;
+        }
+
+        let stake = Number(stakeInput.value);
+        if (!Number.isFinite(stake) || stake < 0.35) {
+          writeLog("Blocked: Minimum stake is $0.35.");
+          return;
+        }
+        if (stake > MAX_STAKE) {
+          stake = MAX_STAKE;
+          stakeInput.value = MAX_STAKE.toFixed(2);
+          writeLog("Guardrail: Stake capped to $1.00.");
+        }
+        if (stake > acct.balance) {
+          writeLog(`Blocked: Stake exceeds ${acctKey.toUpperCase()} balance.`);
+          return;
+        }
+
+        const duration = Math.min(10, Math.max(1, parseInt(ticksInput.value, 10) || 3));
+        const label = barrier !== null ? `${type} ${barrier}` : type;
+        const id = tradeCounter++;
+
+        acct.openTrades.push({
+          id,
+          type,
+          barrier,
+          label,
+          stake,
+          entryPrice: currentPrice,
+          ticksLeft: duration
+        });
+
+        writeLog(`[${acctKey.toUpperCase()}] #${id} Opened ${label} | $${stake.toFixed(2)} | ${duration}t`);
+      }
+
+      document.getElementById("depositBtn").addEventListener("click", () => {
+        const amt = Number(cashierAmountInput.value);
+        if (!Number.isFinite(amt) || amt <= 0) {
+          writeLog("Enter a valid deposit amount greater than $0.00.");
+          return;
+        }
+        const acctKey = isRealAccount ? "real" : "demo";
+        const acct = accounts[acctKey];
+        let nextBal = Number((acct.balance + amt).toFixed(2));
+        if (!isRealAccount && nextBal > DEMO_MAX_BALANCE) {
+          nextBal = DEMO_MAX_BALANCE;
+          writeLog("Demo balance capped at $10,000.00 maximum.");
+        }
         acct.balance = nextBal;
-        acct.pnl = Number((acct.pnl + net).toFixed(2));
-
-        if ((acctKey === "real" && isRealAccount) || (acctKey === "demo" && !isRealAccount)) {
-          syncAccountUI();
-          writeLog(`[${acctKey.toUpperCase()}] #${tr.id} ${tr.label}: ${won ? "WIN +" : "LOSS "}$${Math.abs(net).toFixed(2)} | Bal: $${formatMoney(acct.balance)}`);
-        }
-      }
-      acct.openTrades = remaining;
-    }
-
-    function stepTick() {
-      clockText.textContent = `Session Time: ${new Date().toLocaleTimeString()}`;
-      if (isPaused) return;
-
-      const dec = getDecimals();
-      const stepSize = activeSymbol === "SIM_FX" ? 0.0005 : 0.35;
-      const delta = (Math.random() * 2 - 1) * stepSize;
-      prevPrice = currentPrice;
-      currentPrice = Math.max(1, currentPrice + delta);
-
-      const formatted = currentPrice.toFixed(dec);
-      const lastDigit = Number(formatted.slice(-1));
-      const diff = prevPrice !== null ? currentPrice - prevPrice : 0;
-      const sign = diff >= 0 ? "+" : "";
-
-      priceText.textContent = `${activeSymbol}: ${formatted}`;
-      tickMeta.textContent = `Tick delta: ${sign}${diff.toFixed(dec)}`;
-      digitText.textContent = `Digit: ${lastDigit}`;
-
-      digitList.push(lastDigit);
-      if (digitList.length > 50) digitList.shift();
-      drawDigits(lastDigit);
-
-      evaluateTradesForAccount("demo", currentPrice, lastDigit);
-      evaluateTradesForAccount("real", currentPrice, lastDigit);
-
-      if (autoEnabled && digitList.length >= 3) {
-        const tail3 = digitList.slice(-3);
-        if (tail3.every(d => d <= 2)) {
-          digitList = [];
-          writeLog(`Auto-rule triggered on [${tail3.join(", ")}] -> OVER 3`);
-          placeTrade("DIGITOVER", 3);
-        }
-      }
-    }
-
-    function placeTrade(type, barrier = null) {
-      const acctKey = isRealAccount ? "real" : "demo";
-      const acct = accounts[acctKey];
-
-      const usedLoss = acct.pnl < 0 ? Math.abs(acct.pnl) : 0;
-      if (usedLoss >= MAX_DAILY_LOSS) {
-        autoEnabled = false;
-        autoBtn.className = "auto-off";
-        autoBtn.textContent = "Auto-Rule: LOCKED ($10 Loss Cap)";
-        writeLog(`Blocked on ${acctKey.toUpperCase()}: $10.00 daily loss limit reached.`);
-        return;
-      }
-
-      let stake = Number(stakeInput.value);
-      if (!Number.isFinite(stake) || stake < 0.35) {
-        writeLog("Blocked: Minimum stake is $0.35.");
-        return;
-      }
-      if (stake > MAX_STAKE) {
-        stake = MAX_STAKE;
-        stakeInput.value = MAX_STAKE.toFixed(2);
-        writeLog("Guardrail: Stake capped to $1.00.");
-      }
-      if (stake > acct.balance) {
-        writeLog(`Blocked: Stake exceeds ${acctKey.toUpperCase()} balance.`);
-        return;
-      }
-
-      const duration = Math.min(10, Math.max(1, parseInt(ticksInput.value, 10) || 3));
-      const label = barrier !== null ? `${type} ${barrier}` : type;
-      const id = tradeCounter++;
-
-      acct.openTrades.push({
-        id,
-        type,
-        barrier,
-        label,
-        stake,
-        entryPrice: currentPrice,
-        ticksLeft: duration
+        syncAccountUI();
+        writeLog(`[${acctKey.toUpperCase()}] Logged deposit of +$${amt.toFixed(2)} | New Balance: $${formatMoney(acct.balance)}`);
       });
 
-      writeLog(`[${acctKey.toUpperCase()}] #${id} Opened ${label} | $${stake.toFixed(2)} | ${duration}t`);
-    }
-
-    switchAcctBtn.addEventListener("click", () => {
-      if (!isRealAccount) {
-        if (!confirm("Switch to REAL account ledger ($50.00 starting balance, $1.00 max stake)?")) return;
-        isRealAccount = true;
-        autoEnabled = false;
-        autoBtn.className = "auto-off";
-        autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
-        syncAccountUI();
-        writeLog("Switched to REAL account ledger ($50.00).");
-      } else {
-        isRealAccount = false;
-        syncAccountUI();
-        writeLog("Switched to DEMO account ledger (Max $10,000.00).");
-      }
-    });
-
-    topUpDemoBtn.addEventListener("click", () => {
-      if (isRealAccount) return;
-      accounts.demo.balance = DEMO_MAX_BALANCE;
-      syncAccountUI();
-      writeLog("Demo balance set to $10,000.00 maximum.");
-    });
-
-    pauseBtn.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "Resume Feed" : "Pause Feed";
-      simStatus.textContent = isPaused ? "Feed: Paused" : "Feed: Active";
-      writeLog(isPaused ? "Feed paused." : "Feed resumed.");
-    });
-
-    document.getElementById("resetAcctBtn").addEventListener("click", () => {
-      if (isRealAccount) {
-        accounts.real.balance = REAL_START_BALANCE;
-        accounts.real.pnl = 0;
-        accounts.real.openTrades = [];
-        writeLog("REAL ledger reset to $50.00.");
-      } else {
-        accounts.demo.balance = DEMO_MAX_BALANCE;
-        accounts.demo.pnl = 0;
-        accounts.demo.openTrades = [];
-        writeLog("DEMO ledger reset to $10,000.00.");
-      }
-      autoEnabled = false;
-      autoBtn.className = "auto-off";
-      autoBtn.textContent = "Auto-Rule: OFF (Manual Only)";
-      syncAccountUI();
-    });
-
-    symbolSelect.addEventListener("change", () => {
-      activeSymbol = symbolSelect.value;
-      currentPrice = activeSymbol === "SIM_FX" ? 1.0850 : 1000.00;
-      prevPrice = null;
-      digitList = [];
-      accounts.demo.openTrades = [];
-      accounts.real.openTrades = [];
-      drawDigits(null);
-      writeLog(`Feed switched to ${activeSymbol}`);
-    });
-
-    document.getElementById("riseBtn").addEventListener("click", () => placeTrade("CALL"));
-    document.getElementById("fallBt
+      document.getElementById("withdrawBtn").addEventListener("click", () => {
+        const amt = Number(cashierAmountInput.value);
+        if (!Number.isFinite(amt) || amt <= 0) {
+          writeLog("Enter a valid withdrawal amount greater than $0.00.");
+          return;
+        }
+        const acctKey = isRealAccount ? "real" : "demo";
+        const acct = acc
