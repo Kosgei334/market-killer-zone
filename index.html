@@ -415,4 +415,2394 @@
 
           <!-- Canvas -->
           <div class="w-full h-56 sm:h-64 rounded-xl border border-main-custom p-2 relative overflow-hidden" style="background-color: var(--canvas-bg);">
-            <canvas id="marketCa
+            <canvas id="marketCanvas" class="w-full h-full block"></canvas>
+          </div>
+
+          <!-- 0-9 Digit Distribution Bars -->
+          <div class="pt-3 border-t border-main-custom">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <span class="text-xs font-bold uppercase tracking-wider">Last-Digit Distribution (0–9)</span>
+              <div class="flex items-center gap-3 text-[11px] font-mono">
+                <span class="text-emerald-500 font-semibold">● Hot (&ge;13%)</span>
+                <span class="text-amber-400 font-semibold">● Neutral</span>
+                <span class="text-rose-500 font-semibold">● Cold (&le;7%)</span>
+              </div>
+            </div>
+            <div id="dashboardDigitGrid" class="grid grid-cols-5 sm:grid-cols-10 gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Quick Strategy Cards -->
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold">Quick Strategy Launchers</h3>
+            <button id="dashGoFreeBotsBtn" type="button" class="text-xs font-bold text-emerald-500 hover:underline cursor-pointer">View All Free Bots &rarr;</button>
+          </div>
+          <div id="dashQuickBotsRow" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 2: BOT BUILDER -->
+      <section id="view-builder" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold">Strategy Block Configurator &amp; XML</h2>
+              <p class="text-xs text-muted-custom">Configure parameters, export/import XML, and load directly into the runner</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="builderLoadSampleXmlBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Load Sample XML</button>
+              <label for="builderImportXmlInput" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Import XML File</label>
+              <input id="builderImportXmlInput" type="file" accept=".xml" class="hidden" />
+              <button id="builderExportXmlBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold text-emerald-500 cursor-pointer">Export XML</button>
+              <button id="builderLoadRunnerBtn" type="button" class="btn-primary px-3.5 py-2 rounded-xl text-xs font-extrabold cursor-pointer">Load into Runner</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div>
+              <label for="cfgBotName" class="block text-xs font-semibold text-muted-custom mb-1">Strategy Name</label>
+              <input id="cfgBotName" type="text" value="Custom DBTraders Bot" class="input-field w-full rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold" />
+            </div>
+            <div>
+              <label for="cfgMarket" class="block text-xs font-semibold text-muted-custom mb-1">Market</label>
+              <select id="cfgMarket" class="input-field w-full rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold">
+                <option value="R_100">Volatility 100 Index (R_100)</option>
+                <option value="R_75">Volatility 75 Index (R_75)</option>
+                <option value="R_10">Volatility 10 Index (R_10)</option>
+                <option value="JD25">Jump 25 Index (JD25)</option>
+              </select>
+            </div>
+            <div>
+              <label for="cfgTradeType" class="block text-xs font-semibold text-muted-custom mb-1">Trade Type</label>
+              <select id="cfgTradeType" class="input-field w-full rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold">
+                <option value="DIGITOVER">Digits Over</option>
+                <option value="DIGITUNDER">Digits Under</option>
+                <option value="DIGITEVEN">Digits Even</option>
+                <option value="DIGITODD">Digits Odd</option>
+                <option value="CALL">Rise (CALL)</option>
+                <option value="PUT">Fall (PUT)</option>
+              </select>
+            </div>
+            <div>
+              <label for="cfgBarrier" class="block text-xs font-semibold text-muted-custom mb-1">Digit Barrier (0–9)</label>
+              <input id="cfgBarrier" type="number" min="0" max="9" value="3" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="cfgStake" class="block text-xs font-semibold text-muted-custom mb-1">Base Stake ($)</label>
+              <input id="cfgStake" type="number" min="0.35" step="0.05" value="1.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="cfgDuration" class="block text-xs font-semibold text-muted-custom mb-1">Duration (Ticks)</label>
+              <input id="cfgDuration" type="number" min="1" max="10" value="1" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="cfgMartingale" class="block text-xs font-semibold text-muted-custom mb-1">Martingale Multiplier</label>
+              <input id="cfgMartingale" type="number" min="1.0" max="10.0" step="0.1" value="2.1" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="cfgTakeProfit" class="block text-xs font-semibold text-muted-custom mb-1">Take Profit ($)</label>
+              <input id="cfgTakeProfit" type="number" min="1" step="1" value="50.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="cfgStopLoss" class="block text-xs font-semibold text-muted-custom mb-1">Stop Loss ($)</label>
+              <input id="cfgStopLoss" type="number" min="1" step="1" value="50.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-muted-custom mb-1.5">XML Definition Preview</div>
+            <pre id="builderXmlCode" class="surface-subtle rounded-xl p-3.5 font-mono text-[11px] text-emerald-500 overflow-x-auto max-h-44"></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: FREE BOTS -->
+      <section id="view-freebots" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold">Free Bots Library</h2>
+              <p class="text-xs text-muted-custom">Load any strategy into the runner or launch it immediately with Run Now</p>
+            </div>
+            <button id="freeBotsResetFilterBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Show All (6)</button>
+          </div>
+          <div id="freeBotsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ANALYSIS TOOL -->
+      <section id="view-analysis" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold">100-Tick Digit Dominance &amp; Parity Analyzer</h2>
+              <p class="text-xs text-muted-custom">Digit rings (0–9), Even/Odd &amp; Over 4/Under 5 split, and live sequence tape</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="analysisGenTicksBtn" type="button" class="btn-primary px-3 py-2 rounded-xl text-xs font-extrabold cursor-pointer">Generate 25 Sample Ticks</button>
+              <button id="analysisResetTicksBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Reset Sample</button>
+            </div>
+          </div>
+
+          <div id="analysisRingsGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-3"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="surface-subtle rounded-xl p-4 space-y-2">
+              <div class="flex justify-between text-xs font-bold">
+                <span>Even vs Odd Split</span>
+                <span id="analysisParityTag" class="font-mono text-sky-400">BALANCED</span>
+              </div>
+              <div class="flex justify-between font-mono text-xs">
+                <span>Even: <strong id="analysisEvenPct">50.0%</strong></span>
+                <span>Odd: <strong id="analysisOddPct">50.0%</strong></span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-amber-500/30 overflow-hidden flex">
+                <div id="analysisEvenBar" class="h-full bg-sky-500 transition-all duration-300" style="width: 50%"></div>
+              </div>
+            </div>
+
+            <div class="surface-subtle rounded-xl p-4 space-y-2">
+              <div class="flex justify-between text-xs font-bold">
+                <span>Over 4 (5–9) vs Under 5 (0–4)</span>
+                <span id="analysisOuTag" class="font-mono text-emerald-500">NEUTRAL</span>
+              </div>
+              <div class="flex justify-between font-mono text-xs">
+                <span>Over 4: <strong id="analysisOver4Pct">50.0%</strong></span>
+                <span>Under 5: <strong id="analysisUnder5Pct">50.0%</strong></span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-rose-500/30 overflow-hidden flex">
+                <div id="analysisOver4Bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 50%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="surface-subtle rounded-xl p-3.5">
+            <div class="text-xs font-semibold text-muted-custom mb-2">Recent Tick Sequence Tape (Newest First)</div>
+            <div id="analysisTapeRow" class="flex flex-wrap gap-1.5 font-mono text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SIGNAL CENTRE -->
+      <section id="view-signals" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold">Signal Centre</h2>
+              <p class="text-xs text-muted-custom">Click Execute Signal to load the setup and execute/run immediately</p>
+            </div>
+            <button id="refreshSignalsBtn" type="button" class="btn-secondary px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer">Refresh Signals</button>
+          </div>
+          <div id="signalsListGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+        </div>
+      </section>
+
+      <!-- TAB 6: WALLET (REAL ACCOUNT DEPOSIT & WITHDRAWAL) -->
+      <section id="view-wallet" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold">Real Account Cashier</h2>
+              <p class="text-xs text-muted-custom">
+                Account <strong class="font-mono text-emerald-500">CR4182910</strong> • Real Balance:
+                <strong id="walletRealBalanceText" class="font-mono text-emerald-500">$0.00</strong> • Demo Balance:
+                <strong id="walletDemoBalanceText" class="font-mono text-amber-400">$10,000.00</strong>
+              </p>
+            </div>
+            <button id="walletSelectRealBtn" type="button" class="btn-primary px-3.5 py-2 rounded-xl text-xs font-extrabold cursor-pointer">
+              Switch to Real Account
+            </button>
+          </div>
+
+          <!-- Paybill Banner (Business No. 555222 / Account No. 687637) -->
+          <div class="rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/10 p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-[10px] uppercase">Lipa na M-Pesa Paybill</span>
+              <span class="text-xs text-muted-custom">Use Business No. &amp; Account No. below</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2">
+                <div>
+                  <div class="text-[11px] font-bold uppercase text-muted-custom">Business No.</div>
+                  <div class="font-mono text-xl sm:text-2xl font-extrabold text-emerald-500">555222</div>
+                </div>
+                <button type="button" data-copy="555222" class="copy-value-btn btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Copy</button>
+              </div>
+              <div class="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2">
+                <div>
+                  <div class="text-[11px] font-bold uppercase text-muted-custom">Account No.</div>
+                  <div class="font-mono text-xl sm:text-2xl font-extrabold text-sky-400">687637</div>
+                </div>
+                <button type="button" data-copy="687637" class="copy-value-btn btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Copy</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deposit & Withdraw Sub-Tabs -->
+          <div class="flex gap-2 surface-subtle p-1 rounded-xl w-fit">
+            <button id="cashierTabDepositBtn" type="button" class="px-4 py-2 rounded-lg text-xs font-extrabold btn-primary cursor-pointer">Deposit</button>
+            <button id="cashierTabWithdrawBtn" type="button" class="px-4 py-2 rounded-lg text-xs font-bold text-faint-custom cursor-pointer">Withdraw to Phone</button>
+          </div>
+
+          <!-- Deposit Panel -->
+          <form id="cashierDepositForm" class="surface-subtle rounded-2xl p-4 space-y-3.5">
+            <h3 class="text-sm font-extrabold text-emerald-500">Deposit via Paybill 555222 • Acc 687637</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="depositAmountField" class="block text-xs font-semibold text-muted-custom mb-1">Amount (USD)</label>
+                <input id="depositAmountField" type="number" min="1" step="0.01" placeholder="25.00" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm" />
+              </div>
+              <div>
+                <label for="depositRefField" class="block text-xs font-semibold text-muted-custom mb-1">M-Pesa / Payment Reference</label>
+                <input id="depositRefField" type="text" placeholder="e.g. TKL88219PQ" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm uppercase" />
+              </div>
+            </div>
+            <button id="submitDepositBtn" type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold cursor-pointer">
+              Submit Deposit
+            </button>
+          </form>
+
+          <!-- Withdraw Panel (Hidden until Withdraw tab clicked) -->
+          <form id="cashierWithdrawForm" class="hidden surface-subtle rounded-2xl p-4 space-y-3.5">
+            <h3 class="text-sm font-extrabold text-amber-400">Withdraw Directly to Phone Number</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="withdrawAmountField" class="block text-xs font-semibold text-muted-custom mb-1">Withdrawal Amount (USD)</label>
+                <input id="withdrawAmountField" type="number" min="1" step="0.01" placeholder="10.00" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm" />
+              </div>
+              <div>
+                <label for="withdrawPhoneField" class="block text-xs font-semibold text-muted-custom mb-1">Phone Number (07..., 01..., or 2547...)</label>
+                <input id="withdrawPhoneField" type="tel" placeholder="254712345678" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm" />
+              </div>
+            </div>
+            <button id="submitWithdrawBtn" type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm transition cursor-pointer">
+              Withdraw to Phone
+            </button>
+          </form>
+
+          <!-- Cashier Log -->
+          <div class="space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-muted-custom">Cashier Activity Log</h3>
+            <div id="cashierActivityLog" class="surface-subtle rounded-xl divide-y divide-slate-700/30 max-h-60 overflow-y-auto text-xs">
+              <div class="p-4 text-center text-faint-custom">No deposits or phone withdrawals recorded yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: SETTINGS -->
+      <section id="view-settings" class="trader-view hidden space-y-4">
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-5">
+          <div class="pb-3.5 border-b border-main-custom">
+            <h2 class="text-base sm:text-lg font-extrabold">Settings &amp; Preferences</h2>
+            <p class="text-xs text-muted-custom">Theme switcher, default withdrawal phone, WebSocket auto-connect, alerts &amp; account resets</p>
+          </div>
+
+          <!-- 3 Theme Switcher Buttons -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-muted-custom">Theme</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button type="button" data-theme-name="midnight-slate" class="theme-option-btn surface-subtle rounded-2xl p-3.5 text-left border-2 transition cursor-pointer">
+                <div class="font-bold text-sm">Midnight Slate</div>
+                <div class="text-[11px] text-faint-custom mt-0.5">Dark slate trading surface</div>
+              </button>
+              <button type="button" data-theme-name="emerald-vault" class="theme-option-btn surface-subtle rounded-2xl p-3.5 text-left border-2 transition cursor-pointer">
+                <div class="font-bold text-sm">Emerald Vault</div>
+                <div class="text-[11px] text-faint-custom mt-0.5">Deep emerald high-contrast dark</div>
+              </button>
+              <button type="button" data-theme-name="clean-daylight" class="theme-option-btn surface-subtle rounded-2xl p-3.5 text-left border-2 transition cursor-pointer">
+                <div class="font-bold text-sm">Clean Daylight</div>
+                <div class="text-[11px] text-faint-custom mt-0.5">Bright daylight workspace</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="prefPhoneInput" class="block text-xs font-semibold text-muted-custom mb-1">Default Withdrawal Phone Number</label>
+              <input id="prefPhoneInput" type="tel" placeholder="254712345678" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label for="prefStakeInput" class="block text-xs font-semibold text-muted-custom mb-1">Default Stake ($)</label>
+              <input id="prefStakeInput" type="number" min="0.35" step="0.05" value="1.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="surface-subtle rounded-xl p-3.5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs sm:text-sm font-bold">Auto-Connect WebSocket</div>
+                <div class="text-[11px] text-faint-custom">Connect Deriv WS on load when online</div>
+              </div>
+              <label class="inline-flex items-center cursor-pointer">
+                <input id="prefAutoConnectWs" type="checkbox" class="sr-only" />
+                <span class="switch-track bg-slate-600"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="surface-subtle rounded-xl p-3.5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs sm:text-sm font-bold">Trade Sound &amp; Toast Alerts</div>
+                <div class="text-[11px] text-faint-custom">Audio chime + banner on trade settlement</div>
+              </div>
+              <label class="inline-flex items-center cursor-pointer">
+                <input id="prefTradeAlerts" type="checkbox" checked class="sr-only" />
+                <span class="switch-track bg-slate-600"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Admin ID & Passkey Updater -->
+          <div class="surface-subtle rounded-2xl p-4 space-y-3">
+            <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400">Admin Portal Credentials</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="prefAdminId" class="block text-xs font-semibold text-muted-custom mb-1">Admin ID</label>
+                <input id="prefAdminId" type="text" value="ADMIN-01" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label for="prefAdminPasskey" class="block text-xs font-semibold text-muted-custom mb-1">Admin Passkey</label>
+                <input id="prefAdminPasskey" type="password" value="DBT-ADMIN-2026" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Save & Reset Buttons -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-main-custom">
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="resetBalancesBtn" type="button" class="btn-secondary px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-400 cursor-pointer">
+                Reset Balances ($10k Demo / $0 Real)
+              </button>
+              <button id="resetAllDataBtn" type="button" class="px-3.5 py-2.5 rounded-xl bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-rose-500 text-xs font-bold cursor-pointer">
+                Reset All App Data
+              </button>
+            </div>
+            <button id="saveSettingsBtn" type="button" class="btn-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold cursor-pointer">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT: PERSISTENT DBOT RUNNER DRAWER (4 cols) -->
+    <aside class="xl:col-span-4 surface-card rounded-2xl p-4 sm:p-5 space-y-4 xl:sticky xl:top-20">
+      <div class="surface-subtle rounded-xl p-3 flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-500">Bot Runner Drawer</div>
+          <div id="runnerBotTitle" class="text-sm font-bold truncate">Dollar Printer V2</div>
+          <div id="runnerBotSub" class="text-[11px] font-mono text-faint-custom truncate">DIGITOVER 3 • MARTINGALE</div>
+        </div>
+        <span id="runnerStateBadge" class="px-2.5 py-1 rounded-lg surface-card font-mono text-[10px] font-bold text-faint-custom">STOPPED</span>
+      </div>
+
+      <!-- Run / Stop / Place Quick Trade / Reset -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="runStopBotBtn" type="button" class="flex-1 min-w-[120px] py-2.5 px-3.5 rounded-xl btn-primary font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer">
+          <span id="runStopIcon">▶</span>
+          <span id="runStopLabel">Run Bot</span>
+        </button>
+        <button id="placeQuickTradeBtn" type="button" class="py-2.5 px-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer">
+          Place Quick Trade
+        </button>
+        <button id="resetRunnerBtn" type="button" class="btn-secondary py-2.5 px-3 rounded-xl text-xs font-bold cursor-pointer">
+          Reset
+        </button>
+      </div>
+
+      <!-- Runner Inputs -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label for="runStakeInput" class="block text-[11px] text-muted-custom mb-1">Stake ($)</label>
+          <input id="runStakeInput" type="number" min="0.35" step="0.05" value="1.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="runDurationInput" class="block text-[11px] text-muted-custom mb-1">Duration (Ticks)</label>
+          <input id="runDurationInput" type="number" min="1" max="10" value="1" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="runMartingaleInput" class="block text-[11px] text-muted-custom mb-1">Martingale (x)</label>
+          <input id="runMartingaleInput" type="number" min="1.0" max="10.0" step="0.1" value="2.1" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="runBarrierInput" class="block text-[11px] text-muted-custom mb-1">Barrier (0–9)</label>
+          <input id="runBarrierInput" type="number" min="0" max="9" value="3" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="runTpInput" class="block text-[11px] text-emerald-500 font-semibold mb-1">Take Profit ($)</label>
+          <input id="runTpInput" type="number" min="1" step="1" value="50.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="runSlInput" class="block text-[11px] text-rose-500 font-semibold mb-1">Stop Loss ($)</label>
+          <input id="runSlInput" type="number" min="1" step="1" value="50.00" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="surface-subtle rounded-xl p-3">
+        <div class="flex justify-between text-[11px] mb-1">
+          <span class="text-muted-custom">Settlement Status</span>
+          <span id="runnerProgressText" class="font-mono">Idle</span>
+        </div>
+        <div class="w-full h-1.5 rounded-full bg-slate-700/40 overflow-hidden">
+          <div id="runnerProgressBar" class="h-full bg-emerald-500 transition-all duration-150" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Transactions / Journal Tabs -->
+      <div class="space-y-2">
+        <div class="flex gap-1 surface-subtle p-1 rounded-xl">
+          <button id="drawerShowTxBtn" type="button" class="flex-1 py-1.5 rounded-lg text-xs font-bold btn-primary cursor-pointer">
+            Transactions (<span id="drawerTxBadge">0</span>)
+          </button>
+          <button id="drawerShowJournalBtn" type="button" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-faint-custom cursor-pointer">
+            Journal (<span id="drawerJournalBadge">0</span>)
+          </button>
+        </div>
+
+        <div id="drawerTxFeed" class="surface-subtle rounded-xl divide-y divide-slate-700/30 max-h-60 overflow-y-auto">
+          <div class="py-7 px-3 text-center text-xs text-faint-custom">No trades executed yet.</div>
+        </div>
+
+        <div id="drawerJournalFeed" class="hidden surface-subtle rounded-xl p-3 space-y-1.5 font-mono text-[11px] max-h-60 overflow-y-auto"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. AUTHENTICATED ADMIN PORTAL VIEW                                    -->
+  <!-- ===================================================================== -->
+  <section id="adminPortalView" class="hidden flex-1 max-w-[1660px] w-full mx-auto px-3 sm:px-5 py-4 space-y-4">
+    <div class="surface-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono text-[10px] font-extrabold uppercase">Authenticated Admin Portal</span>
+          <h2 class="text-lg sm:text-xl font-extrabold">Admin Account, Captured Losses &amp; Cashier Queues</h2>
+        </div>
+        <p class="text-xs text-muted-custom mt-0.5">
+          Admin ID: <strong id="adminSessionIdLabel" class="font-mono text-emerald-500">ADMIN-01</strong> • Wins credit user accounts; losses route directly to Admin Account
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="adminLockExitBtn" type="button" class="px-3.5 py-2 rounded-xl bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-rose-400 text-xs font-bold cursor-pointer">
+          Lock &amp; Exit Admin
+        </button>
+        <button id="adminBackTraderBtn" type="button" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">
+          &larr; Trader View
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin KPIs -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="surface-card rounded-2xl p-4">
+        <div class="text-xs text-muted-custom">Admin Account Balance</div>
+        <div id="adminBalanceStat" class="font-mono text-2xl font-extrabold text-emerald-500 mt-1">$0.00</div>
+        <div class="text-[11px] text-faint-custom mt-0.5">Includes captured user losses</div>
+      </div>
+      <div class="surface-card rounded-2xl p-4">
+        <div class="text-xs text-muted-custom">Captured Losses Total</div>
+        <div id="adminLossesStat" class="font-mono text-2xl font-extrabold text-amber-400 mt-1">$0.00</div>
+        <div id="adminLossCountStat" class="text-[11px] text-faint-custom mt-0.5">0 losing trades</div>
+      </div>
+      <div class="surface-card rounded-2xl p-4">
+        <div class="text-xs text-muted-custom">Pending Deposits / Payouts</div>
+        <div id="adminQueuesStat" class="font-mono text-2xl font-extrabold text-sky-400 mt-1">0 / 0</div>
+        <div class="text-[11px] text-faint-custom mt-0.5">Paybill 555222 • Acc 687637</div>
+      </div>
+      <div class="surface-card rounded-2xl p-4">
+        <div class="text-xs text-muted-custom">Paid to User Phones</div>
+        <div id="adminPaidPhonesStat" class="font-mono text-2xl font-extrabold mt-1">$0.00</div>
+        <div class="text-[11px] text-faint-custom mt-0.5">Completed phone payouts</div>
+      </div>
+    </div>
+
+    <!-- Captured Losses Ledger & User Account Snapshot -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm sm:text-base font-extrabold">Captured Losses Ledger (Loss &rarr; Admin Account)</h3>
+          <button id="adminClearLossLedgerBtn" type="button" class="btn-secondary px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer">Clear Ledger View</button>
+        </div>
+        <div id="adminLossLedgerBox" class="space-y-2 max-h-72 overflow-y-auto">
+          <div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No user losses captured yet.</div>
+        </div>
+      </div>
+
+      <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <h3 class="text-sm sm:text-base font-extrabold">User Accounts (Wins Stay With User)</h3>
+        <div id="adminUserAccountsBox" class="space-y-2.5 max-h-72 overflow-y-auto text-xs"></div>
+      </div>
+    </div>
+
+    <!-- Deposits & Phone Withdrawals Queues -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <h3 class="text-sm sm:text-base font-extrabold">Deposits Queue (Paybill 555222 / Acc 687637)</h3>
+        <div id="adminDepositsBox" class="space-y-2.5 max-h-72 overflow-y-auto">
+          <div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No deposit submissions yet.</div>
+        </div>
+      </div>
+
+      <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-3">
+        <h3 class="text-sm sm:text-base font-extrabold">Withdrawals to Phone Queue</h3>
+        <div id="adminWithdrawalsBox" class="space-y-2.5 max-h-72 overflow-y-auto">
+          <div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No phone withdrawal requests yet.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- 4. MODALS: ADMIN LOGIN MODAL & DERIV API MODAL                        -->
+  <!-- ===================================================================== -->
+  <!-- Strict Admin ID + Passkey Login Modal -->
+  <div id="adminLoginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <form id="adminLoginForm" class="surface-card rounded-2xl max-w-sm w-full p-5 space-y-4">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 font-mono text-[10px] font-bold uppercase">Restricted Admin Login</span>
+          <h3 class="text-base font-extrabold mt-1">Admin Portal Sign-In</h3>
+          <p class="text-xs text-muted-custom mt-0.5">Default ID: <span class="font-mono">ADMIN-01</span> • Passkey: <span class="font-mono">DBT-ADMIN-2026</span></p>
+        </div>
+        <button id="closeAdminLoginBtn" type="button" class="btn-secondary px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label for="adminLoginIdInput" class="block text-xs font-semibold text-muted-custom mb-1">Admin ID</label>
+          <input id="adminLoginIdInput" type="text" placeholder="ADMIN-01" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm" />
+        </div>
+        <div>
+          <label for="adminLoginPasskeyInput" class="block text-xs font-semibold text-muted-custom mb-1">Admin Passkey</label>
+          <input id="adminLoginPasskeyInput" type="password" placeholder="DBT-ADMIN-2026" required class="input-field w-full rounded-xl px-3 py-2 font-mono text-sm" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button id="cancelAdminLoginBtn" type="button" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Cancel</button>
+        <button id="submitAdminLoginBtn" type="submit" class="btn-primary px-4 py-2 rounded-xl text-xs font-extrabold cursor-pointer">Unlock Admin</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Deriv OAuth & WebSocket Modal -->
+  <div id="derivModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="surface-card rounded-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-main-custom pb-3">
+        <div>
+          <h3 class="text-base font-extrabold">Deriv OAuth &amp; WebSocket</h3>
+          <p class="text-xs text-muted-custom"><code class="text-emerald-500">wss://ws.derivws.com/websockets/v3</code></p>
+        </div>
+        <button id="closeDerivModalBtn" type="button" class="btn-secondary px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label for="derivAppIdField" class="block text-xs font-semibold text-muted-custom mb-1">Deriv App ID</label>
+          <input id="derivAppIdField" type="text" value="1089" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label for="derivTokenField" class="block text-xs font-semibold text-muted-custom mb-1">Deriv API Token (Optional)</label>
+          <input id="derivTokenField" type="password" placeholder="Optional authorize token" class="input-field w-full rounded-xl px-3 py-2 font-mono text-xs sm:text-sm" />
+        </div>
+        <button id="openDerivOauthBtn" type="button" class="w-full py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition cursor-pointer">
+          Launch Deriv OAuth Authorization
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-main-custom">
+        <button id="selectSimStreamBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">Simulated Stream</button>
+        <button id="connectDerivWsBtn" type="button" class="btn-primary px-4 py-2 rounded-xl text-xs font-extrabold cursor-pointer">Connect WebSocket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5. APPLICATION JAVASCRIPT                                             -->
+  <!-- ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'dbtraders_pro_complete_v2';
+
+      const MARKETS = {
+        R_100: { symbol: 'R_100', base: 1245.84, vol: 0.65, decimals: 2 },
+        R_75:  { symbol: 'R_75',  base: 438920.15, vol: 42.0, decimals: 2 },
+        R_10:  { symbol: 'R_10',  base: 6812.431, vol: 0.22, decimals: 3 },
+        JD25:  { symbol: 'JD25',  base: 8914.52, vol: 1.10, decimals: 2 },
+      };
+
+      const PAYOUT_MULTIPLIERS = {
+        DIGITOVER: 1.64,
+        DIGITUNDER: 1.64,
+        DIGITEVEN: 1.95,
+        DIGITODD: 1.95,
+        CALL: 1.95,
+        PUT: 1.95,
+      };
+
+      const FREE_BOTS = [
+        {
+          id: 'dollar-printer-v2',
+          name: 'Dollar Printer V2',
+          badge: 'POPULAR',
+          market: 'R_100',
+          tradeType: 'DIGITOVER',
+          barrier: 3,
+          stake: 1.00,
+          duration: 1,
+          martingale: 2.1,
+          desc: 'Targets Digits Over 3 on Volatility 100 with 2.1x Martingale recovery.'
+        },
+        {
+          id: 'over-under-sniper',
+          name: 'Over/Under AI Sniper',
+          badge: 'SNIPER',
+          market: 'R_75',
+          tradeType: 'DIGITUNDER',
+          barrier: 6,
+          stake: 1.00,
+          duration: 1,
+          martingale: 2.2,
+          desc: 'Targets Digits Under 6 on Volatility 75 with calibrated step recovery.'
+        },
+        {
+          id: 'even-odd-parity-pro',
+          name: 'Even/Odd Parity Pro',
+          badge: 'PARITY',
+          market: 'R_10',
+          tradeType: 'DIGITEVEN',
+          barrier: 0,
+          stake: 1.00,
+          duration: 1,
+          martingale: 2.0,
+          desc: 'Executes Even digit contracts on Volatility 10 with balanced stake sizing.'
+        },
+        {
+          id: 'rise-fall-trend-rider',
+          name: 'Rise/Fall Trend Rider',
+          badge: 'TREND',
+          market: 'R_100',
+          tradeType: 'CALL',
+          barrier: 0,
+          stake: 2.00,
+          duration: 2,
+          martingale: 2.1,
+          desc: 'Captures upward tick impulses over 2-tick contracts on R_100.'
+        },
+        {
+          id: 'martingale-recovery-master',
+          name: 'Martingale Recovery Master',
+          badge: 'MARTINGALE',
+          market: 'R_75',
+          tradeType: 'DIGITODD',
+          barrier: 0,
+          stake: 0.50,
+          duration: 1,
+          martingale: 2.3,
+          desc: 'Odd digit scalper with 2.3x Martingale multiplier on losses.'
+        },
+        {
+          id: 'jump-25-spike-catcher',
+          name: 'Jump 25 Spike Catcher',
+          badge: 'JUMP 25',
+          market: 'JD25',
+          tradeType: 'PUT',
+          barrier: 0,
+          stake: 1.00,
+          duration: 2,
+          martingale: 2.2,
+          desc: 'Trades Fall (PUT) contracts across Jump 25 market swings.'
+        }
+      ];
+
+      function freshState() {
+        return {
+          role: 'TRADER',          // 'TRADER' | 'ADMIN'
+          adminUnlocked: false,
+          activeTab: 'dashboard',
+          drawerTab: 'tx',         // 'tx' | 'journal'
+          cashierTab: 'deposit',   // 'deposit' | 'withdraw'
+          chartWindow: 50,         // 25 | 50 | 100
+
+          // Demo = $10,000.00 | Real = $0.00
+          accounts: {
+            DEMO: { id: 'VRTC9042185', label: 'Demo (VRTC9042185)', type: 'DEMO', balance: 10000.00 },
+            REAL: { id: 'CR4182910',   label: 'Real (CR4182910)',   type: 'REAL', balance: 0.00 },
+          },
+          activeAccountType: 'DEMO',
+
+          // Dedicated Admin Account (receives user trade losses)
+          adminAccount: {
+            balance: 0.00,
+            capturedLosses: 0.00,
+            lossCount: 0,
+            lossLedger: [],
+          },
+
+          settings: {
+            theme: 'midnight-slate',
+            defaultPhone: '254712345678',
+            defaultStake: 1.00,
+            autoConnectWs: false,
+            tradeAlerts: true,
+            adminId: 'ADMIN-01',
+            adminPasskey: 'DBT-ADMIN-2026',
+            appId: '1089',
+            derivToken: '',
+          },
+
+          paybill: {
+            businessNo: '555222',
+            accountNo: '687637',
+          },
+
+          deposits: [],
+          withdrawals: [],
+
+          market: 'R_100',
+          strategy: {
+            name: 'Dollar Printer V2',
+            tradeType: 'DIGITOVER',
+            barrier: 3,
+          },
+          isRunning: false,
+          baseStake: 1.00,
+          currentStake: 1.00,
+          step: 1,
+          duration: 1,
+          martingale: 2.1,
+          takeProfit: 50.00,
+          stopLoss: 50.00,
+
+          netPnl: 0.00,
+          wins: 0,
+          losses: 0,
+          contractSeq: 500100,
+          openContract: null,
+          transactions: [],
+          journal: ['[System] DBTraders Pro initialized (Demo $10,000.00 / Real $0.00).'],
+        };
+      }
+
+      let state = loadState();
+      let tickHistory = [];
+      let simTimer = null;
+      let keepAliveTimer = null;
+      let wsClient = null;
+      let streamKind = 'SIMULATED';
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return freshState();
+          const parsed = JSON.parse(raw);
+          const def = freshState();
+          return {
+            ...def,
+            ...parsed,
+            role: 'TRADER',
+            adminUnlocked: false,
+            isRunning: false,
+            openContract: null,
+            accounts: {
+              DEMO: { ...def.accounts.DEMO, ...(parsed.accounts?.DEMO || {}) },
+              REAL: { ...def.accounts.REAL, ...(parsed.accounts?.REAL || {}) },
+            },
+            adminAccount: { ...def.adminAccount, ...(parsed.adminAccount || {}) },
+            settings: { ...def.settings, ...(parsed.settings || {}) },
+            strategy: { ...def.strategy, ...(parsed.strategy || {}) },
+          };
+        } catch (_) {
+          return freshState();
+        }
+      }
+
+      function saveState() {
+        try {
+          const toStore = {
+            ...state,
+            role: 'TRADER',
+            adminUnlocked: false,
+            isRunning: false,
+            openContract: null,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+        } catch (_) {}
+      }
+
+      // =====================================================================
+      // DOM ELEMENT BINDINGS
+      // =====================================================================
+      const el = (id) => document.getElementById(id);
+
+      const ui = {
+        traderNavBar: el('traderNavBar'),
+        navTabs: document.querySelectorAll('.nav-tab-btn'),
+        traderViews: document.querySelectorAll('.trader-view'),
+        traderWorkspace: el('traderWorkspace'),
+        adminPortalView: el('adminPortalView'),
+
+        connDot: el('connDot'),
+        connText: el('connText'),
+        acctBadge: el('acctBadge'),
+        accountSelect: el('accountSelect'),
+        headerBalanceDisplay: el('headerBalanceDisplay'),
+        headerWalletBtn: el('headerWalletBtn'),
+        headerSettingsBtn: el('headerSettingsBtn'),
+        headerDerivApiBtn: el('headerDerivApiBtn'),
+        roleTraderBtn: el('roleTraderBtn'),
+        roleAdminBtn: el('roleAdminBtn'),
+        roleAdminLock: el('roleAdminLock'),
+
+        alertBar: el('alertBar'),
+        alertCard: el('alertCard'),
+        alertIcon: el('alertIcon'),
+        alertMessage: el('alertMessage'),
+        dismissAlertBtn: el('dismissAlertBtn'),
+
+        // Dashboard
+        kpiPnl: el('kpiPnl'),
+        kpiTpSlText: el('kpiTpSlText'),
+        kpiWinRate: el('kpiWinRate'),
+        kpiWl: el('kpiWl'),
+        kpiWinBar: el('kpiWinBar'),
+        kpiStrategyName: el('kpiStrategyName'),
+        kpiStrategyMeta: el('kpiStrategyMeta'),
+        kpiStep: el('kpiStep'),
+        kpiStake: el('kpiStake'),
+        kpiRecoveryMeta: el('kpiRecoveryMeta'),
+        dashboardMarketSelect: el('dashboardMarketSelect'),
+        tickWinBtns: document.querySelectorAll('.tick-win-btn'),
+        dashForceTickBtn: el('dashForceTickBtn'),
+        spotReadoutBox: el('spotReadoutBox'),
+        spotDirectionBadge: el('spotDirectionBadge'),
+        spotPrefix: el('spotPrefix'),
+        spotLastChar: el('spotLastChar'),
+        spotDigitLabel: el('spotDigitLabel'),
+        spotClock: el('spotClock'),
+        marketCanvas: el('marketCanvas'),
+        dashboardDigitGrid: el('dashboardDigitGrid'),
+        dashGoFreeBotsBtn: el('dashGoFreeBotsBtn'),
+        dashQuickBotsRow: el('dashQuickBotsRow'),
+
+        // Builder
+        cfgBotName: el('cfgBotName'),
+        cfgMarket: el('cfgMarket'),
+        cfgTradeType: el('cfgTradeType'),
+        cfgBarrier: el('cfgBarrier'),
+        cfgStake: el('cfgStake'),
+        cfgDuration: el('cfgDuration'),
+        cfgMartingale: el('cfgMartingale'),
+        cfgTakeProfit: el('cfgTakeProfit'),
+        cfgStopLoss: el('cfgStopLoss'),
+        builderXmlCode: el('builderXmlCode'),
+        builderLoadSampleXmlBtn: el('builderLoadSampleXmlBtn'),
+        builderImportXmlInput: el('builderImportXmlInput'),
+        builderExportXmlBtn: el('builderExportXmlBtn'),
+        builderLoadRunnerBtn: el('builderLoadRunnerBtn'),
+
+        // Free Bots
+        freeBotsGrid: el('freeBotsGrid'),
+        freeBotsResetFilterBtn: el('freeBotsResetFilterBtn'),
+
+        // Analysis
+        analysisGenTicksBtn: el('analysisGenTicksBtn'),
+        analysisResetTicksBtn: el('analysisResetTicksBtn'),
+        analysisRingsGrid: el('analysisRingsGrid'),
+        analysisParityTag: el('analysisParityTag'),
+        analysisEvenPct: el('analysisEvenPct'),
+        analysisOddPct: el('analysisOddPct'),
+        analysisEvenBar: el('analysisEvenBar'),
+        analysisOuTag: el('analysisOuTag'),
+        analysisOver4Pct: el('analysisOver4Pct'),
+        analysisUnder5Pct: el('analysisUnder5Pct'),
+        analysisOver4Bar: el('analysisOver4Bar'),
+        analysisTapeRow: el('analysisTapeRow'),
+
+        // Signals
+        signalsListGrid: el('signalsListGrid'),
+        refreshSignalsBtn: el('refreshSignalsBtn'),
+
+        // Wallet / Cashier
+        walletRealBalanceText: el('walletRealBalanceText'),
+        walletDemoBalanceText: el('walletDemoBalanceText'),
+        walletSelectRealBtn: el('walletSelectRealBtn'),
+        cashierTabDepositBtn: el('cashierTabDepositBtn'),
+        cashierTabWithdrawBtn: el('cashierTabWithdrawBtn'),
+        cashierDepositForm: el('cashierDepositForm'),
+        depositAmountField: el('depositAmountField'),
+        depositRefField: el('depositRefField'),
+        submitDepositBtn: el('submitDepositBtn'),
+        cashierWithdrawForm: el('cashierWithdrawForm'),
+        withdrawAmountField: el('withdrawAmountField'),
+        withdrawPhoneField: el('withdrawPhoneField'),
+        submitWithdrawBtn: el('submitWithdrawBtn'),
+        cashierActivityLog: el('cashierActivityLog'),
+
+        // Settings
+        themeOptionBtns: document.querySelectorAll('.theme-option-btn'),
+        prefPhoneInput: el('prefPhoneInput'),
+        prefStakeInput: el('prefStakeInput'),
+        prefAutoConnectWs: el('prefAutoConnectWs'),
+        prefTradeAlerts: el('prefTradeAlerts'),
+        prefAdminId: el('prefAdminId'),
+        prefAdminPasskey: el('prefAdminPasskey'),
+        resetBalancesBtn: el('resetBalancesBtn'),
+        resetAllDataBtn: el('resetAllDataBtn'),
+        saveSettingsBtn: el('saveSettingsBtn'),
+
+        // Runner Drawer
+        runnerBotTitle: el('runnerBotTitle'),
+        runnerBotSub: el('runnerBotSub'),
+        runnerStateBadge: el('runnerStateBadge'),
+        runStopBotBtn: el('runStopBotBtn'),
+        runStopIcon: el('runStopIcon'),
+        runStopLabel: el('runStopLabel'),
+        placeQuickTradeBtn: el('placeQuickTradeBtn'),
+        resetRunnerBtn: el('resetRunnerBtn'),
+        runStakeInput: el('runStakeInput'),
+        runDurationInput: el('runDurationInput'),
+        runMartingaleInput: el('runMartingaleInput'),
+        runBarrierInput: el('runBarrierInput'),
+        runTpInput: el('runTpInput'),
+        runSlInput: el('runSlInput'),
+        runnerProgressText: el('runnerProgressText'),
+        runnerProgressBar: el('runnerProgressBar'),
+        drawerShowTxBtn: el('drawerShowTxBtn'),
+        drawerShowJournalBtn: el('drawerShowJournalBtn'),
+        drawerTxBadge: el('drawerTxBadge'),
+        drawerJournalBadge: el('drawerJournalBadge'),
+        drawerTxFeed: el('drawerTxFeed'),
+        drawerJournalFeed: el('drawerJournalFeed'),
+
+        // Admin Portal
+        adminSessionIdLabel: el('adminSessionIdLabel'),
+        adminLockExitBtn: el('adminLockExitBtn'),
+        adminBackTraderBtn: el('adminBackTraderBtn'),
+        adminBalanceStat: el('adminBalanceStat'),
+        adminLossesStat: el('adminLossesStat'),
+        adminLossCountStat: el('adminLossCountStat'),
+        adminQueuesStat: el('adminQueuesStat'),
+        adminPaidPhonesStat: el('adminPaidPhonesStat'),
+        adminClearLossLedgerBtn: el('adminClearLossLedgerBtn'),
+        adminLossLedgerBox: el('adminLossLedgerBox'),
+        adminUserAccountsBox: el('adminUserAccountsBox'),
+        adminDepositsBox: el('adminDepositsBox'),
+        adminWithdrawalsBox: el('adminWithdrawalsBox'),
+
+        // Modals
+        adminLoginModal: el('adminLoginModal'),
+        adminLoginForm: el('adminLoginForm'),
+        adminLoginIdInput: el('adminLoginIdInput'),
+        adminLoginPasskeyInput: el('adminLoginPasskeyInput'),
+        closeAdminLoginBtn: el('closeAdminLoginBtn'),
+        cancelAdminLoginBtn: el('cancelAdminLoginBtn'),
+
+        derivModal: el('derivModal'),
+        closeDerivModalBtn: el('closeDerivModalBtn'),
+        derivAppIdField: el('derivAppIdField'),
+        derivTokenField: el('derivTokenField'),
+        openDerivOauthBtn: el('openDerivOauthBtn'),
+        selectSimStreamBtn: el('selectSimStreamBtn'),
+        connectDerivWsBtn: el('connectDerivWsBtn'),
+      };
+
+      // =====================================================================
+      // UTILITIES, SOUND & ALERTS
+      // =====================================================================
+      function fmtMoney(n) {
+        return Number(n || 0).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function timeNow() {
+        return new Date().toTimeString().split(' ')[0];
+      }
+
+      function playChime(isWin) {
+        if (!state.settings.tradeAlerts) return;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = isWin ? 660 : 240;
+          gain.gain.value = 0.04;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.14);
+          setTimeout(() => ctx.close(), 200);
+        } catch (_) {}
+      }
+
+      function showAlert(msg, kind = 'info') {
+        const styles = {
+          info:    'bg-sky-500/15 border-sky-500/40 text-sky-300',
+          success: 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400',
+          warn:    'bg-amber-500/15 border-amber-500/40 text-amber-300',
+          error:   'bg-rose-500/15 border-rose-500/40 text-rose-400',
+        };
+        const icons = { info: 'ℹ️', success: '✅', warn: '⚠️', error: '🛑' };
+        ui.alertCard.className = `rounded-xl border px-4 py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md ${styles[kind] || styles.info}`;
+        ui.alertIcon.textContent = icons[kind] || 'ℹ️';
+        ui.alertMessage.textContent = msg;
+        ui.alertBar.classList.remove('hidden');
+      }
+
+      function logJournal(entry) {
+        state.journal.unshift(`[${timeNow()}] ${entry}`);
+        if (state.journal.length > 120) state.journal.pop();
+        renderDrawer();
+      }
+
+      function activeUserAccount() {
+        return state.accounts[state.activeAccountType] || state.accounts.DEMO;
+      }
+
+      function copyText(text) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showAlert(`Copied "${text}" to clipboard.`, 'success');
+        } catch (_) {
+          showAlert(`Value: ${text}`, 'info');
+        }
+      }
+
+      // =====================================================================
+      // THEME & VIEW NAVIGATION
+      // =====================================================================
+      function applyTheme(name) {
+        const chosen = ['midnight-slate', 'emerald-vault', 'clean-daylight'].includes(name)
+          ? name
+          : 'midnight-slate';
+        state.settings.theme = chosen;
+        document.documentElement.setAttribute('data-theme', chosen);
+
+        ui.themeOptionBtns.forEach((btn) => {
+          const selected = btn.dataset.themeName === chosen;
+          btn.style.borderColor = selected ? 'var(--accent-primary)' : 'var(--border-soft)';
+        });
+
+        saveState();
+        requestAnimationFrame(drawCanvas);
+      }
+
+      function openTab(tabName) {
+        state.role = 'TRADER';
+        state.activeTab = tabName;
+        renderRoleLayout();
+
+        ui.navTabs.forEach((btn) => {
+          const active = btn.dataset.navTab === tabName;
+          btn.className = active
+            ? 'nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-extrabold btn-primary transition whitespace-nowrap flex items-center gap-1 cursor-pointer'
+            : 'nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold text-faint-custom hover:bg-slate-700/20 transition whitespace-nowrap flex items-center gap-1 cursor-pointer';
+        });
+
+        ui.traderViews.forEach((sec) => {
+          sec.id === `view-${tabName}` ? sec.classList.remove('hidden') : sec.classList.add('hidden');
+        });
+
+        if (tabName === 'dashboard') requestAnimationFrame(drawCanvas);
+        if (tabName === 'wallet') renderCashier();
+        if (tabName === 'analysis') renderAnalysis();
+        if (tabName === 'signals') renderSignals();
+      }
+
+      function renderRoleLayout() {
+        const isAdmin = state.role === 'ADMIN' && state.adminUnlocked;
+        if (isAdmin) {
+          ui.roleAdminBtn.className = 'px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold bg-amber-500 text-slate-950 transition flex items-center gap-1 cursor-pointer';
+          ui.roleTraderBtn.className = 'px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-faint-custom transition cursor-pointer';
+          ui.roleAdminLock.textContent = '🔓';
+          ui.traderWorkspace.classList.add('hidden');
+          ui.traderNavBar.classList.add('hidden');
+          ui.adminPortalView.classList.remove('hidden');
+          renderAdminPortal();
+        } else {
+          state.role = 'TRADER';
+          ui.roleTraderBtn.className = 'px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold btn-primary transition cursor-pointer';
+          ui.roleAdminBtn.className = 'px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-faint-custom transition flex items-center gap-1 cursor-pointer';
+          ui.roleAdminLock.textContent = state.adminUnlocked ? '🔓' : '🔒';
+          ui.adminPortalView.classList.add('hidden');
+          ui.traderWorkspace.classList.remove('hidden');
+          ui.traderNavBar.classList.remove('hidden');
+        }
+      }
+
+      function promptAdminLogin() {
+        if (state.adminUnlocked) {
+          state.role = 'ADMIN';
+          renderRoleLayout();
+          return;
+        }
+        ui.adminLoginIdInput.value = '';
+        ui.adminLoginPasskeyInput.value = '';
+        ui.adminLoginModal.classList.remove('hidden');
+        ui.adminLoginModal.classList.add('flex');
+        ui.adminLoginIdInput.focus();
+      }
+
+      function lockAdmin() {
+        state.adminUnlocked = false;
+        state.role = 'TRADER';
+        renderRoleLayout();
+        openTab(state.activeTab);
+        showAlert('Admin session locked. Returned to Trader view.', 'info');
+      }
+
+      // =====================================================================
+      // KPI, ACCOUNT & CASHIER RENDERING
+      // =====================================================================
+      function renderBalancesAndKpis() {
+        const acct = activeUserAccount();
+        const isReal = state.activeAccountType === 'REAL';
+
+        ui.accountSelect.value = state.activeAccountType;
+        ui.acctBadge.textContent = isReal ? 'REAL' : 'DEMO';
+        ui.acctBadge.className = isReal
+          ? 'px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
+          : 'px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500/15 text-amber-400 border border-amber-500/30';
+
+        ui.headerBalanceDisplay.textContent = `$${fmtMoney(acct.balance)}`;
+        ui.headerBalanceDisplay.className = isReal
+          ? 'font-mono text-xs sm:text-sm font-extrabold text-emerald-500 leading-tight'
+          : 'font-mono text-xs sm:text-sm font-extrabold text-amber-400 leading-tight';
+
+        ui.walletRealBalanceText.textContent = `$${fmtMoney(state.accounts.REAL.balance)}`;
+        ui.walletDemoBalanceText.textContent = `$${fmtMoney(state.accounts.DEMO.balance)}`;
+
+        const pnlSign = state.netPnl >= 0 ? '+' : '-';
+        ui.kpiPnl.textContent = `${pnlSign}$${fmtMoney(Math.abs(state.netPnl))}`;
+        ui.kpiPnl.className = `font-mono text-xl sm:text-2xl font-extrabold mt-1 ${state.netPnl >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+        ui.kpiTpSlText.textContent = `TP +$${fmtMoney(state.takeProfit)} / SL -$${fmtMoney(state.stopLoss)}`;
+
+        const total = state.wins + state.losses;
+        const winPct = total ? ((state.wins / total) * 100).toFixed(1) : '0.0';
+        ui.kpiWinRate.textContent = `${winPct}%`;
+        ui.kpiWl.textContent = `${state.wins}W / ${state.losses}L`;
+        ui.kpiWinBar.style.width = `${winPct}%`;
+
+        ui.kpiStrategyName.textContent = state.strategy.name;
+        ui.kpiStrategyMeta.textContent = `${state.strategy.tradeType} ${state.strategy.barrier} • ${state.duration}T`;
+
+        ui.kpiStep.textContent = `Step ${state.step}`;
+        ui.kpiStake.textContent = `$${fmtMoney(state.currentStake)}`;
+        ui.kpiRecoveryMeta.textContent = `Base $${fmtMoney(state.baseStake)} • ${state.martingale}x`;
+
+        ui.runnerBotTitle.textContent = state.strategy.name;
+        ui.runnerBotSub.textContent = `${state.strategy.tradeType} ${state.strategy.barrier} • ${state.market}`;
+      }
+
+      function setCashierTab(mode) {
+        state.cashierTab = mode;
+        const isDep = mode === 'deposit';
+        ui.cashierTabDepositBtn.className = isDep
+          ? 'px-4 py-2 rounded-lg text-xs font-extrabold btn-primary cursor-pointer'
+          : 'px-4 py-2 rounded-lg text-xs font-bold text-faint-custom cursor-pointer';
+        ui.cashierTabWithdrawBtn.className = !isDep
+          ? 'px-4 py-2 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950 cursor-pointer'
+          : 'px-4 py-2 rounded-lg text-xs font-bold text-faint-custom cursor-pointer';
+
+        ui.cashierDepositForm.classList.toggle('hidden', !isDep);
+        ui.cashierWithdrawForm.classList.toggle('hidden', isDep);
+      }
+
+      function renderCashier() {
+        setCashierTab(state.cashierTab);
+        if (!ui.withdrawPhoneField.value && state.settings.defaultPhone) {
+          ui.withdrawPhoneField.value = state.settings.defaultPhone;
+        }
+
+        const combined = [
+          ...state.deposits.map((d) => ({
+            time: d.time,
+            title: `DEPOSIT +$${fmtMoney(d.amount)} (Ref: ${d.ref})`,
+            sub: `Paybill 555222 / Acc 687637`,
+            status: d.status,
+            tone: d.status === 'REJECTED' ? 'text-rose-500' : 'text-emerald-500',
+          })),
+          ...state.withdrawals.map((w) => ({
+            time: w.time,
+            title: `WITHDRAW -$${fmtMoney(w.amount)} &rarr; ${w.phone}`,
+            sub: `Direct Phone Payout`,
+            status: w.status,
+            tone: w.status === 'DECLINED' ? 'text-rose-500' : 'text-amber-400',
+          })),
+        ];
+
+        if (!combined.length) {
+          ui.cashierActivityLog.innerHTML = `<div class="p-4 text-center text-faint-custom">No deposits or phone withdrawals recorded yet.</div>`;
+          return;
+        }
+
+        ui.cashierActivityLog.innerHTML = combined.map((item) => `
+          <div class="p-3 flex items-center justify-between gap-2">
+            <div>
+              <div class="font-mono font-bold ${item.tone}">${item.title}</div>
+              <div class="text-[11px] text-faint-custom">${item.sub} • ${item.time}</div>
+            </div>
+            <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold surface-card">${item.status}</span>
+          </div>
+        `).join('');
+      }
+
+      function handleDeposit(e) {
+        e.preventDefault();
+        const amount = parseFloat(ui.depositAmountField.value);
+        const ref = ui.depositRefField.value.trim().toUpperCase();
+        if (!amount || amount <= 0) {
+          showAlert('Enter a valid deposit amount greater than $0.00.', 'warn');
+          return;
+        }
+        if (ref.length < 3) {
+          showAlert('Enter a valid M-Pesa / payment reference code.', 'warn');
+          return;
+        }
+
+        state.accounts.REAL.balance = Number((state.accounts.REAL.balance + amount).toFixed(2));
+        state.deposits.unshift({
+          id: `DEP-${Date.now()}`,
+          amount,
+          ref,
+          status: 'APPROVED',
+          credited: true,
+          time: timeNow(),
+        });
+
+        ui.depositAmountField.value = '';
+        ui.depositRefField.value = '';
+        saveState();
+        renderBalancesAndKpis();
+        renderCashier();
+        if (state.role === 'ADMIN' && state.adminUnlocked) renderAdminPortal();
+        logJournal(`Real deposit +$${fmtMoney(amount)} (Ref: ${ref}) via Paybill 555222 / Acc 687637.`);
+        showAlert(`Deposited $${fmtMoney(amount)} (Ref: ${ref}) to Real Account CR4182910.`, 'success');
+      }
+
+      function handleWithdraw(e) {
+        e.preventDefault();
+        const amount = parseFloat(ui.withdrawAmountField.value);
+        const phone = ui.withdrawPhoneField.value.trim().replace(/\s+/g, '');
+
+        if (!amount || amount <= 0) {
+          showAlert('Enter a valid withdrawal amount greater than $0.00.', 'warn');
+          return;
+        }
+        if (!/^(?:\+?254|0)[17]\d{8}$/.test(phone) && !/^\d{9,15}$/.test(phone)) {
+          showAlert('Enter a valid phone number (e.g. 0712345678, 0112345678, or 254712345678).', 'warn');
+          return;
+        }
+        if (amount > state.accounts.REAL.balance) {
+          showAlert(`Insufficient Real Account balance ($${fmtMoney(state.accounts.REAL.balance)} available).`, 'error');
+          return;
+        }
+
+        state.accounts.REAL.balance = Number((state.accounts.REAL.balance - amount).toFixed(2));
+        state.withdrawals.unshift({
+          id: `WD-${Date.now()}`,
+          amount,
+          phone,
+          status: 'PENDING_PAYOUT',
+          time: timeNow(),
+        });
+
+        ui.withdrawAmountField.value = '';
+        saveState();
+        renderBalancesAndKpis();
+        renderCashier();
+        if (state.role === 'ADMIN' && state.adminUnlocked) renderAdminPortal();
+        logJournal(`Withdrawal -$${fmtMoney(amount)} queued to phone ${phone}.`);
+        showAlert(`Withdrawal of $${fmtMoney(amount)} submitted to phone ${phone}.`, 'success');
+      }
+
+      // =====================================================================
+      // ADMIN PORTAL RENDERING & ACTIONS
+      // =====================================================================
+      function renderAdminPortal() {
+        const pendingDeps = state.deposits.filter((d) => d.status === 'PENDING').length;
+        const pendingWds = state.withdrawals.filter((w) => w.status === 'PENDING_PAYOUT').length;
+        const paidPhones = state.withdrawals
+          .filter((w) => w.status === 'PAID_TO_PHONE')
+          .reduce((s, w) => s + w.amount, 0);
+
+        ui.adminSessionIdLabel.textContent = state.settings.adminId;
+        ui.adminBalanceStat.textContent = `$${fmtMoney(state.adminAccount.balance)}`;
+        ui.adminLossesStat.textContent = `$${fmtMoney(state.adminAccount.capturedLosses)}`;
+        ui.adminLossCountStat.textContent = `${state.adminAccount.lossCount} losing trades`;
+        ui.adminQueuesStat.textContent = `${pendingDeps} / ${pendingWds}`;
+        ui.adminPaidPhonesStat.textContent = `$${fmtMoney(paidPhones)}`;
+
+        if (!state.adminAccount.lossLedger.length) {
+          ui.adminLossLedgerBox.innerHTML = `<div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No user losses captured yet.</div>`;
+        } else {
+          ui.adminLossLedgerBox.innerHTML = state.adminAccount.lossLedger.map((item) => `
+            <div class="surface-subtle rounded-xl p-3 flex items-center justify-between gap-2 text-xs">
+              <div>
+                <div class="font-mono font-bold text-emerald-500">+$${fmtMoney(item.amount)} <span class="text-faint-custom font-normal">from ${item.accountId} (${item.accountType})</span></div>
+                <div class="text-[11px] text-muted-custom">${item.detail} • ${item.contractId}</div>
+              </div>
+              <span class="font-mono text-[10px] text-faint-custom">${item.time}</span>
+            </div>
+          `).join('');
+        }
+
+        ui.adminUserAccountsBox.innerHTML = ['DEMO', 'REAL'].map((k) => {
+          const u = state.accounts[k];
+          return `
+            <div class="surface-subtle rounded-xl p-3.5 flex items-center justify-between gap-2">
+              <div>
+                <div class="font-mono font-extrabold text-sm">${u.id} <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-700/40">${u.type}</span></div>
+                <div class="text-[11px] text-faint-custom">Wins credit user; losses transfer to Admin Account</div>
+              </div>
+              <div class="font-mono text-base font-extrabold ${k === 'REAL' ? 'text-emerald-500' : 'text-amber-400'}">$${fmtMoney(u.balance)}</div>
+            </div>
+          `;
+        }).join('');
+
+        if (!state.deposits.length) {
+          ui.adminDepositsBox.innerHTML = `<div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No deposit submissions yet.</div>`;
+        } else {
+          ui.adminDepositsBox.innerHTML = state.deposits.map((d) => `
+            <div class="surface-subtle rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div>
+                <div class="font-mono font-bold">$${fmtMoney(d.amount)} • Ref <span class="text-emerald-500">${d.ref}</span></div>
+                <div class="text-[11px] text-faint-custom">Paybill 555222 / Acc 687637 • ${d.time}</div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold surface-card">${d.status}</span>
+                ${d.status !== 'APPROVED' ? `<button type="button" onclick="window.setDepositStatus('${d.id}', 'APPROVED')" class="px-2.5 py-1 rounded-lg btn-primary text-[11px] font-bold cursor-pointer">Approve</button>` : ''}
+                ${d.status !== 'REJECTED' ? `<button type="button" onclick="window.setDepositStatus('${d.id}', 'REJECTED')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-bold cursor-pointer">Reject</button>` : ''}
+              </div>
+            </div>
+          `).join('');
+        }
+
+        if (!state.withdrawals.length) {
+          ui.adminWithdrawalsBox.innerHTML = `<div class="surface-subtle rounded-xl p-4 text-xs text-faint-custom text-center">No phone withdrawal requests yet.</div>`;
+        } else {
+          ui.adminWithdrawalsBox.innerHTML = state.withdrawals.map((w) => `
+            <div class="surface-subtle rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div>
+                <div class="font-mono font-bold">$${fmtMoney(w.amount)} &rarr; <span class="text-amber-400">${w.phone}</span></div>
+                <div class="text-[11px] text-faint-custom">Requested ${w.time}</div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold surface-card">${w.status}</span>
+                ${w.status === 'PENDING_PAYOUT' ? `
+                  <button type="button" onclick="window.setWithdrawalStatus('${w.id}', 'PAID_TO_PHONE')" class="px-2.5 py-1 rounded-lg btn-primary text-[11px] font-bold cursor-pointer">Mark Paid</button>
+                  <button type="button" onclick="window.setWithdrawalStatus('${w.id}', 'DECLINED')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-bold cursor-pointer">Reject</button>
+                ` : ''}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      window.setDepositStatus = function (depId, nextStatus) {
+        const dep = state.deposits.find((d) => d.id === depId);
+        if (!dep) return;
+        if (nextStatus === 'REJECTED' && dep.credited) {
+          state.accounts.REAL.balance = Math.max(0, Number((state.accounts.REAL.balance - dep.amount).toFixed(2)));
+          dep.credited = false;
+        } else if (nextStatus === 'APPROVED' && !dep.credited) {
+          state.accounts.REAL.balance = Number((state.accounts.REAL.balance + dep.amount).toFixed(2));
+          dep.credited = true;
+        }
+        dep.status = nextStatus;
+        saveState();
+        renderBalancesAndKpis();
+        renderCashier();
+        renderAdminPortal();
+        showAlert(`Deposit ${dep.ref} set to ${nextStatus}.`, 'info');
+      };
+
+      window.setWithdrawalStatus = function (wdId, nextStatus) {
+        const wd = state.withdrawals.find((w) => w.id === wdId);
+        if (!wd) return;
+        if (nextStatus === 'DECLINED' && wd.status === 'PENDING_PAYOUT') {
+          state.accounts.REAL.balance = Number((state.accounts.REAL.balance + wd.amount).toFixed(2));
+        }
+        wd.status = nextStatus;
+        saveState();
+        renderBalancesAndKpis();
+        renderCashier();
+        renderAdminPortal();
+        showAlert(`Withdrawal to ${wd.phone} marked ${nextStatus}.`, 'info');
+      };
+
+      // =====================================================================
+      // BOT BUILDER, XML, FREE BOTS, ANALYSIS & SIGNALS
+      // =====================================================================
+      function xmlEscape(v) {
+        return String(v).replace(/[<>&'"]/g, (c) => ({
+          '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;'
+        }[c]));
+      }
+
+      function refreshBuilderXml() {
+        const xml = `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="trade_definition">
+    <field name="BOT_NAME">${xmlEscape(ui.cfgBotName.value || 'DBTraders Bot')}</field>
+    <field name="MARKET">${ui.cfgMarket.value}</field>
+    <field name="TRADE_TYPE">${ui.cfgTradeType.value}</field>
+    <field name="BARRIER">${ui.cfgBarrier.value}</field>
+    <field name="STAKE">${Number(ui.cfgStake.value || 1).toFixed(2)}</field>
+    <field name="DURATION">${ui.cfgDuration.value}</field>
+    <field name="MARTINGALE">${Number(ui.cfgMartingale.value || 2.1).toFixed(1)}</field>
+    <field name="TAKE_PROFIT">${Number(ui.cfgTakeProfit.value || 50).toFixed(2)}</field>
+    <field name="STOP_LOSS">${Number(ui.cfgStopLoss.value || 50).toFixed(2)}</field>
+  </block>
+</xml>`;
+        ui.builderXmlCode.textContent = xml;
+        return xml;
+      }
+
+      function loadBuilderIntoRunner(runImmediately = false) {
+        const mkt = ui.cfgMarket.value;
+        if (MARKETS[mkt] && mkt !== state.market) {
+          ui.dashboardMarketSelect.value = mkt;
+          switchMarket(mkt);
+        }
+
+        state.strategy = {
+          name: (ui.cfgBotName.value || 'Custom DBTraders Bot').trim(),
+          tradeType: ui.cfgTradeType.value,
+          barrier: Math.min(9, Math.max(0, parseInt(ui.cfgBarrier.value, 10) || 0)),
+        };
+        state.baseStake = Math.max(0.35, parseFloat(ui.cfgStake.value) || 1.00);
+        state.currentStake = state.baseStake;
+        state.step = 1;
+        state.duration = Math.min(10, Math.max(1, parseInt(ui.cfgDuration.value, 10) || 1));
+        state.martingale = Math.max(1.0, parseFloat(ui.cfgMartingale.value) || 2.1);
+        state.takeProfit = Math.max(1, parseFloat(ui.cfgTakeProfit.value) || 50.00);
+        state.stopLoss = Math.max(1, parseFloat(ui.cfgStopLoss.value) || 50.00);
+
+        syncInputsFromState();
+        refreshBuilderXml();
+        saveState();
+        renderBalancesAndKpis();
+        logJournal(`Loaded "${state.strategy.name}" into runner (${state.market}).`);
+        showAlert(`Loaded "${state.strategy.name}" into runner.`, 'success');
+
+        openTab('dashboard');
+        if (runImmediately && !state.isRunning) startBotRunner();
+      }
+
+      function parseXmlString(xmlText) {
+        const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+        const getField = (n) => doc.querySelector(`field[name="${n}"]`)?.textContent?.trim() || null;
+
+        ui.cfgBotName.value = getField('BOT_NAME') || 'Imported XML Bot';
+        const mkt = getField('MARKET');
+        if (mkt && MARKETS[mkt]) ui.cfgMarket.value = mkt;
+        const tt = getField('TRADE_TYPE');
+        if (tt && PAYOUT_MULTIPLIERS[tt]) ui.cfgTradeType.value = tt;
+        ui.cfgBarrier.value = parseInt(getField('BARRIER') || '3', 10);
+        ui.cfgStake.value = Number(getField('STAKE') || 1).toFixed(2);
+        ui.cfgDuration.value = parseInt(getField('DURATION') || '1', 10);
+        ui.cfgMartingale.value = Number(getField('MARTINGALE') || 2.1).toFixed(1);
+        ui.cfgTakeProfit.value = Number(getField('TAKE_PROFIT') || 50).toFixed(2);
+        ui.cfgStopLoss.value = Number(getField('STOP_LOSS') || 50).toFixed(2);
+        loadBuilderIntoRunner(false);
+      }
+
+      function renderFreeBots() {
+        ui.freeBotsGrid.innerHTML = FREE_BOTS.map((bot) => `
+          <div class="surface-subtle rounded-2xl p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-sm font-extrabold">${bot.name}</h3>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-mono text-[10px] font-bold">${bot.badge}</span>
+              </div>
+              <p class="text-xs text-muted-custom leading-relaxed">${bot.desc}</p>
+            </div>
+            <div class="pt-2.5 border-t border-main-custom flex items-center justify-between gap-2">
+              <span class="font-mono text-[11px] text-faint-custom">${bot.market} • ${bot.tradeType}</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="window.applyPresetBot('${bot.id}', false)" class="btn-secondary px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer">Load Bot</button>
+                <button type="button" onclick="window.applyPresetBot('${bot.id}', true)" class="btn-primary px-3 py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">Run Now</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        ui.dashQuickBotsRow.innerHTML = FREE_BOTS.slice(0, 3).map((bot) => `
+          <div class="surface-subtle rounded-xl p-3 flex flex-col justify-between gap-2.5">
+            <div>
+              <div class="text-xs font-extrabold">${bot.name}</div>
+              <div class="text-[11px] font-mono text-faint-custom">${bot.market} • ${bot.tradeType} ${bot.barrier}</div>
+            </div>
+            <button type="button" onclick="window.applyPresetBot('${bot.id}', true)" class="btn-primary w-full py-1.5 rounded-lg text-xs font-extrabold cursor-pointer">Run Now</button>
+          </div>
+        `).join('');
+      }
+
+      window.applyPresetBot = function (botId, autoRun) {
+        const bot = FREE_BOTS.find((b) => b.id === botId);
+        if (!bot) return;
+        ui.cfgBotName.value = bot.name;
+        ui.cfgMarket.value = bot.market;
+        ui.cfgTradeType.value = bot.tradeType;
+        ui.cfgBarrier.value = bot.barrier;
+        ui.cfgStake.value = bot.stake.toFixed(2);
+        ui.cfgDuration.value = bot.duration;
+        ui.cfgMartingale.value = bot.martingale.toFixed(1);
+        loadBuilderIntoRunner(autoRun);
+      };
+
+      function renderAnalysis() {
+        const sample = tickHistory.slice(-100);
+        const denom = sample.length || 1;
+        const counts = new Array(10).fill(0);
+        let evens = 0;
+        let over4 = 0;
+
+        sample.forEach((t) => {
+          counts[t.digit] += 1;
+          if (t.digit % 2 === 0) evens += 1;
+          if (t.digit > 4) over4 += 1;
+        });
+
+        ui.dashboardDigitGrid.innerHTML = counts.map((c, d) => {
+          const pct = (c / denom) * 100;
+          const cls = pct >= 13
+            ? 'border-emerald-500/60 text-emerald-500 bg-emerald-500/10'
+            : pct <= 7
+              ? 'border-rose-500/60 text-rose-500 bg-rose-500/10'
+              : 'border-amber-500/40 text-amber-400 bg-amber-500/5';
+          return `
+            <div class="rounded-xl border ${cls} p-2 text-center">
+              <div class="font-mono text-sm font-extrabold">${d}</div>
+              <div class="font-mono text-[11px] font-bold">${pct.toFixed(1)}%</div>
+            </div>
+          `;
+        }).join('');
+
+        ui.analysisRingsGrid.innerHTML = counts.map((c, d) => {
+          const pct = (c / denom) * 100;
+          const ringColor = pct >= 13 ? '#10b981' : pct <= 7 ? '#ef4444' : '#38bdf8';
+          const deg = Math.min(360, Math.round((pct / 25) * 360));
+          return `
+            <div class="surface-subtle rounded-xl p-3 flex flex-col items-center gap-1.5">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center font-mono text-xs font-extrabold" style="background: conic-gradient(${ringColor} ${deg}deg, rgba(148,163,184,0.18) 0deg);">
+                <div class="w-9 h-9 rounded-full surface-card flex items-center justify-center">${d}</div>
+              </div>
+              <div class="font-mono text-xs font-bold">${pct.toFixed(1)}%</div>
+              <div class="font-mono text-[10px] text-faint-custom">${c} ticks</div>
+            </div>
+          `;
+        }).join('');
+
+        const evenPct = (evens / denom) * 100;
+        const oddPct = 100 - evenPct;
+        ui.analysisEvenPct.textContent = `${evenPct.toFixed(1)}%`;
+        ui.analysisOddPct.textContent = `${oddPct.toFixed(1)}%`;
+        ui.analysisEvenBar.style.width = `${evenPct}%`;
+        ui.analysisParityTag.textContent = evenPct >= 55 ? 'EVEN DOMINANT' : oddPct >= 55 ? 'ODD DOMINANT' : 'BALANCED';
+
+        const overPct = (over4 / denom) * 100;
+        const underPct = 100 - overPct;
+        ui.analysisOver4Pct.textContent = `${overPct.toFixed(1)}%`;
+        ui.analysisUnder5Pct.textContent = `${underPct.toFixed(1)}%`;
+        ui.analysisOver4Bar.style.width = `${overPct}%`;
+        ui.analysisOuTag.textContent = overPct >= 55 ? 'OVER 4 EDGE' : underPct >= 55 ? 'UNDER 5 EDGE' : 'NEUTRAL';
+
+        ui.analysisTapeRow.innerHTML = sample.slice(-30).reverse().map((t) => {
+          const isEven = t.digit % 2 === 0;
+          return `<span class="w-7 h-7 rounded-lg border ${isEven ? 'bg-sky-500/15 text-sky-400 border-sky-500/30' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'} flex items-center justify-center font-bold">${t.digit}</span>`;
+        }).join('');
+      }
+
+      function renderSignals() {
+        const list = [
+          { id: 'sig1', title: 'R_100 Digit Over 3 Signal', market: 'R_100', tradeType: 'DIGITOVER', barrier: 3, conf: '88%' },
+          { id: 'sig2', title: 'R_75 Digit Under 6 Signal', market: 'R_75', tradeType: 'DIGITUNDER', barrier: 6, conf: '85%' },
+          { id: 'sig3', title: 'R_10 Even Digit Signal', market: 'R_10', tradeType: 'DIGITEVEN', barrier: 0, conf: '82%' },
+          { id: 'sig4', title: 'JD25 Fall (PUT) Impulse', market: 'JD25', tradeType: 'PUT', barrier: 0, conf: '80%' },
+        ];
+
+        ui.signalsListGrid.innerHTML = list.map((s) => `
+          <div class="surface-subtle rounded-2xl p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-mono font-bold text-emerald-500">${s.market}</span>
+                <span class="font-mono font-bold text-sky-400">Confidence ${s.conf}</span>
+              </div>
+              <div class="text-sm font-extrabold">${s.title}</div>
+            </div>
+            <button type="button" onclick="window.executeSignalItem('${s.id}')" class="btn-primary w-full py-2 rounded-xl text-xs font-extrabold cursor-pointer">
+              Execute Signal
+            </button>
+          </div>
+        `).join('');
+
+        window._signalsCache = list;
+      }
+
+      window.executeSignalItem = function (id) {
+        const s = (window._signalsCache || []).find((x) => x.id === id);
+        if (!s) return;
+        ui.cfgBotName.value = s.title;
+        ui.cfgMarket.value = s.market;
+        ui.cfgTradeType.value = s.tradeType;
+        ui.cfgBarrier.value = s.barrier;
+        loadBuilderIntoRunner(false);
+        runSingleContractCycle();
+      };
+
+      // =====================================================================
+      // MARKET STREAM (DERIV WS + SIMULATED FALLBACK) & CANVAS
+      // =====================================================================
+      function drawCanvas() {
+        const canvas = ui.marketCanvas;
+        if (!canvas || !canvas.parentElement) return;
+        const w = canvas.parentElement.clientWidth - 16;
+        const h = canvas.parentElement.clientHeight - 16;
+        if (w <= 0 || h <= 0) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const slice = tickHistory.slice(-state.chartWindow);
+        if (slice.length < 2) return;
+
+        const padL = 8, padR = 58, padT = 14, padB = 14;
+        const plotW = w - padL - padR;
+        const plotH = h - padT - padB;
+        const vals = slice.map((t) => t.quote);
+        let minV = Math.min(...vals);
+        let maxV = Math.max(...vals);
+        if (minV === maxV) { minV -= 0.5; maxV += 0.5; }
+        const span = maxV - minV;
+        const dec = MARKETS[state.market].decimals;
+
+        const styles = getComputedStyle(document.documentElement);
+        ctx.strokeStyle = styles.getPropertyValue('--canvas-grid').trim() || 'rgba(148,163,184,0.25)';
+        ctx.fillStyle = styles.getPropertyValue('--text-muted').trim() || '#64748b';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 3; i++) {
+          const y = padT + (plotH / 3) * i;
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(w - padR + 4, y);
+          ctx.stroke();
+          ctx.fillText((maxV - (span / 3) * i).toFixed(dec), w - padR + 8, y + 3);
+        }
+
+        const pts = slice.map((t, idx) => ({
+          x: padL + (idx / Math.max(1, slice.length - 1)) * plotW,
+          y: padT + plotH - ((t.quote - minV) / span) * plotH,
+          t,
+        }));
+
+        const last = slice[slice.length - 1];
+        const color = last.dir === 'down' ? '#ef4444' : '#10b981';
+
+        ctx.beginPath();
+        pts.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        pts.forEach((p, idx) => {
+          const endDot = idx === pts.length - 1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, endDot ? 4.5 : 2, 0, Math.PI * 2);
+          ctx.fillStyle = endDot ? '#fbbf24' : color;
+          ctx.fill();
+        });
+      }
+
+      function ingestTick(rawQuote, epochSec) {
+        const mkt = MARKETS[state.market];
+        const formatted = Number(rawQuote).toFixed(mkt.decimals);
+        const digit = parseInt(formatted.charAt(formatted.length - 1), 10);
+        const prev = tickHistory.length ? tickHistory[tickHistory.length - 1] : null;
+        const dir = !prev ? 'flat' : Number(rawQuote) > prev.quote ? 'up' : Number(rawQuote) < prev.quote ? 'down' : 'flat';
+        const stamp = epochSec ? new Date(epochSec * 1000).toTimeString().split(' ')[0] : timeNow();
+
+        tickHistory.push({ quote: Number(rawQuote), formatted, digit, dir, time: stamp });
+        if (tickHistory.length > 120) tickHistory.shift();
+
+        ui.spotPrefix.textContent = formatted.slice(0, -1);
+        ui.spotLastChar.textContent = formatted.slice(-1);
+        ui.spotDigitLabel.textContent = String(digit);
+        ui.spotClock.textContent = stamp;
+
+        ui.spotReadoutBox.classList.remove('pulse-up', 'pulse-down');
+        void ui.spotReadoutBox.offsetWidth;
+        if (dir === 'up') {
+          ui.spotDirectionBadge.textContent = '▲ UP';
+          ui.spotDirectionBadge.className = 'font-mono font-bold text-emerald-500';
+          ui.spotLastChar.className = 'text-emerald-500 underline decoration-2 underline-offset-4';
+          ui.spotReadoutBox.classList.add('pulse-up');
+        } else if (dir === 'down') {
+          ui.spotDirectionBadge.textContent = '▼ DOWN';
+          ui.spotDirectionBadge.className = 'font-mono font-bold text-rose-500';
+          ui.spotLastChar.className = 'text-rose-500 underline decoration-2 underline-offset-4';
+          ui.spotReadoutBox.classList.add('pulse-down');
+        }
+
+        drawCanvas();
+        renderAnalysis();
+
+        if (state.isRunning && !state.openContract) {
+          runSingleContractCycle();
+        }
+      }
+
+      function seedHistory(symbol, count = 70) {
+        tickHistory = [];
+        const mkt = MARKETS[symbol];
+        let val = mkt.base;
+        const now = Math.floor(Date.now() / 1000);
+        for (let i = count; i >= 1; i--) {
+          val = Math.max(1, val + (Math.random() - 0.495) * mkt.vol);
+          const formatted = val.toFixed(mkt.decimals);
+          const digit = parseInt(formatted.charAt(formatted.length - 1), 10);
+          const prevQ = tickHistory.length ? tickHistory[tickHistory.length - 1].quote : val;
+          tickHistory.push({
+            quote: val,
+            formatted,
+            digit,
+            dir: val >= prevQ ? 'up' : 'down',
+            time: new Date((now - i) * 1000).toTimeString().split(' ')[0],
+          });
+        }
+      }
+
+      function stopStreamTimers() {
+        if (simTimer) { clearInterval(simTimer); simTimer = null; }
+        if (keepAliveTimer) { clearInterval(keepAliveTimer); keepAliveTimer = null; }
+        if (wsClient) { try { wsClient.close(); } catch (_) {} wsClient = null; }
+      }
+
+      function startSimulatedStream() {
+        stopStreamTimers();
+        streamKind = 'SIMULATED';
+        ui.connDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+        ui.connText.className = 'text-amber-400';
+        ui.connText.textContent = 'Sim Stream';
+
+        seedHistory(state.market, 75);
+        drawCanvas();
+        renderAnalysis();
+
+        simTimer = setInterval(() => {
+          const mkt = MARKETS[state.market];
+          const prev = tickHistory.length ? tickHistory[tickHistory.length - 1].quote : mkt.base;
+          const jump = state.market === 'JD25' && Math.random() < 0.14 ? 3.5 : 1.0;
+          const next = Math.max(1, prev + (Math.random() - 0.498) * mkt.vol * jump);
+          ingestTick(next, Math.floor(Date.now() / 1000));
+        }, 1000);
+      }
+
+      function connectDerivWs(appId, token) {
+        stopStreamTimers();
+        const cleanId = (appId || '1089').trim();
+        state.settings.appId = cleanId;
+        state.settings.derivToken = (token || '').trim();
+        streamKind = 'LIVE';
+
+        ui.connDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+        ui.connText.className = 'text-emerald-500';
+        ui.connText.textContent = `Deriv (${cleanId})`;
+
+        try {
+          const sock = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${encodeURIComponent(cleanId)}`);
+          wsClient = sock;
+
+          sock.addEventListener('open', () => {
+            tickHistory = [];
+            keepAliveTimer = setInterval(() => {
+              if (sock.readyState === WebSocket.OPEN) sock.send(JSON.stringify({ ping: 1 }));
+            }, 25000);
+            if (state.settings.derivToken) {
+              sock.send(JSON.stringify({ authorize: state.settings.derivToken }));
+            }
+            sock.send(JSON.stringify({ ticks: state.market, subscribe: 1 }));
+            logJournal(`Deriv WebSocket connected (App ID: ${cleanId}).`);
+            showAlert(`Connected to Deriv WebSocket (App ID: ${cleanId}).`, 'success');
+          });
+
+          sock.addEventListener('message', (ev) => {
+            const data = JSON.parse(ev.data);
+            if (data.error) {
+              showAlert(`Deriv API: ${data.error.message}. Using Simulated Stream.`, 'warn');
+              startSimulatedStream();
+              return;
+            }
+            if (data.msg_type === 'tick' && data.tick) {
+              ingestTick(data.tick.quote, data.tick.epoch);
+            }
+          });
+
+          sock.addEventListener('error', () => {
+            showAlert('Live WebSocket unreachable here; switched to Simulated Stream.', 'warn');
+            startSimulatedStream();
+          });
+
+          sock.addEventListener('close', () => {
+            if (streamKind === 'LIVE') startSimulatedStream();
+          });
+        } catch (_) {
+          startSimulatedStream();
+        }
+      }
+
+      function switchMarket(symbol) {
+        if (!MARKETS[symbol]) return;
+        state.market = symbol;
+        ui.dashboardMarketSelect.value = symbol;
+        ui.cfgMarket.value = symbol;
+        refreshBuilderXml();
+
+        if (streamKind === 'LIVE' && wsClient && wsClient.readyState === WebSocket.OPEN) {
+          tickHistory = [];
+          wsClient.send(JSON.stringify({ forget_all: 'ticks' }));
+          wsClient.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
+        } else {
+          startSimulatedStream();
+        }
+        renderBalancesAndKpis();
+      }
+
+      // =====================================================================
+      // WIN / LOSS SETTLEMENT & RUNNER ENGINE
+      // =====================================================================
+      function syncRunnerInputsToState() {
+        state.baseStake = Math.max(0.35, parseFloat(ui.runStakeInput.value) || 1.00);
+        state.duration = Math.min(10, Math.max(1, parseInt(ui.runDurationInput.value, 10) || 1));
+        state.martingale = Math.max(1.0, parseFloat(ui.runMartingaleInput.value) || 2.1);
+        state.strategy.barrier = Math.min(9, Math.max(0, parseInt(ui.runBarrierInput.value, 10) || 0));
+        state.takeProfit = Math.max(1, parseFloat(ui.runTpInput.value) || 50.00);
+        state.stopLoss = Math.max(1, parseFloat(ui.runSlInput.value) || 50.00);
+        if (state.step === 1) state.currentStake = state.baseStake;
+        renderBalancesAndKpis();
+      }
+
+      function syncInputsFromState() {
+        ui.runStakeInput.value = state.baseStake.toFixed(2);
+        ui.runDurationInput.value = state.duration;
+        ui.runMartingaleInput.value = state.martingale.toFixed(1);
+        ui.runBarrierInput.value = state.strategy.barrier;
+        ui.runTpInput.value = state.takeProfit.toFixed(2);
+        ui.runSlInput.value = state.stopLoss.toFixed(2);
+      }
+
+      function startBotRunner() {
+        syncRunnerInputsToState();
+        state.isRunning = true;
+        ui.runStopLabel.textContent = 'Stop Bot';
+        ui.runStopIcon.textContent = '■';
+        ui.runnerStateBadge.textContent = 'RUNNING';
+        ui.runnerStateBadge.className = 'px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-mono text-[10px] font-bold animate-pulse';
+        logJournal(`Bot started: ${state.strategy.name} on ${state.market}.`);
+        showAlert(`Bot "${state.strategy.name}" started.`, 'info');
+      }
+
+      function stopBotRunner(msg, kind = 'info') {
+        state.isRunning = false;
+        ui.runStopLabel.textContent = 'Run Bot';
+        ui.runStopIcon.textContent = '▶';
+        ui.runnerStateBadge.textContent = 'STOPPED';
+        ui.runnerStateBadge.className = 'px-2.5 py-1 rounded-lg surface-card font-mono text-[10px] font-bold text-faint-custom';
+        if (msg) {
+          logJournal(msg);
+          showAlert(msg, kind);
+        }
+      }
+
+      function runSingleContractCycle() {
+        syncRunnerInputsToState();
+        const acct = activeUserAccount();
+        const stake = Number(state.currentStake.toFixed(2));
+
+        if (acct.balance < stake) {
+          stopBotRunner(`Insufficient ${acct.type} balance ($${fmtMoney(acct.balance)}) for $${fmtMoney(stake)} trade.`, 'error');
+          return;
+        }
+
+        const mkt = MARKETS[state.market];
+        const entryTick = tickHistory.length
+          ? tickHistory[tickHistory.length - 1]
+          : { quote: mkt.base, formatted: mkt.base.toFixed(mkt.decimals), digit: 4, time: timeNow() };
+
+        // Deduct stake from active user account
+        acct.balance = Number((acct.balance - stake).toFixed(2));
+        state.contractSeq += 1;
+
+        const exitDelta = (Math.random() - 0.48) * mkt.vol * 1.4;
+        const exitQuote = Math.max(1, entryTick.quote + exitDelta);
+        const exitFmt = Number(exitQuote).toFixed(mkt.decimals);
+        const exitDigit = parseInt(exitFmt.charAt(exitFmt.length - 1), 10);
+
+        const tType = state.strategy.tradeType;
+        const bar = state.strategy.barrier;
+        let won = false;
+        if (tType === 'DIGITOVER') won = exitDigit > bar;
+        else if (tType === 'DIGITUNDER') won = exitDigit < bar;
+        else if (tType === 'DIGITEVEN') won = exitDigit % 2 === 0;
+        else if (tType === 'DIGITODD') won = exitDigit % 2 !== 0;
+        else if (tType === 'CALL') won = exitQuote > entryTick.quote;
+        else if (tType === 'PUT') won = exitQuote < entryTick.quote;
+
+        const rate = PAYOUT_MULTIPLIERS[tType] || 1.95;
+        const txId = `T-${state.contractSeq}`;
+
+        if (won) {
+          // WIN: Credit payout directly to active user account; do NOT route to Admin Account
+          const totalPayout = Number((stake * rate).toFixed(2));
+          const profit = Number((totalPayout - stake).toFixed(2));
+          acct.balance = Number((acct.balance + totalPayout).toFixed(2));
+          state.netPnl = Number((state.netPnl + profit).toFixed(2));
+          state.wins += 1;
+          state.step = 1;
+          state.currentStake = state.baseStake;
+
+          state.transactions.unshift({
+            id: txId,
+            type: tType,
+            barrier: bar,
+            entry: entryTick.formatted,
+            exit: exitFmt,
+            stake,
+            pnl: profit,
+            status: 'WON',
+            accountId: acct.id,
+            time: timeNow(),
+          });
+
+          ui.runnerProgressBar.style.width = '100%';
+          ui.runnerProgressBar.className = 'h-full bg-emerald-500 transition-all duration-200';
+          ui.runnerProgressText.textContent = `WON +$${fmtMoney(profit)}`;
+          playChime(true);
+          logJournal(`WIN ${txId}: +$${fmtMoney(profit)} credited to ${acct.id} (${acct.type}).`);
+          showAlert(`Trade ${txId} WON +$${fmtMoney(profit)} on ${acct.id}!`, 'success');
+        } else {
+          // LOSS: Lost stake goes directly to Admin Account balance & Captured Losses Ledger
+          state.netPnl = Number((state.netPnl - stake).toFixed(2));
+          state.losses += 1;
+          state.step += 1;
+          state.currentStake = Number((state.currentStake * state.martingale).toFixed(2));
+
+          state.adminAccount.balance = Number((state.adminAccount.balance + stake).toFixed(2));
+          state.adminAccount.capturedLosses = Number((state.adminAccount.capturedLosses + stake).toFixed(2));
+          state.adminAccount.lossCount += 1;
+          state.adminAccount.lossLedger.unshift({
+            id: `L-${Date.now()}-${state.contractSeq}`,
+            contractId: txId,
+            accountId: acct.id,
+            accountType: acct.type,
+            amount: stake,
+            detail: `${tType} on ${state.market} (exit digit ${exitDigit})`,
+            time: timeNow(),
+          });
+          if (state.adminAccount.lossLedger.length > 200) state.adminAccount.lossLedger.pop();
+
+          state.transactions.unshift({
+            id: txId,
+            type: tType,
+            barrier: bar,
+            entry: entryTick.formatted,
+            exit: exitFmt,
+            stake,
+            pnl: -stake,
+            status: 'LOST',
+            accountId: acct.id,
+            time: timeNow(),
+          });
+
+          ui.runnerProgressBar.style.width = '100%';
+          ui.runnerProgressBar.className = 'h-full bg-rose-500 transition-all duration-200';
+          ui.runnerProgressText.textContent = `LOST -$${fmtMoney(stake)} -> Admin`;
+          playChime(false);
+          logJournal(`LOSS ${txId}: -$${fmtMoney(stake)} from ${acct.id} routed to Admin Account.`);
+          showAlert(`Trade ${txId} LOST -$${fmtMoney(stake)} — routed to Admin Account.`, 'warn');
+        }
+
+        if (state.transactions.length > 80) state.transactions.pop();
+
+        saveState();
+        renderBalancesAndKpis();
+        renderDrawer();
+        if (state.role === 'ADMIN' && state.adminUnlocked) renderAdminPortal();
+
+        if (state.netPnl >= state.takeProfit) {
+          stopBotRunner(`Take Profit (+$${fmtMoney(state.takeProfit)}) reached!`, 'success');
+        } else if (state.netPnl <= -Math.abs(state.stopLoss)) {
+          stopBotRunner(`Stop Loss (-$${fmtMoney(state.stopLoss)}) reached!`, 'error');
+        }
+      }
+
+      function renderDrawer() {
+        ui.drawerTxBadge.textContent = String(state.transactions.length);
+        ui.drawerJournalBadge.textContent = String(state.journal.length);
+
+        if (!state.transactions.length) {
+          ui.drawerTxFeed.innerHTML = `<div class="py-7 px-3 text-center text-xs text-faint-custom">No trades executed yet.</div>`;
+        } else {
+          ui.drawerTxFeed.innerHTML = state.transactions.slice(0, 35).map((tx) => {
+            const won = tx.status === 'WON';
+            return `
+              <div class="p-2.5 flex items-center justify-between gap-2 text-xs">
+                <div>
+                  <div class="font-mono font-bold">${tx.type} <span class="text-[10px] text-faint-custom">${tx.id} • ${tx.accountId}</span></div>
+                  <div class="font-mono text-[10px] text-faint-custom">${tx.entry} &rarr; ${tx.exit} • Stake $${fmtMoney(tx.stake)}</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-mono font-bold ${won ? 'text-emerald-500' : 'text-rose-500'}">${won ? '+' : '-'}$${fmtMoney(Math.abs(tx.pnl))}</div>
+                  <div class="font-mono text-[10px] text-faint-custom">${tx.time}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        ui.drawerJournalFeed.innerHTML = state.journal.map((line) => `<div class="text-muted-custom">${line}</div>`).join('');
+      }
+
+      function resetRunnerStats() {
+        stopBotRunner();
+        state.netPnl = 0;
+        state.wins = 0;
+        state.losses = 0;
+        state.step = 1;
+        state.transactions = [];
+        syncRunnerInputsToState();
+        state.currentStake = state.baseStake;
+        ui.runnerProgressBar.style.width = '0%';
+        ui.runnerProgressText.textContent = 'Idle';
+        saveState();
+        renderBalancesAndKpis();
+        renderDrawer();
+        logJournal('Runner session stats reset.');
+        showAlert('Runner session stats reset.', 'info');
+      }
+
+      // =====================================================================
+      // SETTINGS ACTIONS
+      // =====================================================================
+      function populateSettingsInputs() {
+        ui.prefPhoneInput.value = state.settings.defaultPhone || '';
+        ui.prefStakeInput.value = Number(state.settings.defaultStake || 1).toFixed(2);
+        ui.prefAutoConnectWs.checked = Boolean(state.settings.autoConnectWs);
+        ui.prefTradeAlerts.checked = state.settings.tradeAlerts !== false;
+        ui.prefAdminId.value = state.settings.adminId;
+        ui.prefAdminPasskey.value = state.settings.adminPasskey;
+        applyTheme(state.settings.theme);
+      }
+
+      function saveSettingsAll() {
+        state.settings.defaultPhone = ui.prefPhoneInput.value.trim();
+        state.settings.defaultStake = Math.max(0.35, parseFloat(ui.prefStakeInput.value) || 1.00);
+        state.settings.autoConnectWs = ui.prefAutoConnectWs.checked;
+        state.settings.tradeAlerts = ui.prefTradeAlerts.checked;
+
+        const nextAdminId = ui.prefAdminId.value.trim();
+        const nextAdminKey = ui.prefAdminPasskey.value.trim();
+        if (nextAdminId.length >= 3) state.settings.adminId = nextAdminId;
+        if (nextAdminKey.length >= 6) state.settings.adminPasskey = nextAdminKey;
+
+        state.baseStake = state.settings.defaultStake;
+        if (state.step === 1) state.currentStake = state.baseStake;
+        if (state.settings.defaultPhone) ui.withdrawPhoneField.value = state.settings.defaultPhone;
+
+        syncInputsFromState();
+        saveState();
+        renderBalancesAndKpis();
+        logJournal('Settings saved.');
+        showAlert('Settings saved successfully.', 'success');
+      }
+
+      function resetBalancesOnly() {
+        state.accounts.DEMO.balance = 10000.00;
+        state.accounts.REAL.balance = 0.00;
+        saveState();
+        renderBalancesAndKpis();
+        renderCashier();
+        if (state.role === 'ADMIN' && state.adminUnlocked) renderAdminPortal();
+        logJournal('Balances reset: Demo $10,000.00 / Real $0.00.');
+        showAlert('Balances reset to Demo $10,000.00 and Real $0.00.', 'success');
+      }
+
+      function resetAllAppData() {
+        stopBotRunner();
+        localStorage.removeItem(STORAGE_KEY);
+        state = freshState();
+        populateSettingsInputs();
+        syncInputsFromState();
+        refreshBuilderXml();
+        renderBalancesAndKpis();
+        renderCashier();
+        renderDrawer();
+        renderAdminPortal();
+        renderRoleLayout();
+        openTab('dashboard');
+        startSimulatedStream();
+        showAlert('All app data reset to default ($10,000 Demo / $0 Real).', 'info');
+      }
+
+      // =====================================================================
+      // BIND EVERY BUTTON, TAB, FORM & MODAL
+      // =====================================================================
+      ui.navTabs.forEach((btn) => {
+        btn.addEventListener('click', () => openTab(btn.dataset.navTab));
+      });
+
+      ui.headerWalletBtn.addEventListener('click', () => openTab('wallet'));
+      ui.headerSettingsBtn.addEventListener('click', () => openTab('settings'));
+      ui.dashGoFreeBotsBtn.addEventListener('click', () => openTab('freebots'));
+
+      ui.accountSelect.addEventListener('change', (e) => {
+        state.activeAccountType = e.target.value === 'REAL' ? 'REAL' : 'DEMO';
+        saveState();
+        renderBalancesAndKpis();
+        logJournal(`Active account switched to ${activeUserAccount().label}.`);
+        showAlert(`Active account: ${activeUserAccount().label}`, 'info');
+      });
+
+      // Role & Admin Login Modal
+      ui.roleTraderBtn.addEventListener('click', () => {
+        state.role = 'TRADER';
+        renderRoleLayout();
+        openTab(state.activeTab);
+      });
+      ui.roleAdminBtn.addEventListener('click', promptAdminLogin);
+      ui.closeAdminLoginBtn.addEventListener('click', () => {
+        ui.adminLoginModal.classList.add('hidden');
+        ui.adminLoginModal.classList.remove('flex');
+      });
+      ui.cancelAdminLoginBtn.addEventListener('click', () => {
+        ui.adminLoginModal.classList.add('hidden');
+        ui.adminLoginModal.classList.remove('flex');
+      });
+      ui.adminLoginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const idVal = ui.adminLoginIdInput.value.trim();
+        const keyVal = ui.adminLoginPasskeyInput.value;
+        if (idVal === state.settings.adminId && keyVal === state.settings.adminPasskey) {
+          state.adminUnlocked = true;
+          state.role = 'ADMIN';
+          ui.adminLoginModal.classList.add('hidden');
+          ui.adminLoginModal.classList.remove('flex');
+          renderRoleLayout();
+          showAlert(`Admin Portal unlocked (${idVal}).`, 'success');
+        } else {
+          showAlert('Invalid Admin ID or Admin Passkey.', 'error');
+        }
+      });
+
+      ui.adminLockExitBtn.addEventListener('click', lockAdmin);
+      ui.adminBackTraderBtn.addEventListener('click', () => {
+        state.role = 'TRADER';
+        renderRoleLayout();
+        openTab(state.activeTab);
+      });
+      ui.adminClearLossLedgerBtn.addEventListener('click', () => {
+        state.adminAccount.lossLedger = [];
+        saveState();
+        renderAdminPortal();
+        showAlert('Captured losses ledger display cleared.', 'info');
+      });
+
+      // Deriv Modal
+      ui.headerDerivApiBtn.addEventListener('click', () => {
+        ui.derivAppIdField.value = state.settings.appId;
+        ui.derivTokenField.value = state.settings.derivToken;
+        ui.derivModal.classList.remove('hidden');
+        ui.derivModal.classList.add('flex');
+      });
+      ui.closeDerivModalBtn.addEventListener('click', () => {
+        ui.derivModal.classList.add('hidden');
+        ui.derivModal.classList.remove('flex');
+      });
+      ui.openDerivOauthBtn.addEventListener('click', () => {
+        const aid = (ui.derivAppIdField.value || '1089').trim();
+        window.open(`https://oauth.deriv.com/oauth2/authorize?app_id=${encodeURIComponent(aid)}`, '_blank', 'noopener');
+      });
+      ui.selectSimStreamBtn.addEventListener('click', () => {
+        startSimulatedStream();
+        ui.derivModal.classList.add('hidden');
+        ui.derivModal.classList.remove('flex');
+        showAlert('Switched to Simulated Tick Stream.', 'info');
+      });
+      ui.connectDerivWsBtn.addEventListener('click', () => {
+        connectDerivWs(ui.derivAppIdField.value, ui.derivTokenField.value);
+        ui.derivModal.classList.add('hidden');
+        ui.derivModal.classList.remove('flex');
+      });
+
+      // Dashboard Controls
+      ui.dashboardMarketSelect.addEventListener('change', (e) => switchMarket(e.target.value));
+      ui.tickWinBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.chartWindow = parseInt(btn.dataset.tickWindow, 10) || 50;
+          ui.tickWinBtns.forEach((b) => {
+            b.className = b === btn
+              ? 'tick-win-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold btn-primary cursor-pointer'
+              : 'tick-win-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold cursor-pointer';
+          });
+          drawCanvas();
+        });
+      });
+      ui.dashForceTickBtn.addEventListener('click', () => {
+        const mkt = MARKETS[state.market];
+        const prev = tickHistory.length ? tickHistory[tickHistory.length - 1].quote : mkt.base;
+        ingestTick(Math.max(1, prev + (Math.random() - 0.49) * mkt.vol), Math.floor(Date.now() / 1000));
+      });
+
+      // Bot Builder Controls
+      [ui.cfgBotName, ui.cfgMarket, ui.cfgTradeType, ui.cfgBarrier, ui.cfgStake, ui.cfgDuration, ui.cfgMartingale, ui.cfgTakeProfit, ui.cfgStopLoss]
+        .forEach((node) => node.addEventListener('input', refreshBuilderXml));
+
+      ui.builderLoadSampleXmlBtn.addEventListener('click', () => {
+        const sample = `<xml xmlns="https://developers.google.com/blockly/xml"><block type="trade_definition"><field name="BOT_NAME">Sample Over 2 Bot</field><field name="MARKET">R_100</field><field name="TRADE_TYPE">DIGITOVER</field><field name="BARRIER">2</field><field name="STAKE">1.50</field><field name="DURATION">1</field><field name="MARTINGALE">2.2</field><field name="TAKE_PROFIT">60</field><field name="STOP_LOSS">40</field></block></xml>`;
+        parseXmlString(sample);
+        showAlert('Loaded sample XML strategy.', 'success');
+      });
+
+      ui.builderImportXmlInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => parseXmlString(String(ev.target.result || ''));
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      ui.builderExportXmlBtn.addEventListener('click', () => {
+        const xml = refreshBuilderXml();
+        const blob = new Blob([xml], { type: 'application/xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${(ui.cfgBotName.value || 'dbtraders_bot').trim().toLowerCase().replace(/\s+/g, '_')}.xml`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showAlert('Exported strategy XML file.', 'success');
+      });
+
+      ui.builderLoadRunnerBtn.addEventListener('click', () => loadBuilderIntoRunner(false));
+
+      // Free Bots & Analysis & Signals
+      ui.freeBotsResetFilterBtn.addEventListener('click', () => {
+        renderFreeBots();
+        showAlert('Showing all 6 free bots.', 'info');
+      });
+      ui.analysisGenTicksBtn.addEventListener('click', () => {
+        const mkt = MARKETS[state.market];
+        for (let i = 0; i < 25; i++) {
+          const prev = tickHistory.length ? tickHistory[tickHistory.length - 1].quote : mkt.base;
+          ingestTick(Math.max(1, prev + (Math.random() - 0.5) * mkt.vol), Math.floor(Date.now() / 1000) + i);
+        }
+        showAlert('Generated 25 sample ticks.', 'success');
+      });
+      ui.analysisResetTicksBtn.addEventListener('click', () => {
+        seedHistory(state.market, 100);
+        drawCanvas();
+        renderAnalysis();
+        showAlert('Reset 100-tick sample.', 'info');
+      });
+      ui.refreshSignalsBtn.addEventListener('click', () => {
+        renderSignals();
+        showAlert('Refreshed live signals.', 'info');
+      });
+
+      // Cashier & Copy Buttons
+      document.querySelectorAll('.copy-value-btn').forEach((btn) => {
+        btn.addEventListener('click', () => copyText(btn.dataset.copy));
+      });
+      ui.walletSelectRealBtn.addEventListener('click', () => {
+        state.activeAccountType = 'REAL';
+        saveState();
+        renderBalancesAndKpis();
+        showAlert('Switched active account to Real (CR4182910).', 'info');
+      });
+      ui.cashierTabDepositBtn.addEventListener('click', () => setCashierTab('deposit'));
+      ui.cashierTabWithdrawBtn.addEventListener('click', () => setCashierTab('withdraw'));
+      ui.cashierDepositForm.addEventListener('submit', handleDeposit);
+      ui.cashierWithdrawForm.addEventListener('submit', handleWithdraw);
+
+      // Settings Buttons
+      ui.themeOptionBtns.forEach((btn) => {
+        btn.addEventListener('click', () => applyTheme(btn.dataset.themeName));
+      });
+      ui.saveSettingsBtn.addEventListener('click', saveSettingsAll);
+      ui.resetBalancesBtn.addEventListener('click', resetBalancesOnly);
+      ui.resetAllDataBtn.addEventListener('click', resetAllAppData);
+
+      // Runner Drawer Buttons
+      ui.runStopBotBtn.addEventListener('click', () => {
+        if (state.isRunning) stopBotRunner('Bot stopped.', 'info');
+        else startBotRunner();
+      });
+      ui.placeQuickTradeBtn.addEventListener('click', runSingleContractCycle);
+      ui.resetRunnerBtn.addEventListener('click', resetRunnerStats);
+      [ui.runStakeInput, ui.runDurationInput, ui.runMartingaleInput, ui.runBarrierInput, ui.runTpInput, ui.runSlInput]
+        .forEach((inp) => inp.addEventListener('change', syncRunnerInputsToState));
+
+      ui.drawerShowTxBtn.addEventListener('click', () => {
+        state.drawerTab = 'tx';
+        ui.drawerShowTxBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold btn-primary cursor-pointer';
+        ui.drawerShowJournalBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-faint-custom cursor-pointer';
+        ui.drawerTxFeed.classList.remove('hidden');
+        ui.drawerJournalFeed.classList.add('hidden');
+      });
+
+      ui.drawerShowJournalBtn.addEventListener('click', () => {
+        state.drawerTab = 'journal';
+        ui.drawerShowJournalBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold btn-primary cursor-pointer';
+        ui.drawerShowTxBtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-faint-custom cursor-pointer';
+        ui.drawerJournalFeed.classList.remove('hidden');
+        ui.drawerTxFeed.classList.add('hidden');
+      });
+
+      ui.dismissAlertBtn.addEventListener('click', () => ui.alertBar.classList.add('hidden'));
+      window.addEventListener('resize', drawCanvas);
+
+      // =====================================================================
+      // INITIAL BOOT
+      // =====================================================================
+      populateSettingsInputs();
+      syncInputsFromState();
+      refreshBuilderXml();
+      renderFreeBots();
+      renderSignals();
+      renderBalancesAndKpis();
+      renderCashier();
+      renderDrawer();
+      renderRoleLayout();
+      openTab('dashboard');
+
+      if (state.settings.autoConnectWs) {
+        connectDerivWs(state.settings.appId, state.settings.derivToken);
+      } else {
+        startSimulatedStream();
+      }
+    })();
+  </script>
+</body>
+</html>
