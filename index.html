@@ -1,540 +1,418 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="midnight">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DBTraders Pro — Automated Trading & Cashier</title>
+  <title>DBTraders Pro — Automated Deriv Bot, Cashier &amp; Admin Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
   <style>
+    /* =====================================================================
+       THEME CUSTOM PROPERTIES: MIDNIGHT SLATE, EMERALD VAULT, CLEAN DAYLIGHT
+       ===================================================================== */
     :root,
-    [data-theme="midnight"] {
-      --bg: #090d16;
-      --surface: #111827;
-      --surface-2: #182234;
-      --border: #263349;
-      --text: #f3f6fb;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-2: #22c55e;
+    [data-theme="midnight-slate"] {
+      --bg-app: #090d14;
+      --bg-card: #111724;
+      --bg-subtle: #0d121c;
+      --bg-input: #090d14;
+      --bg-hover: #182133;
+      --border-main: #1f293d;
+      --border-soft: #2b3852;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #10b981;
+      --accent-primary-hover: #34d399;
+      --accent-text: #03150e;
+      --accent-secondary: #38bdf8;
       --danger: #ef4444;
-      --warn: #f59e0b;
+      --warning: #f59e0b;
+      --canvas-bg: #090d14;
+      --canvas-grid: rgba(51, 65, 85, 0.35);
+      --shadow-card: 0 12px 28px -8px rgba(0, 0, 0, 0.45);
     }
 
-    [data-theme="emerald"] {
-      --bg: #061310;
-      --surface: #0c1f1a;
-      --surface-2: #122d26;
-      --border: #1e463b;
-      --text: #ecfdf5;
-      --muted: #86efac;
-      --accent: #10b981;
-      --accent-2: #34d399;
+    [data-theme="emerald-vault"] {
+      --bg-app: #05110d;
+      --bg-card: #0b1e18;
+      --bg-subtle: #081712;
+      --bg-input: #05110d;
+      --bg-hover: #112b22;
+      --border-main: #16362b;
+      --border-soft: #204c3d;
+      --text-primary: #ecfdf5;
+      --text-secondary: #a7f3d0;
+      --text-muted: #6ee7b7;
+      --accent-primary: #10b981;
+      --accent-primary-hover: #34d399;
+      --accent-text: #03150e;
+      --accent-secondary: #2dd4bf;
       --danger: #f87171;
-      --warn: #fbbf24;
+      --warning: #fbbf24;
+      --canvas-bg: #05110d;
+      --canvas-grid: rgba(16, 185, 129, 0.16);
+      --shadow-card: 0 12px 28px -8px rgba(0, 22, 14, 0.6);
     }
 
-    [data-theme="daylight"] {
-      --bg: #f1f5f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --border: #cbd5e1;
-      --text: #0f172a;
-      --muted: #475569;
-      --accent: #0284c7;
-      --accent-2: #16a34a;
+    [data-theme="clean-daylight"] {
+      --bg-app: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --bg-input: #f1f5f9;
+      --bg-hover: #e2e8f0;
+      --border-main: #cbd5e1;
+      --border-soft: #94a3b8;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #059669;
+      --accent-primary-hover: #10b981;
+      --accent-text: #ffffff;
+      --accent-secondary: #0284c7;
       --danger: #dc2626;
-      --warn: #d97706;
+      --warning: #d97706;
+      --canvas-bg: #f8fafc;
+      --canvas-grid: rgba(148, 163, 184, 0.35);
+      --shadow-card: 0 10px 22px -8px rgba(15, 23, 42, 0.1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      padding-bottom: 48px;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 20;
+    .surface-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-main);
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
     }
 
-    .brand { font-weight: 800; font-size: 1.15rem; letter-spacing: 0.4px; color: var(--accent); }
-    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-
-    button, select, input {
-      font: inherit;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      padding: 8px 12px;
+    .surface-subtle {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-main);
     }
 
-    button { cursor: pointer; font-weight: 600; transition: opacity 0.15s ease; }
-    button:hover { opacity: 0.9; }
-    button.primary { background: var(--accent); color: #06101d; border-color: transparent; }
-    button.success { background: var(--accent-2); color: #05160c; border-color: transparent; }
-    button.danger { background: var(--danger); color: #ffffff; border-color: transparent; }
-    button.active-tab { background: var(--accent); color: #06101d; border-color: transparent; }
-
-    .container { max-width: 1120px; margin: 20px auto; padding: 0 16px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 16px; }
-    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
+    .input-field {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      color: var(--text-primary);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-    .value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
-    .section-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; }
-    .stack { display: flex; flex-direction: column; gap: 10px; }
-    .hidden { display: none !important; }
-
-    .log-box {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 220px;
-      overflow-y: auto;
-      font-size: 0.88rem;
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
     }
 
-    .log-item { padding: 6px 0; border-bottom: 1px solid var(--border); }
-    .log-item:last-child { border-bottom: none; }
-
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 10px;
-      z-index: 50;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    .btn-primary {
+      background-color: var(--accent-primary);
+      color: var(--accent-text);
+      transition: background-color 0.18s ease, transform 0.1s ease;
     }
 
-    .badge {
+    .btn-primary:hover {
+      background-color: var(--accent-primary-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.985);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-soft);
+      color: var(--text-primary);
+      transition: background-color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .text-muted-custom {
+      color: var(--text-secondary);
+    }
+
+    .text-faint-custom {
+      color: var(--text-muted);
+    }
+
+    .border-main-custom {
+      border-color: var(--border-main);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-subtle);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-soft);
+      border-radius: 9999px;
+    }
+
+    @keyframes pulseUp {
+      0% { box-shadow: inset 0 0 0 2px rgba(16, 185, 129, 0.65); }
+      100% { box-shadow: inset 0 0 0 0 transparent; }
+    }
+    @keyframes pulseDown {
+      0% { box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.65); }
+      100% { box-shadow: inset 0 0 0 0 transparent; }
+    }
+    .pulse-up { animation: pulseUp 0.45s ease-out; }
+    .pulse-down { animation: pulseDown 0.45s ease-out; }
+
+    .switch-track {
+      width: 44px;
+      height: 24px;
+      border-radius: 9999px;
+      position: relative;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+    }
+    .switch-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    input:checked + .switch-track {
+      background-color: var(--accent-primary);
+    }
+    input:checked + .switch-track .switch-thumb {
+      transform: translateX(20px);
     }
   </style>
 </head>
-<body>
-  <header>
-    <div class="brand">DBTraders Pro</div>
-    <div class="row">
-      <button id="switchDemoBtn" class="active-tab">Demo ($10,000.00)</button>
-      <button id="switchRealBtn">Real ($0.00)</button>
-      <span id="wsStatus" class="badge">Feed: Simulating</span>
-    </div>
-    <div class="row">
-      <button id="navTradeBtn" class="active-tab">Trader</button>
-      <button id="navCashierBtn">Cashier</button>
-      <button id="navSettingsBtn">Settings</button>
-      <button id="openAdminLoginBtn">Admin Portal</button>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- ===================================================================== -->
+  <!-- 1. HEADER BAR & ROLE / ACCOUNT CONTROLS                             -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-40 surface-card border-x-0 border-t-0 backdrop-blur-md">
+    <div class="max-w-[1660px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 flex items-center justify-center shadow-md">
+          <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-base sm:text-lg tracking-tight">DB<span class="text-emerald-500">Traders</span></span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">PRO</span>
+          </div>
+          <p class="text-[11px] text-faint-custom hidden 2xl:block">Automated Deriv Bot, Paybill Cashier &amp; Admin Suite</p>
+        </div>
+      </div>
+
+      <!-- Trader Workspace Tabs -->
+      <nav id="traderNavBar" aria-label="Trader Navigation" class="order-3 xl:order-2 w-full xl:w-auto overflow-x-auto flex items-center gap-1 surface-subtle p-1 rounded-xl">
+        <button type="button" data-nav-tab="dashboard" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Dashboard</button>
+        <button type="button" data-nav-tab="builder" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Bot Builder</button>
+        <button type="button" data-nav-tab="freebots" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Free Bots</button>
+        <button type="button" data-nav-tab="analysis" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Analysis Tool</button>
+        <button type="button" data-nav-tab="signals" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Signal Centre</button>
+        <button type="button" data-nav-tab="wallet" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap flex items-center gap-1 cursor-pointer">
+          <span>Wallet</span>
+          <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-500 font-mono text-[10px]">555222</span>
+        </button>
+        <button type="button" data-nav-tab="settings" class="nav-tab-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer">Settings</button>
+      </nav>
+
+      <!-- Right Header Controls -->
+      <div class="order-2 xl:order-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <!-- Connection Status -->
+        <div id="connBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl surface-subtle text-[11px] font-semibold">
+          <span id="connDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="connText" class="text-amber-400">Sim Stream</span>
+        </div>
+
+        <!-- Account Switcher (DEMO $10,000 / REAL $0.00) -->
+        <div class="flex items-center surface-subtle rounded-xl px-2.5 py-1 gap-2">
+          <span id="acctBadge" class="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500/15 text-amber-400 border border-amber-500/30">DEMO</span>
+          <div class="flex flex-col">
+            <select id="accountSelect" aria-label="Switch Demo or Real Account" class="bg-transparent text-[11px] font-mono font-bold focus:outline-none cursor-pointer">
+              <option value="DEMO">VRTC9042185 (Demo)</option>
+              <option value="REAL">CR4182910 (Real)</option>
+            </select>
+            <span id="headerBalanceDisplay" class="font-mono text-xs sm:text-sm font-extrabold text-amber-400 leading-tight">$10,000.00</span>
+          </div>
+        </div>
+
+        <!-- Wallet Button -->
+        <button id="headerWalletBtn" type="button" class="px-2.5 py-2 rounded-xl btn-primary text-xs font-bold flex items-center gap-1 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          <span class="hidden md:inline">Wallet</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="headerSettingsBtn" type="button" class="p-2 rounded-xl btn-secondary text-xs font-semibold cursor-pointer" title="Open Settings">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+
+        <!-- Deriv Login / API Modal Button -->
+        <button id="headerDerivApiBtn" type="button" class="px-2.5 py-2 rounded-xl btn-secondary text-xs font-semibold flex items-center gap-1 cursor-pointer">
+          <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          <span class="hidden lg:inline">Deriv Login / API</span>
+        </button>
+
+        <!-- Role Switcher (Trader vs Admin Portal) -->
+        <div class="flex items-center surface-subtle p-0.5 rounded-xl">
+          <button id="roleTraderBtn" type="button" class="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold btn-primary transition cursor-pointer">Trader</button>
+          <button id="roleAdminBtn" type="button" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-faint-custom transition flex items-center gap-1 cursor-pointer">
+            <span>Admin Portal</span>
+            <span id="roleAdminLock">🔒</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <div class="grid">
-      <div class="card">
-        <div class="label">Active Account</div>
-        <div id="activeAccountLabel" class="value">Demo (VRTC9042185)</div>
+  <!-- Toast / Alert Bar (Zero alert() or confirm() calls) -->
+  <div id="alertBar" class="hidden max-w-[1660px] w-full mx-auto px-3 sm:px-5 pt-3">
+    <div id="alertCard" class="rounded-xl border px-4 py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md">
+      <div class="flex items-center gap-2">
+        <span id="alertIcon">ℹ️</span>
+        <span id="alertMessage" class="font-medium"></span>
       </div>
-      <div class="card">
-        <div class="label">Active Balance</div>
-        <div id="activeBalanceValue" class="value">$10,000.00</div>
-      </div>
-      <div class="card">
-        <div class="label">Latest Tick</div>
-        <div id="latestTickValue" class="value">R_100 · 1042.35</div>
-      </div>
+      <button id="dismissAlertBtn" type="button" class="px-2.5 py-1 rounded-lg text-xs font-bold btn-secondary cursor-pointer">Dismiss</button>
     </div>
+  </div>
 
-    <!-- TRADER VIEW -->
-    <section id="viewTrade">
-      <div class="two-col">
-        <div class="card stack">
-          <div class="section-title">Automated Bot Runner</div>
-          <label class="label" for="symbolSelect">Market Symbol</label>
-          <select id="symbolSelect">
-            <option value="R_100">Volatility 100 Index (R_100)</option>
-            <option value="R_50">Volatility 50 Index (R_50)</option>
-            <option value="R_25">Volatility 25 Index (R_25)</option>
-          </select>
+  <!-- ===================================================================== -->
+  <!-- 2. TRADER WORKSPACE (MAIN VIEWPORT + PERSISTENT EXECUTION DRAWER)     -->
+  <!-- ===================================================================== -->
+  <div id="traderWorkspace" class="flex-1 max-w-[1660px] w-full mx-auto px-3 sm:px-5 py-4 grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
-          <label class="label" for="stakeInput">Stake (USD)</label>
-          <input id="stakeInput" type="number" min="1" step="1" value="10" />
+    <!-- LEFT / MAIN WORKSPACE (8 cols) -->
+    <main class="xl:col-span-8 space-y-4">
 
-          <label class="label" for="winChanceInput">Win Probability (%)</label>
-          <input id="winChanceInput" type="number" min="1" max="99" step="1" value="50" />
-
-          <div class="row">
-            <button id="startBotBtn" class="success">Start Bot</button>
-            <button id="stopBotBtn" class="danger">Stop Bot</button>
-            <button id="singleTradeBtn" class="primary">Place Single Trade</button>
+      <!-- TAB 1: DASHBOARD -->
+      <section id="view-dashboard" class="trader-view space-y-4">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="surface-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between text-[11px] text-muted-custom">
+              <span>Session Net P&amp;L</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded surface-subtle">USD</span>
+            </div>
+            <div id="kpiPnl" class="font-mono text-xl sm:text-2xl font-extrabold mt-1">+$0.00</div>
+            <div id="kpiTpSlText" class="text-[11px] text-faint-custom mt-0.5">TP +$50.00 / SL -$50.00</div>
           </div>
-          <p style="font-size: 0.85rem; color: var(--muted);">
-            Wins add profit to your active account balance. Losses deduct your stake and send the lost amount to the Admin account.
-          </p>
-        </div>
 
-        <div class="card stack">
-          <div class="section-title">Live Deriv WebSocket Connection</div>
-          <label class="label" for="appIdInput">Deriv App ID</label>
-          <input id="appIdInput" type="text" value="1089" />
+          <div class="surface-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between text-[11px] text-muted-custom">
+              <span>Win Rate</span>
+              <span id="kpiWl" class="font-mono text-[11px]">0W / 0L</span>
+            </div>
+            <div id="kpiWinRate" class="font-mono text-xl sm:text-2xl font-extrabold text-emerald-500 mt-1">0.0%</div>
+            <div class="w-full h-1.5 rounded-full surface-subtle mt-1.5 overflow-hidden">
+              <div id="kpiWinBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
 
-          <label class="label" for="apiTokenInput">Deriv API Token (Optional for Live Auth)</label>
-          <input id="apiTokenInput" type="password" placeholder="Paste Deriv token or leave blank for simulated feed" />
+          <div class="surface-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between text-[11px] text-muted-custom">
+              <span>Active Strategy</span>
+              <span class="text-[10px] font-bold text-emerald-500">LOADED</span>
+            </div>
+            <div id="kpiStrategyName" class="text-sm font-bold truncate mt-1.5">Dollar Printer V2</div>
+            <div id="kpiStrategyMeta" class="text-[11px] font-mono text-faint-custom mt-0.5">DIGITOVER 3 • 1 Tick</div>
+          </div>
 
-          <div class="row">
-            <button id="connectWsBtn" class="primary">Connect WebSocket</button>
-            <button id="disconnectWsBtn">Use Simulated Feed</button>
+          <div class="surface-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between text-[11px] text-muted-custom">
+              <span>Next Stake</span>
+              <span id="kpiStep" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-400 font-bold">Step 1</span>
+            </div>
+            <div id="kpiStake" class="font-mono text-xl sm:text-2xl font-extrabold text-amber-400 mt-1">$1.00</div>
+            <div id="kpiRecoveryMeta" class="text-[11px] text-faint-custom mt-0.5">MARTINGALE • 2.1x</div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="section-title">Trade & Activity Log</div>
-        <div id="tradeLog" class="log-box"></div>
-      </div>
-    </section>
+        <!-- Live Market Chart & Digit Bars -->
+        <div class="surface-card rounded-2xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-main-custom">
+            <div class="flex flex-wrap items-end gap-2.5">
+              <div>
+                <label for="dashboardMarketSelect" class="block text-[11px] font-bold uppercase tracking-wider text-muted-custom mb-1">Market</label>
+                <select id="dashboardMarketSelect" class="input-field rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold cursor-pointer">
+                  <option value="R_100">Volatility 100 Index (R_100)</option>
+                  <option value="R_75">Volatility 75 Index (R_75)</option>
+                  <option value="R_10">Volatility 10 Index (R_10)</option>
+                  <option value="JD25">Jump 25 Index (JD25)</option>
+                </select>
+              </div>
 
-    <!-- CASHIER VIEW (REAL ACCOUNT DEPOSIT & PHONE WITHDRAWAL) -->
-    <section id="viewCashier" class="hidden">
-      <div class="two-col">
-        <div class="card stack">
-          <div class="section-title">Deposit to Real Account (Paybill)</div>
-          <p><strong>Business No.:</strong> <span id="paybillNo">555222</span> <button id="copyPaybillBtn">Copy</button></p>
-          <p><strong>Account No.:</strong> <span id="accountNo">687637</span> <button id="copyAccountBtn">Copy</button></p>
+              <!-- Tick Window Buttons -->
+              <div>
+                <span class="block text-[11px] font-bold uppercase tracking-wider text-muted-custom mb-1">Chart Window</span>
+                <div class="flex items-center gap-1 surface-subtle p-1 rounded-xl">
+                  <button type="button" data-tick-window="25" class="tick-win-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold cursor-pointer">25T</button>
+                  <button type="button" data-tick-window="50" class="tick-win-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold btn-primary cursor-pointer">50T</button>
+                  <button type="button" data-tick-window="100" class="tick-win-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold cursor-pointer">100T</button>
+                </div>
+              </div>
 
-          <label class="label" for="depositAmountInput">Deposit Amount (USD)</label>
-          <input id="depositAmountInput" type="number" min="1" step="0.01" placeholder="e.g. 50" />
+              <button id="dashForceTickBtn" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer">+1 Tick</button>
+            </div>
 
-          <label class="label" for="depositRefInput">M-Pesa / Transaction Reference</label>
-          <input id="depositRefInput" type="text" placeholder="e.g. UJK492LMN1" />
+            <!-- Live Spot Readout -->
+            <div id="spotReadoutBox" class="surface-subtle rounded-xl px-4 py-2 text-right">
+              <div class="flex items-center justify-end gap-2 text-[11px] text-muted-custom">
+                <span>Live Spot</span>
+                <span id="spotDirectionBadge" class="font-mono font-bold">—</span>
+              </div>
+              <div class="font-mono text-2xl sm:text-3xl font-extrabold tracking-tight leading-none mt-1">
+                <span id="spotPrefix">1245.8</span><span id="spotLastChar" class="text-emerald-500 underline decoration-2 underline-offset-4">4</span>
+              </div>
+              <div class="text-[11px] font-mono text-faint-custom mt-1">
+                Last Digit <strong id="spotDigitLabel">4</strong> • <span id="spotClock">--:--:--</span>
+              </div>
+            </div>
+          </div>
 
-          <button id="submitDepositBtn" class="success">Confirm Deposit to Real Account</button>
-        </div>
-
-        <div class="card stack">
-          <div class="section-title">Withdraw Real Balance to Phone</div>
-          <label class="label" for="withdrawAmountInput">Withdrawal Amount (USD)</label>
-          <input id="withdrawAmountInput" type="number" min="1" step="0.01" placeholder="e.g. 25" />
-
-          <label class="label" for="withdrawPhoneInput">Recipient Phone Number</label>
-          <input id="withdrawPhoneInput" type="tel" placeholder="e.g. 254712345678 or 0712345678" />
-
-          <button id="submitWithdrawBtn" class="primary">Withdraw Directly to Phone</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Cashier Transactions</div>
-        <div id="cashierLog" class="log-box"></div>
-      </div>
-    </section>
-
-    <!-- SETTINGS VIEW -->
-    <section id="viewSettings" class="hidden">
-      <div class="card stack">
-        <div class="section-title">Application Settings</div>
-        <label class="label" for="themeSelect">Theme</label>
-        <select id="themeSelect">
-          <option value="midnight">Midnight Slate</option>
-          <option value="emerald">Emerald Vault</option>
-          <option value="daylight">Clean Daylight</option>
-        </select>
-
-        <label class="label" for="defaultPhoneInput">Default Withdrawal Phone Number</label>
-        <input id="defaultPhoneInput" type="tel" placeholder="2547XXXXXXXX" />
-
-        <div class="row">
-          <button id="saveSettingsBtn" class="primary">Save Settings</button>
-          <button id="resetBalancesBtn" class="danger">Reset Demo ($10,000) & Real ($0)</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ADMIN LOGIN GATE -->
-    <section id="viewAdminLogin" class="hidden">
-      <div class="card stack" style="max-width: 440px; margin: 0 auto;">
-        <div class="section-title">Admin Authentication Required</div>
-        <p style="font-size: 0.88rem; color: var(--muted);">
-          Regular traders cannot view or access the Admin account. Enter your Admin ID and Passkey to continue.
-        </p>
-        <label class="label" for="adminIdInput">Admin ID</label>
-        <input id="adminIdInput" type="text" placeholder="ADMIN-01" />
-
-        <label class="label" for="adminPasskeyInput">Admin Passkey</label>
-        <input id="adminPasskeyInput" type="password" placeholder="Enter admin passkey" />
-
-        <div class="row">
-          <button id="loginAdminBtn" class="primary">Unlock Admin Console</button>
-          <button id="cancelAdminLoginBtn">Back to Trader</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SEPARATED ADMIN CONSOLE -->
-    <section id="viewAdminDashboard" class="hidden">
-      <div class="grid">
-        <div class="card">
-          <div class="label">Admin Account Balance (Captured Losses)</div>
-          <div id="adminBalanceValue" class="value">$0.00</div>
-        </div>
-        <div class="card">
-          <div class="label">Total User Losses Routed</div>
-          <div id="adminLossCountValue" class="value">0</div>
-        </div>
-      </div>
-
-      <div class="card stack">
-        <div class="row" style="justify-content: space-between;">
-          <div class="section-title" style="margin: 0;">Admin Ledger & Payouts</div>
-          <button id="lockAdminBtn" class="danger">Lock & Exit Admin</button>
-        </div>
-        <div id="adminLog" class="log-box"></div>
-      </div>
-    </section>
-  </main>
-
-  <div id="toast" class="toast hidden"></div>
-
-  <script>
-    const STORAGE_KEY = "dbtraders_pro_state_v1";
-
-    const defaultState = {
-      activeAccount: "demo", // "demo" | "real"
-      balances: {
-        demo: 10000.0,
-        real: 0.0
-      },
-      admin: {
-        id: "ADMIN-01",
-        passkey: "DBT-ADMIN-2026",
-        authenticated: false,
-        balance: 0.0,
-        lossCount: 0,
-        logs: []
-      },
-      settings: {
-        theme: "midnight",
-        defaultPhone: "",
-        appId: "1089"
-      },
-      tradeLogs: [],
-      cashierLogs: []
-    };
-
-    let state = loadState();
-    let botTimer = null;
-    let simTimer = null;
-    let ws = null;
-    let lastQuote = 1042.35;
-
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return structuredClone(defaultState);
-        const parsed = JSON.parse(raw);
-        return {
-          ...structuredClone(defaultState),
-          ...parsed,
-          balances: { ...structuredClone(defaultState.balances), ...(parsed.balances || {}) },
-          admin: { ...structuredClone(defaultState.admin), ...(parsed.admin || {}), authenticated: false },
-          settings: { ...structuredClone(defaultState.settings), ...(parsed.settings || {}) }
-        };
-      } catch {
-        return structuredClone(defaultState);
-      }
-    }
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function fmtMoney(n) {
-      return "$" + Number(n || 0).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    function showToast(msg) {
-      const el = document.getElementById("toast");
-      el.textContent = msg;
-      el.classList.remove("hidden");
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => el.classList.add("hidden"), 2800);
-    }
-
-    function appendLog(list, message) {
-      const stamp = new Date().toLocaleTimeString();
-      list.unshift(`[${stamp}] ${message}`);
-      if (list.length > 80) list.length = 80;
-    }
-
-    function renderLogs(elId, items, emptyText) {
-      const el = document.getElementById(elId);
-      if (!items.length) {
-        el.innerHTML = `<div class="log-item" style="color: var(--muted);">${emptyText}</div>`;
-        return;
-      }
-      el.innerHTML = items.map((x) => `<div class="log-item">${x}</div>`).join("");
-    }
-
-    function renderAll() {
-      document.documentElement.setAttribute("data-theme", state.settings.theme);
-      document.getElementById("themeSelect").value = state.settings.theme;
-      document.getElementById("defaultPhoneInput").value = state.settings.defaultPhone;
-      if (!document.getElementById("withdrawPhoneInput").value && state.settings.defaultPhone) {
-        document.getElementById("withdrawPhoneInput").value = state.settings.defaultPhone;
-      }
-      document.getElementById("appIdInput").value = state.settings.appId;
-
-      const isDemo = state.activeAccount === "demo";
-      document.getElementById("switchDemoBtn").textContent = `Demo (${fmtMoney(state.balances.demo)})`;
-      document.getElementById("switchRealBtn").textContent = `Real (${fmtMoney(state.balances.real)})`;
-      document.getElementById("switchDemoBtn").classList.toggle("active-tab", isDemo);
-      document.getElementById("switchRealBtn").classList.toggle("active-tab", !isDemo);
-
-      document.getElementById("activeAccountLabel").textContent = isDemo
-        ? "Demo (VRTC9042185)"
-        : "Real (CR4182910)";
-      document.getElementById("activeBalanceValue").textContent = fmtMoney(
-        isDemo ? state.balances.demo : state.balances.real
-      );
-
-      document.getElementById("adminBalanceValue").textContent = fmtMoney(state.admin.balance);
-      document.getElementById("adminLossCountValue").textContent = String(state.admin.lossCount);
-
-      renderLogs("tradeLog", state.tradeLogs, "No trades executed yet.");
-      renderLogs("cashierLog", state.cashierLogs, "No cashier transactions yet.");
-      renderLogs("adminLog", state.admin.logs, "No admin loss or payout records yet.");
-    }
-
-    function showView(viewName) {
-      const views = ["viewTrade", "viewCashier", "viewSettings", "viewAdminLogin", "viewAdminDashboard"];
-      views.forEach((id) => document.getElementById(id).classList.add("hidden"));
-      document.getElementById(viewName).classList.remove("hidden");
-
-      document.getElementById("navTradeBtn").classList.toggle("active-tab", viewName === "viewTrade");
-      document.getElementById("navCashierBtn").classList.toggle("active-tab", viewName === "viewCashier");
-      document.getElementById("navSettingsBtn").classList.toggle("active-tab", viewName === "viewSettings");
-      document.getElementById("openAdminLoginBtn").classList.toggle("active-tab", viewName === "viewAdminDashboard");
-    }
-
-    function executeTrade() {
-      const acct = state.activeAccount;
-      const stake = Number(document.getElementById("stakeInput").value);
-      const winChance = Math.min(99, Math.max(1, Number(document.getElementById("winChanceInput").value) || 50));
-      const symbol = document.getElementById("symbolSelect").value;
-
-      if (!Number.isFinite(stake) || stake <= 0) {
-        stopBot();
-        showToast("Enter a valid stake greater than 0.");
-        return;
-      }
-
-      if (state.balances[acct] < stake) {
-        stopBot();
-        showToast(`Insufficient ${acct.toUpperCase()} balance for ${fmtMoney(stake)} stake.`);
-        return;
-      }
-
-      const won = Math.random() * 100 < winChance;
-      if (won) {
-        const profit = Number((stake * 0.85).toFixed(2));
-        state.balances[acct] = Number((state.balances[acct] + profit).toFixed(2));
-        appendLog(
-          state.tradeLogs,
-          `<strong style="color: var(--accent-2);">WIN</strong> on ${symbol} (${acct.toUpperCase()}) · +${fmtMoney(profit)}`
-        );
-      } else {
-        state.balances[acct] = Number((state.balances[acct] - stake).toFixed(2));
-        state.admin.balance = Number((state.admin.balance + stake).toFixed(2));
-        state.admin.lossCount += 1;
-        appendLog(
-          state.tradeLogs,
-          `<strong style="color: var(--danger);">LOSS</strong> on ${symbol} (${acct.toUpperCase()}) · -${fmtMoney(stake)} routed to Admin`
-        );
-        appendLog(
-          state.admin.logs,
-          `Captured ${fmtMoney(stake)} loss from ${acct.toUpperCase()} account on ${symbol}`
-        );
-      }
-
-      saveState();
-      renderAll();
-    }
-
-    function startBot() {
-      if (botTimer) return;
-      executeTrade();
-      botTimer = setInterval(executeTrade, 2200);
-      showToast("Automated bot started.");
-    }
-
-    function stopBot() {
-      if (botTimer) {
-        clearInterval(botTimer);
-        botTimer = null;
-        showToast("Automated bot stopped.");
-      }
-    }
-
-    function startSimulatedFeed() {
-      if (ws) {
-        ws.close();
-        ws = null;
-      }
-      clearInterval(simTimer);
-      document.getElementById("wsStatus").textContent = "Feed: Simulating";
-      simTimer = setInterval(() => {
-        const sym = document.getElementById("symbolSelect").value;
-        const delta = (Math.random() - 0.49) * 1.4;
-        lastQuote = Math.max(100, Number((lastQuote + delta).toFixed(2)));
-        document.getElementById("latestTickValue").textContent = `${sym} · ${lastQuote.toFixed(2)}`;
-      }, 1000);
-    }
-
-    function connectLiveWebSocket() {
-      const appId = document.getElementById("appIdInput").value.trim() || "1089";
-      const token = document.getElementById("apiTokenInput").value.trim();
-      state.settings.appId = appId;
-      saveState();
-
-      clearInterval(simTimer);
-      if (ws) ws.close();
-
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${encodeURIComponent(appId)}`);
-      document.getElementById("wsStatus").textContent = "Feed: Connecting...";
-
-      ws.addEventListener("open", () => {
-        document.getElementById("wsStatus").textContent = "Feed: Live WS";
-  
+          <!-- Canvas -->
+          <div class="w-full h-56 sm:h-64 rounded-xl border border-main-custom p-2 relative overflow-hidden" style="background-color: var(--canvas-bg);">
+            <canvas id="marketCa
