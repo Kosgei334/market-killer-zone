@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DERIV — Dashboard, Options, CFDs & TradingView</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- TradingView Lightweight Charts v4.1.3 Standalone Production -->
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            deriv: {
+              red: '#FF444F',
+              redHover: '#E03540',
+              coral: '#FF4B55',
+              hero: '#16181A',
+              topbar: '#151717',
+              pill: '#25282C',
+              surface: '#F4F5F6',
+              card: '#F8F9FA',
+              emerald: '#00A79E',
+              amber: '#FF9C13',
+              ink: '#18191C',
+              muted: '#6E717A',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      background-color: #E8EAED;
+      color: #18191C;
+      overflow-x: hidden;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.25); }
+    }
+    .live-dot {
+      animation: pulse-dot 1.5s infinite ease-in-out;
+    }
+    @media (min-width: 640px) {
+      .app-shell {
+        max-width: 440px;
+        margin: 18px auto;
+        min-height: calc(100vh - 36px);
+        border-radius: 34px;
+        box-shadow: 0 26px 64px -16px rgba(14, 14, 14, 0.28);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+      .bottom-nav-fixed {
+        max-width: 440px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 34px;
+        border-bottom-right-radius: 34px;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-[#FF444F] selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[80] flex flex-col gap-2 w-full max-w-[420px] px-4 pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN MOBILE-FIRST DERIV APP SHELL                                     -->
+  <!-- ===================================================================== -->
+  <div class="app-shell bg-white min-h-screen flex flex-col relative pb-20">
+
+    <!-- =================================================================== -->
+    <!-- VIEW 1: HOME DASHBOARD                                              -->
+    <!-- =================================================================== -->
+    <div id="view-home" class="flex-1 flex flex-col bg-white">
+
+      <!-- 1. DARK HERO CARD (#16181A) WITH ROUNDED BOTTOM CORNERS -->
+      <div class="bg-[#16181A] text-white rounded-b-[28px] px-4 pt-3.5 pb-6 shadow-md relative overflow-hidden">
+
+        <!-- Top Dark Utility Bar: SK Settings Button + Coral 'd' DERIV Mark + Search | Ask Amy | Eye + Bell (15) -->
+        <div class="flex items-center justify-between gap-1.5 mb-5">
+
+          <!-- Left Cluster: SK Settings Trigger + Coral 'd' DERIV Logo + Search Button -->
+          <div class="flex items-center gap-1.5">
+            <!-- Initials Badge ("SK") placed as Settings trigger -->
+            <button onclick="openSettingsModal()" aria-label="Open Settings & Account Preferences" title="Settings & Account Preferences" class="w-9 h-9 rounded-full bg-[#25282C] hover:bg-[#32363C] border border-white/10 flex items-center justify-center text-xs font-extrabold text-gray-100 tracking-tight transition shrink-0 relative">
+              <span>SK</span>
+              <span id="settings-mode-dot" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#00A79E] border-2 border-[#16181A]"></span>
+            </button>
+
+            <!-- Brand Mark: Coral-Red Lowercase 'd' Square Badge + DERIV -->
+            <div class="flex items-center gap-1.5 pr-0.5">
+              <div class="w-7 h-7 rounded-lg bg-[#FF4B55] flex items-center justify-center shrink-0 shadow-sm shadow-[#FF444F]/30">
+                <svg class="w-4 h-4 text-white" viewBox="0 0 120 120" fill="none" aria-label="DERIV logo mark">
+                  <path d="M68.5 19L59.5 56.5C55.4 51.6 49.3 48.8 42.4 48.8C28.4 48.8 18 59.8 18 74.9C18 90.3 28.6 101 43.3 101C50.9 101 57.6 97.6 61.9 92.1L60.2 99.6H74.6L93.5 19H68.5ZM45.4 88.6C37.4 88.6 32.1 82.8 32.1 74.9C32.1 67 37.6 61.1 45.7 61.1C53.6 61.1 58.9 67 58.9 74.9C58.9 82.8 53.5 88.6 45.4 88.6Z" fill="currentColor" />
+                </svg>
+              </div>
+              <span class="font-extrabold text-xs sm:text-sm tracking-tight text-white">DERIV</span>
+            </div>
+
+            <!-- Search Button -->
+            <button onclick="openSearchModal()" aria-label="Search Markets and Actions" class="w-9 h-9 rounded-full bg-[#25282C] hover:bg-[#32363C] flex items-center justify-center text-gray-200 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" />
+                <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Center Pill: "Ask Amy" AI Assistant -->
+          <button onclick="openAmyModal()" class="px-3 py-2 rounded-full bg-[#25282C] hover:bg-[#30343A] border border-white/10 flex items-center gap-1.5 text-xs font-bold text-white shadow-sm transition shrink-0">
+            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
+              <defs>
+                <linearGradient id="amySparkGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#60A5FA" />
+                  <stop offset="50%" stop-color="#C084FC" />
+                  <stop offset="100%" stop-color="#F472B6" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2L14.2 8.8L21 11L14.2 13.2L12 20L9.8 13.2L3 11L9.8 8.8L12 2Z" fill="url(#amySparkGrad)" />
+              <path d="M19 16L19.8 18.2L22 19L19.8 19.8L19 22L18.2 19.8L16 19L18.2 18.2L19 16Z" fill="#93C5FD" />
+            </svg>
+            <span>Ask Amy</span>
+          </button>
+
+          <!-- Right Cluster: Privacy Eye Toggle + Notification Bell (15) -->
+          <div class="flex items-center gap-1.5">
+            <button onclick="togglePrivacyMask()" aria-label="Toggle Balance Visibility" class="w-9 h-9 rounded-full bg-[#25282C] hover:bg-[#32363C] flex items-center justify-center text-gray-200 transition shrink-0">
+              <svg id="eye-icon-open" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eye-icon-closed" class="hidden w-4 h-4 text-[#FF9C13]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            </button>
+
+            <button onclick="openNotificationsModal()" aria-label="Notifications" class="relative w-9 h-9 rounded-full bg-[#25282C] hover:bg-[#32363C] flex items-center justify-center text-gray-200 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span id="notif-count-badge" class="absolute -top-1 -right-1 min-w-[20px] h-[18px] px-1 rounded-full bg-[#FF444F] text-white text-[10px] font-extrabold flex items-center justify-center shadow">
+                15
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Carousel Section -->
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <div class="flex-1 space-y-3.5 z-10">
+            <h1 id="hero-slide-title" class="text-[22px] sm:text-[24px] font-extrabold leading-[1.2] tracking-tight text-white">
+              Make your first<br/>deposit
+            </h1>
+
+            <!-- Two-segment indicator bar -->
+            <div class="flex items-center gap-2">
+              <button onclick="setHeroSlide(0)" id="hero-dot-0" aria-label="Slide 1" class="h-1.5 w-10 rounded-full bg-[#00A79E] transition-all"></button>
+              <button onclick="setHeroSlide(1)" id="hero-dot-1" aria-label="Slide 2" class="h-1.5 w-10 rounded-full bg-[#4A4D55] hover:bg-gray-400 transition-all"></button>
+            </div>
+
+            <!-- Coral-Red CTA Button ("Deposit now") -->
+            <div class="pt-0.5">
+              <button id="hero-slide-cta" onclick="handleHeroCTA()" class="px-6 py-2.5 rounded-full bg-[#FF444F] hover:bg-[#E03540] active:scale-[0.98] text-white font-bold text-sm transition shadow-lg shadow-[#FF444F]/30">
+                Deposit now
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Candlestick & L-Axis Illustration -->
+          <div class="w-36 h-32 shrink-0 flex items-center justify-center">
+            <svg viewBox="0 0 180 160" class="w-full h-full drop-shadow-xl" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="heroAxisGrad" x1="25" y1="20" x2="155" y2="145" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#F3F4F6" />
+                  <stop offset="45%" stop-color="#9CA3AF" />
+                  <stop offset="75%" stop-color="#E5E7EB" />
+                  <stop offset="100%" stop-color="#6B7280" />
+                </linearGradient>
+                <linearGradient id="heroAxisShadow" x1="30" y1="130" x2="155" y2="145" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#4B5563" />
+                  <stop offset="100%" stop-color="#9CA3AF" />
+                </linearGradient>
+                <linearGradient id="heroCandleGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FF6B74" />
+                  <stop offset="50%" stop-color="#FF444F" />
+                  <stop offset="100%" stop-color="#B91C26" />
+                </linearGradient>
+              </defs>
+
+              <path d="M36 24C36 19.5 39.5 16 44 16C48.5 16 52 19.5 52 24V122H150C154.5 122 158 125.5 158 130C158 134.5 154.5 138 150 138H44C39.5 138 36 134.5 36 130V24Z" fill="url(#heroAxisGrad)" />
+              <path d="M36 130C36 134.5 39.5 138 44 138H150C154.5 138 158 134.5 158 130H48V20C48 17.5 46.2 16 44 16V130H36Z" fill="url(#heroAxisShadow)" opacity="0.55" />
+
+              <g transform="translate(64, 34)">
+                <rect x="10" y="0" width="6" height="72" rx="3" fill="url(#heroCandleGrad)" />
+                <rect x="0" y="14" width="26" height="44" rx="11" fill="url(#heroCandleGrad)" />
+                <ellipse cx="8" cy="24" rx="2.5" ry="7" fill="#FFA3A8" opacity="0.65" />
+              </g>
+
+              <g transform="translate(98, 22)">
+                <rect x="10" y="0" width="6" height="70" rx="3" fill="url(#heroCandleGrad)" />
+                <rect x="0" y="13" width="26" height="44" rx="11" fill="url(#heroCandleGrad)" />
+                <ellipse cx="8" cy="23" rx="2.5" ry="7" fill="#FFA3A8" opacity="0.65" />
+              </g>
+
+              <g transform="translate(132, 36)">
+                <rect x="10" y="0" width="6" height="72" rx="3" fill="url(#heroCandleGrad)" />
+                <rect x="0" y="15" width="26" height="42" rx="11" fill="url(#heroCandleGrad)" />
+                <ellipse cx="8" cy="25" rx="2.5" ry="7" fill="#FFA3A8" opacity="0.65" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. "WAYS TO DEPOSIT" HORIZONTAL STRIP -->
+      <div class="bg-[#F4F5F6] rounded-b-[24px] px-4 py-4 flex items-center gap-2.5 overflow-x-auto no-scrollbar">
+        <span class="text-xs font-extrabold text-[#18191C] whitespace-nowrap shrink-0">Ways to deposit</span>
+
+        <!-- Mobile Money -->
+        <button onclick="openCashierModal('deposit', 'MobileMoney')" class="relative bg-[#EAECEF] hover:bg-[#E1E4E8] px-3.5 py-2.5 rounded-xl flex items-center gap-2 shrink-0 transition">
+          <span class="text-[10px] font-extrabold tracking-tight">
+            <span class="text-[#7C3AED]">Dusu</span><span class="text-[#F59E0B]">Pay</span>
+          </span>
+          <span class="text-xs font-extrabold text-[#18191C]">Mobile Money</span>
+          <span class="absolute bottom-0 left-3 w-16 h-[3px] rounded-full bg-[#9CA3AF]"></span>
+        </button>
+
+        <!-- Bank Transfer -->
+        <button onclick="openCashierModal('deposit', 'BankTransfer')" class="bg-[#EAECEF] hover:bg-[#E1E4E8] px-3.5 py-2.5 rounded-xl flex items-center gap-2 shrink-0 transition">
+          <span class="w-4 h-4 rounded bg-[#18191C] text-white text-[9px] font-extrabold flex items-center justify-center">🏦</span>
+          <span class="text-xs font-bold text-[#18191C]">Bank Transfer</span>
+        </button>
+
+        <!-- Card -->
+        <button onclick="openCashierModal('deposit', 'Card')" class="bg-[#EAECEF] hover:bg-[#E1E4E8] px-3.5 py-2.5 rounded-xl flex items-center gap-2 shrink-0 transition">
+          <span class="w-4 h-4 rounded bg-[#2563EB] text-white text-[9px] font-extrabold flex items-center justify-center">V</span>
+          <span class="text-xs font-bold text-[#18191C]">Card</span>
+        </button>
+
+        <!-- Crypto -->
+        <button onclick="openCashierModal('deposit', 'Crypto')" class="bg-[#EAECEF] hover:bg-[#E1E4E8] px-3.5 py-2.5 rounded-xl flex items-center gap-2 shrink-0 transition">
+          <span class="w-4 h-4 rounded-full bg-[#18191C] text-white text-[9px] font-extrabold flex items-center justify-center">₿</span>
+          <span class="text-xs font-bold text-[#18191C]">Crypto</span>
+        </button>
+      </div>
+
+      <!-- 3. "MY TRADING ACCOUNTS" SECTION -->
+      <div class="px-4 pt-6 space-y-3.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-[19px] font-extrabold tracking-tight text-[#18191C]">My trading accounts</h2>
+          <span id="home-active-mode-pill" onclick="openSettingsModal()" class="cursor-pointer text-[11px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-[#F4F5F6] text-[#18191C] border border-gray-200">
+            REAL • USD
+          </span>
+        </div>
+
+        <!-- Two-Column Grid (Options & TradingView) + Additional Accounts Row -->
+        <div class="grid grid-cols-2 gap-3">
+
+          <!-- Card 1: Options -->
+          <div onclick="switchTab('options')" class="cursor-pointer bg-[#F8F9FA] hover:bg-[#F1F3F5] border border-gray-200/80 rounded-2xl p-4 flex flex-col justify-between gap-4 transition active:scale-[0.99]">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FF5A64] to-[#E02D38] shadow-md shadow-[#FF444F]/25 flex items-center justify-center text-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h4v4M14 10l6-6M8 20H4v-4M10 14l-6 6" />
+              </svg>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-[15px] font-bold text-[#18191C]">Options</h3>
+              <p class="font-mono tabular-nums text-[15px] font-semibold text-[#18191C]">
+                <span class="balance-text" data-acc="options">0.00</span> <span class="text-xs font-medium text-[#6E717A]">USD</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2: TradingView -->
+          <div onclick="switchTab('options', 'tv_focus')" class="cursor-pointer bg-[#F8F9FA] hover:bg-[#F1F3F5] border border-gray-200/80 rounded-2xl p-4 flex flex-col justify-between gap-4 transition active:scale-[0.99]">
+            <div class="w-11 h-11 rounded-xl bg-[#0E0E0E] shadow-md flex flex-col items-center justify-center text-white">
+              <span class="font-extrabold text-sm tracking-tighter leading-none">7%</span>
+              <span class="text-[6.5px] font-bold tracking-tight text-gray-300 mt-0.5">TradingView</span>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-[15px] font-bold text-[#18191C]">TradingView</h3>
+              <p class="font-mono tabular-nums text-[15px] font-semibold text-[#18191C]">
+                <span class="balance-text" data-acc="tv">0.00</span> <span class="text-xs font-medium text-[#6E717A]">USD</span>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Secondary Account Strip: Deriv MT5 & Mobile Money Wallet -->
+        <div class="grid grid-cols-2 gap-3">
+          <div onclick="switchTab('cfds')" class="cursor-pointer bg-[#F8F9FA] hover:bg-[#F1F3F5] border border-gray-200/80 rounded-2xl p-3.5 flex items-center justify-between transition">
+            <div>
+              <span class="block text-xs font-extrabold text-[#18191C]">Deriv MT5</span>
+              <span class="font-mono tabular-nums text-xs font-semibold text-[#6E717A]"><span class="balance-text" data-acc="mt5">0.00</span> USD</span>
+            </div>
+            <span class="w-8 h-8 rounded-lg bg-[#18191C] text-white text-[10px] font-extrabold flex items-center justify-center">MT5</span>
+          </div>
+
+          <div onclick="openCashierModal('deposit', 'MobileMoney')" class="cursor-pointer bg-[#F8F9FA] hover:bg-[#F1F3F5] border border-gray-200/80 rounded-2xl p-3.5 flex items-center justify-between transition">
+            <div>
+              <span class="block text-xs font-extrabold text-[#18191C]">Mobile Wallet</span>
+              <span class="font-mono tabular-nums text-xs font-semibold text-[#6E717A]"><span class="balance-text" data-acc="mm">0.00</span> USD</span>
+            </div>
+            <span class="w-8 h-8 rounded-lg bg-[#00A79E]/15 text-[#00A79E] text-xs font-extrabold flex items-center justify-center">📱</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Restore Banner Link (Only appears if dismissed) -->
+      <div id="restore-ant-wrap" class="hidden px-4 pt-3">
+        <button onclick="restoreAntBanner()" class="text-[11px] font-bold text-[#6E717A] hover:text-[#18191C] underline">
+          Show "ANT has entered the chart" banner
+        </button>
+      </div>
+
+      <!-- 4. DISMISSIBLE DARK ALERT BANNER ("ANT has entered the chart") -->
+      <div id="ant-promo-banner" class="px-4 pt-5 pb-3 mt-auto">
+        <div class="bg-[#16181A] text-white rounded-2xl px-4 py-3.5 flex items-center justify-between gap-3 shadow-lg">
+          <div onclick="launchSymbolInOptions('ANTUSD')" class="cursor-pointer flex-1">
+            <p class="text-[15px] font-extrabold leading-snug text-white">ANT has entered the chart</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Tap to trade ANT/USD on Options & TradingView</p>
+          </div>
+          <button onclick="dismissAntBanner()" aria-label="Dismiss Banner" class="w-8 h-8 rounded-full bg-[#25282C] hover:bg-[#383B42] flex items-center justify-center text-gray-300 hover:text-white transition shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 2: BINARY OPTIONS & TRADINGVIEW TERMINAL                       -->
+    <!-- =================================================================== -->
+    <div id="view-options" class="hidden flex-1 flex flex-col bg-[#0E0E0E] text-white">
+
+      <!-- Terminal Top Bar -->
+      <div class="bg-[#151717] px-3.5 py-2.5 border-b border-[#2A2D30] flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('home')" aria-label="Back to Home" class="p-1.5 rounded-lg bg-[#25282C] text-gray-300 hover:text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div>
+            <select id="terminal-asset-select" onchange="handleAssetChange(this.value)" class="bg-transparent text-white font-extrabold text-xs sm:text-sm focus:outline-none cursor-pointer">
+              <option value="R_75" class="bg-[#151717]">Volatility 75 Index</option>
+              <option value="R_100" class="bg-[#151717]">Volatility 100 Index</option>
+              <option value="1HZ10V" class="bg-[#151717]">Volatility 10 (1s)</option>
+              <option value="ANTUSD" class="bg-[#151717]">ANT/USD</option>
+              <option value="EURUSD" class="bg-[#151717]">EUR/USD</option>
+              <option value="BTCUSD" class="bg-[#151717]">BTC/USD</option>
+              <option value="XAUUSD" class="bg-[#151717]">Gold/USD</option>
+            </select>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00A79E] live-dot"></span>
+              <span id="term-live-price" class="font-mono tabular-nums text-xs font-extrabold text-[#00A79E]">482,910.45</span>
+              <span id="term-live-delta" class="font-mono text-[10px] text-[#00A79E]">+1.42%</span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="openSettingsModal()" class="flex items-center gap-1.5 bg-[#25282C] px-2.5 py-1.5 rounded-xl border border-white/10 text-right">
+          <div>
+            <span id="term-mode-tag" class="block text-[9px] font-extrabold uppercase text-[#00A79E]">REAL USD</span>
+            <span id="term-balance-tag" class="font-mono tabular-nums text-xs font-extrabold text-white">$0.00</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- TradingView Chart Controls Strip -->
+      <div class="bg-[#141518] px-3 py-1.5 border-b border-[#2A2D30] flex items-center justify-between gap-1 text-[11px] font-bold">
+        <div class="flex items-center gap-1">
+          <button onclick="setChartType('candlestick')" data-ctype="candlestick" class="ctype-btn px-2 py-1 rounded bg-[#FF444F] text-white">Candles</button>
+          <button onclick="setChartType('area')" data-ctype="area" class="ctype-btn px-2 py-1 rounded text-gray-400">Area</button>
+          <button onclick="setChartType('heikin')" data-ctype="heikin" class="ctype-btn px-2 py-1 rounded text-gray-400">Heikin</button>
+        </div>
+        <div class="flex items-center gap-1 font-mono">
+          <button onclick="setChartTimeframe('1s')" data-tf="1s" class="tf-btn px-1.5 py-0.5 rounded bg-white/15 text-white">1s</button>
+          <button onclick="setChartTimeframe('1m')" data-tf="1m" class="tf-btn px-1.5 py-0.5 rounded text-gray-400">1m</button>
+          <button onclick="setChartTimeframe('5m')" data-tf="5m" class="tf-btn px-1.5 py-0.5 rounded text-gray-400">5m</button>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="toggleIndicator('sma20')" id="ind-sma20" class="px-1.5 py-0.5 rounded text-gray-400">SMA</button>
+          <button onclick="toggleIndicator('bb')" id="ind-bb" class="px-1.5 py-0.5 rounded text-gray-400">BB</button>
+        </div>
+      </div>
+
+      <!-- TradingView Lightweight Chart Canvas Area -->
+      <div class="relative w-full h-[235px] bg-[#0E0E0E] border-b border-[#2A2D30]">
+        <div id="tv-chart-container" class="w-full h-full"></div>
+        <canvas id="fallback-chart-canvas" class="hidden w-full h-full"></canvas>
+        <div class="pointer-events-none absolute top-2 left-2.5 z-10 flex items-center gap-2 bg-[#16181A]/85 px-2 py-0.5 rounded text-[10px] font-mono text-gray-300 border border-white/10">
+          <span class="text-[#FF444F] font-extrabold">TV</span>
+          <span>O:<strong id="ro-open" class="text-white">--</strong></span>
+          <span>H:<strong id="ro-high" class="text-[#00A79E]">--</strong></span>
+          <span>L:<strong id="ro-low" class="text-[#FF444F]">--</strong></span>
+        </div>
+      </div>
+
+      <!-- Binary Options Order Ticket -->
+      <div class="p-3.5 bg-[#16181A] space-y-3">
+
+        <!-- 5 Binary Contract Modes (Rise/Fall, Higher/Lower, Touch/No Touch, Over/Under, Digits Matches/Differs) -->
+        <div class="flex gap-1 overflow-x-auto no-scrollbar bg-[#0E0E0E] p-1 rounded-xl border border-[#2A2D30]">
+          <button onclick="setContractCategory('rise_fall')" data-ccat="rise_fall" class="ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold bg-[#FF444F] text-white whitespace-nowrap">Rise / Fall</button>
+          <button onclick="setContractCategory('higher_lower')" data-ccat="higher_lower" class="ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 whitespace-nowrap">Higher / Lower</button>
+          <button onclick="setContractCategory('touch_notouch')" data-ccat="touch_notouch" class="ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 whitespace-nowrap">Touch / No Touch</button>
+          <button onclick="setContractCategory('over_under')" data-ccat="over_under" class="ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 whitespace-nowrap">Over / Under</button>
+          <button onclick="setContractCategory('digits')" data-ccat="digits" class="ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 whitespace-nowrap">Matches / Differs</button>
+        </div>
+
+        <!-- Dynamic Barrier or 0-9 Digit Selector -->
+        <div id="dynamic-contract-params" class="hidden bg-[#0E0E0E] rounded-xl p-2.5 border border-[#2A2D30] space-y-2">
+          <!-- Barrier Offset -->
+          <div id="barrier-param-box" class="hidden flex items-center justify-between gap-2">
+            <span class="text-[11px] font-bold text-gray-300">Barrier (<strong id="computed-barrier-price" class="font-mono text-[#FF9C13]">--</strong>)</span>
+            <div class="flex items-center bg-[#16181A] rounded-lg border border-[#2A2D30]">
+              <button type="button" onclick="adjustBarrierOffset(-1)" class="px-2.5 py-1 text-gray-300 font-bold">−</button>
+              <input id="barrier-offset-input" type="number" step="any" value="150" oninput="updateTicketCalculations(); syncChartOverlays();" class="w-20 bg-transparent text-center font-mono text-xs font-bold text-white focus:outline-none" />
+              <button type="button" onclick="adjustBarrierOffset(1)" class="px-2.5 py-1 text-gray-300 font-bold">+</button>
+            </div>
+          </div>
+
+          <!-- 0-9 Digit Prediction & Last-25-Tick Frequency Bars -->
+          <div id="digits-param-box" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span id="digit-selector-label" class="font-bold text-gray-300">Digit Prediction</span>
+              <span class="font-mono text-gray-400">Live Digit: <strong id="live-last-digit" class="text-[#00A79E] text-xs">5</strong></span>
+            </div>
+            <div id="digit-buttons-grid" class="grid grid-cols-10 gap-1"></div>
+            <div id="digit-bars-container" class="grid grid-cols-10 gap-1 items-end h-10 bg-[#16181A] p-1 rounded-lg border border-[#2A2D30]"></div>
+          </div>
+        </div>
+
+        <!-- Duration & Stake Row -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-[#0E0E0E] p-2.5 rounded-xl border border-[#2A2D30] space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase text-gray-400">Duration</span>
+              <div class="flex gap-1 text-[10px] font-bold">
+                <button type="button" onclick="setDurationUnit('ticks')" id="unit-ticks-btn" class="px-1.5 py-0.5 rounded bg-white/15 text-white">Ticks</button>
+                <button type="button" onclick="setDurationUnit('seconds')" id="unit-seconds-btn" class="px-1.5 py-0.5 rounded text-gray-400">Sec</button>
+              </div>
+            </div>
+            <div id="duration-presets-grid" class="grid grid-cols-5 gap-1"></div>
+          </div>
+
+          <div class="bg-[#0E0E0E] p-2.5 rounded-xl border border-[#2A2D30] space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase text-gray-400">Stake (USD)</span>
+              <span class="font-mono text-[10px] text-[#00A79E]" id="payout-summary-mini">+$23.85</span>
+            </div>
+            <div class="flex items-center bg-[#16181A] rounded-lg border border-[#2A2D30]">
+              <button type="button" onclick="adjustStake(-5)" class="px-2.5 py-1 text-gray-300 font-bold">−</button>
+              <input id="binary-stake-input" type="number" min="1" max="10000" value="25" oninput="updateTicketCalculations()" class="w-full bg-transparent text-center font-mono text-xs font-extrabold text-white focus:outline-none" />
+              <button type="button" onclick="adjustStake(5)" class="px-2.5 py-1 text-gray-300 font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dual Purchase Buttons -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <button id="exec-btn-primary" onclick="placeBinaryContract('PRIMARY')" class="py-3 px-3.5 rounded-xl bg-[#00A79E] hover:bg-[#008F87] active:scale-[0.99] text-white font-extrabold text-xs flex items-center justify-between transition shadow-lg shadow-[#00A79E]/20">
+            <span class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+              <span id="exec-btn-primary-label">Rise</span>
+            </span>
+            <span id="exec-btn-primary-pct" class="font-mono text-[11px] bg-black/25 px-1.5 py-0.5 rounded">+95.4%</span>
+          </button>
+
+          <button id="exec-btn-secondary" onclick="placeBinaryContract('SECONDARY')" class="py-3 px-3.5 rounded-xl bg-[#FF444F] hover:bg-[#E03540] active:scale-[0.99] text-white font-extrabold text-xs flex items-center justify-between transition shadow-lg shadow-[#FF444F]/20">
+            <span class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              <span id="exec-btn-secondary-label">Fall</span>
+            </span>
+            <span id="exec-btn-secondary-pct" class="font-mono text-[11px] bg-black/25 px-1.5 py-0.5 rounded">+95.4%</span>
+          </button>
+        </div>
+
+        <!-- Open Binary Contracts -->
+        <div class="pt-1 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-extrabold text-gray-300">Open Contracts (<span id="active-contracts-count">0</span>)</span>
+            <button onclick="switchTab('portfolio')" class="text-[11px] font-bold text-[#FF444F]">Portfolio →</button>
+          </div>
+          <div id="active-contracts-cards" class="space-y-2 max-h-36 overflow-y-auto">
+            <p class="text-[11px] text-gray-500 text-center py-3">No active contracts. Tap Rise or Fall to trade.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 3: CFDs & DERIV MT5                                            -->
+    <!-- =================================================================== -->
+    <div id="view-cfds" class="hidden flex-1 flex flex-col bg-[#F4F5F6] text-[#18191C] p-4 space-y-4">
+      <div class="bg-[#16181A] text-white rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#00A79E]">Deriv MT5 • Leverage 1:1000</span>
+          <h2 class="text-lg font-extrabold mt-0.5">CFDs & Margin Trading</h2>
+          <p class="text-xs text-gray-400">Available Margin: <strong id="cfd-margin-readout" class="font-mono text-white">$0.00</strong></p>
+        </div>
+        <button onclick="openCashierModal('deposit', 'MobileMoney')" class="px-3.5 py-2 rounded-full bg-[#FF444F] text-white text-xs font-extrabold">Deposit</button>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-[#18191C]">Instant CFD Execution</span>
+          <select id="cfd-symbol-select" onchange="updateCfdQuotes()" class="bg-[#F4F5F6] px-2.5 py-1 rounded-lg text-xs font-extrabold">
+            <option value="R_75">Volatility 75 Index</option>
+            <option value="ANTUSD">ANT/USD</option>
+            <option value="EURUSD">EUR/USD</option>
+            <option value="BTCUSD">BTC/USD</option>
+            <option value="XAUUSD">Gold/USD</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[10px] font-bold text-[#6E717A] mb-1">Volume (Lots)</label>
+            <input id="cfd-lot-input" type="number" step="0.01" min="0.01" max="50" value="0.10" class="w-full px-3 py-2 rounded-xl bg-[#F4F5F6] font-mono text-xs font-extrabold" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#6E717A] mb-1">Risk Profile</label>
+            <select id="cfd-risk-preset" class="w-full px-2.5 py-2 rounded-xl bg-[#F4F5F6] text-xs font-bold">
+              <option value="tight">Tight (SL -1% / TP +2%)</option>
+              <option value="balanced" selected>Balanced (SL -2% / TP +4%)</option>
+              <option value="wide">Swing (SL -5% / TP +10%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button onclick="placeCfdOrder('SELL')" class="py-3 px-3 rounded-xl bg-[#FF444F] hover:bg-[#E03540] text-white flex flex-col items-center transition">
+            <span class="text-[10px] font-bold uppercase opacity-90">Sell / Short</span>
+            <span id="cfd-bid-price" class="font-mono tabular-nums text-sm font-extrabold">482,895.10</span>
+          </button>
+          <button onclick="placeCfdOrder('BUY')" class="py-3 px-3 rounded-xl bg-[#00A79E] hover:bg-[#008F87] text-white flex flex-col items-center transition">
+            <span class="text-[10px] font-bold uppercase opacity-90">Buy / Long</span>
+            <span id="cfd-ask-price" class="font-mono tabular-nums text-sm font-extrabold">482,925.80</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-extrabold text-[#18191C]">Open CFD Positions (<span id="open-cfd-count">0</span>)</h3>
+        <div id="open-cfd-list" class="space-y-2">
+          <div class="bg-white rounded-2xl p-4 border border-gray-200 text-center text-xs text-[#6E717A]">
+            No open leveraged CFD positions.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 4: EXCHANGE (DXN MARKET & INSTANT SWAP)                        -->
+    <!-- =================================================================== -->
+    <div id="view-exchange" class="hidden flex-1 flex flex-col bg-[#F4F5F6] text-[#18191C] p-4 space-y-4">
+      <div class="bg-[#16181A] text-white rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#FF9C13]">DERIV Exchange (DXN)</span>
+          <h2 class="text-lg font-extrabold mt-0.5">Markets & Instant Swap</h2>
+          <p class="text-xs text-gray-400">Zero-fee conversion across USD, USDT, BTC & ANT</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-[#25282C] flex items-center justify-center font-extrabold text-xs border border-white/10">DXN</div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-bold text-[#6E717A]">From</span>
+            <span id="swap-from-bal" class="font-mono text-[#6E717A]">Bal: 0.00</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#F4F5F6] p-2.5 rounded-xl">
+            <select id="swap-from-curr" onchange="updateSwapPreview()" class="bg-white px-2.5 py-1.5 rounded-lg text-xs font-extrabold border border-gray-200">
+              <option value="USD">USD</option>
+              <option value="USDT">USDT</option>
+              <option value="BTC">BTC</option>
+              <option value="ANT">ANT</option>
+            </select>
+            <input id="swap-amount-input" type="number" min="1" step="any" value="100" oninput="updateSwapPreview()" class="w-full bg-transparent text-right font-mono text-sm font-extrabold focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex justify-center">
+          <button onclick="flipSwapCurrencies()" class="w-8 h-8 rounded-full bg-[#16181A] text-white flex items-center justify-center text-xs font-extrabold shadow">⇅</button>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-bold text-[#6E717A]">To (Estimated)</span>
+            <span id="swap-rate-label" class="font-mono text-[11px] text-[#00A79E]">1 USD = 1.00 USDT</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#F4F5F6] p-2.5 rounded-xl">
+            <select id="swap-to-curr" onchange="updateSwapPreview()" class="bg-white px-2.5 py-1.5 rounded-lg text-xs font-extrabold border border-gray-200">
+              <option value="USDT" selected>USDT</option>
+              <option value="BTC">BTC</option>
+              <option value="ANT">ANT</option>
+              <option value="USD">USD</option>
+            </select>
+            <div id="swap-receive-output" class="w-full text-right font-mono text-sm font-extrabold text-[#18191C]">100.00</div>
+          </div>
+        </div>
+
+        <button onclick="executeWalletSwap()" class="w-full py-3 rounded-full bg-[#FF444F] hover:bg-[#E03540] text-white font-extrabold text-sm transition shadow-md">
+          Convert Instantly
+        </button>
+      </div>
+
+      <!-- Live Markets List -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-extrabold text-[#18191C]">Live Markets</h3>
+        <div id="exchange-markets-list" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 5: PORTFOLIO & STATEMENT                                       -->
+    <!-- =================================================================== -->
+    <div id="view-portfolio" class="hidden flex-1 flex flex-col bg-[#F4F5F6] text-[#18191C] p-4 space-y-4">
+      <div class="bg-[#16181A] text-white rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <span id="port-mode-badge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#00A79E] text-white">REAL ACCOUNT</span>
+            <h2 class="text-2xl font-mono tabular-nums font-extrabold mt-1.5" id="port-total-usd">$0.00 USD</h2>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openCashierModal('deposit', 'MobileMoney')" class="px-3.5 py-2 rounded-full bg-[#FF444F] text-white text-xs font-extrabold">Deposit</button>
+            <button onclick="openCashierModal('withdraw', 'MobileMoney')" class="px-3.5 py-2 rounded-full bg-[#25282C] text-white text-xs font-bold">Withdraw</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
+          <div>
+            <span class="block text-[10px] text-gray-400">Settled Trades</span>
+            <strong id="port-kpi-trades" class="font-mono text-xs text-white">0</strong>
+          </div>
+          <div>
+            <span class="block text-[10px] text-gray-400">Win Rate</span>
+            <strong id="port-kpi-winrate" class="font-mono text-xs text-[#00A79E]">0.0%</strong>
+          </div>
+          <div>
+            <span class="block text-[10px] text-gray-400">Net P&L</span>
+            <strong id="port-kpi-pnl" class="font-mono text-xs text-white">$0.00</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-[#18191C]">Open & Settled Statement</h3>
+          <button onclick="openSettingsModal()" class="text-xs font-bold text-[#FF444F]">Settings</button>
+        </div>
+        <div id="portfolio-history-list" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- 5. FIXED 5-TAB BOTTOM NAVIGATION BAR                                -->
+    <!-- =================================================================== -->
+    <nav class="bottom-nav-fixed fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-2 py-2 grid grid-cols-5 items-center text-center shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+
+      <!-- Tab 1: Home -->
+      <button onclick="switchTab('home')" id="bnav-home" class="flex flex-col items-center justify-center gap-1 text-[#FF444F] transition">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+          <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+        </svg>
+        <span class="text-[11px] font-bold">Home</span>
+      </button>
+
+      <!-- Tab 2: CFDs -->
+      <button onclick="switchTab('cfds')" id="bnav-cfds" class="flex flex-col items-center justify-center gap-1 text-[#6E717A] hover:text-[#18191C] transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M6 4v16M12 6v12M18 3v18" />
+          <rect x="4.5" y="7" width="3" height="8" rx="0.8" fill="white" stroke="currentColor" stroke-width="1.8" />
+          <rect x="10.5" y="9" width="3" height="6" rx="0.8" fill="white" stroke="currentColor" stroke-width="1.8" />
+          <rect x="16.5" y="6" width="3" height="9" rx="0.8" fill="white" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+        <span class="text-[11px] font-semibold">CFDs</span>
+      </button>
+
+      <!-- Tab 3: Exchange -->
+      <button onclick="switchTab('exchange')" id="bnav-exchange" class="flex flex-col items-center justify-center gap-1 text-[#6E717A] hover:text-[#18191C] transition">
+        <div class="w-6 h-5 rounded border-[1.6px] border-current flex items-center justify-center text-[7px] font-extrabold tracking-tighter">
+          DXN
+        </div>
+        <span class="text-[11px] font-semibold">Exchange</span>
+      </button>
+
+      <!-- Tab 4: Options -->
+      <button onclick="switchTab('options')" id="bnav-options" class="flex flex-col items-center justify-center gap-1 text-[#6E717A] hover:text-[#18191C] transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 4h4v4M14 10l6-6M8 20H4v-4M10 14l-6 6" />
+        </svg>
+        <span class="text-[11px] font-semibold">Options</span>
+      </button>
+
+      <!-- Tab 5: Portfolio -->
+      <button onclick="switchTab('portfolio')" id="bnav-portfolio" class="flex flex-col items-center justify-center gap-1 text-[#6E717A] hover:text-[#18191C] transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <rect x="3" y="6" width="18" height="13" rx="2.5" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 12.5h2.5" />
+          <path stroke-linecap="round" d="M6 6V5a2 2 0 012-2h8" />
+        </svg>
+        <span class="text-[11px] font-semibold">Portfolio</span>
+      </button>
+
+    </nav>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: SETTINGS & ACCOUNT PREFERENCES ("SK" INITIALS TRIGGER)       -->
+  <!-- ===================================================================== -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4">
+    <div class="bg-white text-[#18191C] w-full max-w-[440px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#16181A] text-white font-extrabold text-sm flex items-center justify-center">SK</div>
+          <div>
+            <h3 class="font-extrabold text-base">Account & App Settings</h3>
+            <p class="text-xs text-[#6E717A]">Initials: SK • Account CR-9481024</p>
+          </div>
+        </div>
+        <button onclick="closeModal('settings-modal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Real vs Demo Switcher -->
+      <div class="space-y-1.5">
+        <span class="text-xs font-extrabold text-[#18191C]">Trading Account Mode</span>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button onclick="setAccountMode('real')" id="settings-btn-real" class="p-3 rounded-2xl border-2 border-[#18191C] bg-[#F8F9FA] text-left transition">
+            <span class="text-[10px] font-extrabold uppercase text-[#00A79E]">Real Account</span>
+            <strong id="settings-real-bal" class="block font-mono text-sm font-extrabold mt-0.5">$0.00</strong>
+          </button>
+          <button onclick="setAccountMode('demo')" id="settings-btn-demo" class="p-3 rounded-2xl border border-gray-200 bg-[#F8F9FA] text-left transition">
+            <span class="text-[10px] font-extrabold uppercase text-[#FF9C13]">Demo Account</span>
+            <strong id="settings-demo-bal" class="block font-mono text-sm font-extrabold mt-0.5">$10,000.00</strong>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reset Demo Balance -->
+      <button onclick="resetDemoBalance()" class="w-full py-2.5 rounded-xl bg-[#FF9C13]/15 text-[#9A5800] text-xs font-extrabold hover:bg-[#FF9C13]/25 transition">
+        ↻ Reset Demo Balance to $10,000.00
+      </button>
+
+      <!-- Preferences Toggles -->
+      <div class="bg-[#F8F9FA] rounded-2xl p-3.5 border border-gray-200/80 space-y-3 text-xs">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="font-bold text-[#18191C] block">Hide Balances by Default</span>
+            <span class="text-[11px] text-[#6E717A]">Mask account balances across screens</span>
+          </div>
+          <input id="pref-hide-balances" type="checkbox" onchange="togglePrivacyMask()" class="w-4 h-4 accent-[#FF444F] rounded" />
+        </div>
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="font-bold text-[#18191C] block">Instant Trade Toasts</span>
+            <span class="text-[11px] text-[#6E717A]">Show settlement alerts when contracts close</span>
+          </div>
+          <input id="pref-toasts" type="checkbox" checked onchange="appState.prefs.toasts = this.checked" class="w-4 h-4 accent-[#FF444F] rounded" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: ASK AMY AI ASSISTANT                                         -->
+  <!-- ===================================================================== -->
+  <div id="amy-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4">
+    <div class="bg-[#16181A] text-white w-full max-w-[440px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-full bg-[#25282C] text-xs font-extrabold">✨ Ask Amy</span>
+          <span class="text-xs text-gray-400">DERIV Trading Assistant</span>
+        </div>
+        <button onclick="closeModal('amy-modal')" class="w-8 h-8 rounded-full bg-[#25282C] text-gray-300 flex items-center justify-center">✕</button>
+      </div>
+
+      <div id="amy-chat-box" class="bg-[#0E0E0E] rounded-2xl p-3.5 h-52 overflow-y-auto space-y-2.5 text-xs">
+        <div class="bg-[#25282C] p-3 rounded-2xl rounded-tl-none text-gray-200 leading-relaxed">
+          Hi SK! I'm <strong>Amy</strong>. Ask me about binary contracts (Rise/Fall, Over/Under, Digits), TradingView indicators, or Demo practice tips.
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-1.5">
+        <button onclick="askAmyPrompt('Explain Over / Under & Digits contracts')" class="px-2.5 py-1.5 rounded-full bg-[#25282C] hover:bg-[#32363C] text-[11px] font-bold">🎲 Over/Under & Digits</button>
+        <button onclick="askAmyPrompt('How to use SMA & Bollinger Bands?')" class="px-2.5 py-1.5 rounded-full bg-[#25282C] hover:bg-[#32363C] text-[11px] font-bold">📊 Chart Indicators</button>
+        <button onclick="askAmyPrompt('Risk & Demo account tips')" class="px-2.5 py-1.5 rounded-full bg-[#25282C] hover:bg-[#32363C] text-[11px] font-bold">🛡️ Risk & Demo Tips</button>
+      </div>
+
+      <form onsubmit="submitAmyCustom(event)" class="flex gap-2">
+        <input id="amy-custom-input" type="text" placeholder="Ask Amy about contracts, charts, or risk..." class="flex-1 bg-[#0E0E0E] border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:border-[#FF444F]" />
+        <button type="submit" class="px-4 py-2 rounded-full bg-[#FF444F] text-white text-xs font-extrabold">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: CASHIER / DEPOSIT MODAL                                      -->
+  <!-- ===================================================================== -->
+  <div id="cashier-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4">
+    <div class="bg-white text-[#18191C] w-full max-w-[440px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 id="cashier-modal-title" class="font-extrabold text-lg">Deposit funds</h3>
+        <button onclick="closeModal('cashier-modal')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <form onsubmit="submitCashierTx(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-[#6E717A] mb-1">Payment Method</label>
+          <select id="cashier-method-select" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F4F5F6] text-sm font-bold focus:outline-none">
+            <option value="MobileMoney">DusuPay — Mobile Money (M-Pesa / Airtel)</option>
+            <option value="BankTransfer">Bank Transfer (Instant Wire / Local Bank)</option>
+            <option value="Card">Visa / Mastercard Debit & Credit</option>
+            <option value="Crypto">Crypto (USDT / BTC / ETH)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#6E717A] mb-1">Amount (USD)</label>
+          <input id="cashier-amount-input" type="number" min="5" step="any" value="100" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F4F5F6] font-mono text-base font-extrabold focus:outline-none" />
+          <div class="grid grid-cols-4 gap-2 mt-2">
+            <button type="button" onclick="document.getElementById('cashier-amount-input').value=25" class="py-1.5 rounded-lg bg-[#F4F5F6] hover:bg-gray-200 font-mono text-xs font-bold">$25</button>
+            <button type="button" onclick="document.getElementById('cashier-amount-input').value=50" class="py-1.5 rounded-lg bg-[#F4F5F6] hover:bg-gray-200 font-mono text-xs font-bold">$50</button>
+            <button type="button" onclick="document.getElementById('cashier-amount-input').value=100" class="py-1.5 rounded-lg bg-[#F4F5F6] hover:bg-gray-200 font-mono text-xs font-bold">$100</button>
+            <button type="button" onclick="document.getElementById('cashier-amount-input').value=500" class="py-1.5 rounded-lg bg-[#F4F5F6] hover:bg-gray-200 font-mono text-xs font-bold">$500</button>
+          </div>
+        </div>
+
+        <button id="cashier-submit-btn" type="submit" class="w-full py-3 rounded-full bg-[#FF444F] hover:bg-[#E03540] text-white font-extrabold text-sm transition shadow-lg shadow-[#FF444F]/25">
+          Deposit now
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: MARKET & ACTION SEARCH + NOTIFICATIONS (15)                  -->
+  <!-- ===================================================================== -->
+  <div id="search-modal" class="hidden fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-12">
+    <div class="bg-white text-[#18191C] w-full max-w-[420px] rounded-3xl p-4 space-y-3 shadow-2xl">
+      <div class="flex items-center gap-2 bg-[#F4F5F6] px-3.5 py-2.5 rounded-full">
+        <span>🔍</span>
+        <input id="global-search-input" type="text" placeholder="Search Volatility 75, ANT, Deposit, Settings..." oninput="renderSearchResults(this.value)" class="w-full bg-transparent text-xs font-bold focus:outline-none" />
+        <button onclick="closeModal('search-modal')" class="text-xs font-bold text-[#6E717A]">Close</button>
+      </div>
+      <div id="global-search-results" class="max-h-72 overflow-y-auto divide-y divide-gray-100"></div>
+    </div>
+  </div>
+
+  <div id="notifications-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4">
+    <div class="bg-white text-[#18191C] w-full max-w-[440px] rounded-t-3xl sm:rounded-3xl p-5 space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-extrabold text-base">Notifications (<span id="notif-modal-count">15</span>)</h3>
+        <button onclick="markNotificationsRead()" class="text-xs font-bold text-[#FF444F]">Mark all read</button>
+      </div>
+      <div id="notifications-feed" class="max-h-72 overflow-y-auto divide-y divide-gray-100 text-xs"></div>
+      <button onclick="closeModal('notifications-modal')" class="w-full py-2.5 rounded-full bg-[#F4F5F6] font-extrabold text-xs">Close</button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION LOGIC & TRADINGVIEW ENGINE                                -->
+  <!-- ===================================================================== -->
+  <script>
+    const appState = {
+      activeTab: 'home',
+      accountMode: 'real',
+      privacyHidden: false,
+      heroSlide: 0,
+      selectedSymbol: 'R_75',
+      chartType: 'candlestick',
+      timeframe: '1s',
+      indicators: { sma20: false, bb: false },
+      contractCategory: 'rise_fall',
+      barrierOffset: 150,
+      selectedDigit: 5,
+      durationUnit: 'ticks',
+      durationValue: 5,
+      stake: 25,
+      cashierAction: 'deposit',
+      prefs: { toasts: true },
+
+      balances: {
+        real: { options: 0.00, tv: 0.00, mt5: 0.00, mm: 0.00, USDT: 0.00, BTC: 0.0000, ANT: 0.00 },
+        demo: { options: 10000.00, tv: 10000.00, mt5: 5000.00, mm: 2500.00, USDT: 2500.00, BTC: 0.0500, ANT: 420.00 }
+      },
+
+      instruments: [
+        { symbol: 'R_75',   name: 'Volatility 75 Index', price: 482910.45, prev: 482910.45, delta: 1.42,  decimals: 2, vol: 0.0014, offset: 150,   candles: [], digits: [] },
+        { symbol: 'R_100',  name: 'Volatility 100 Index',price: 2418.74,   prev: 2418.74,   delta: 1.68,  decimals: 2, vol: 0.0016, offset: 4.5,   candles: [], digits: [] },
+        { symbol: '1HZ10V', name: 'Volatility 10 (1s)',  price: 9412.38,   prev: 9412.38,   delta: 0.54,  decimals: 2, vol: 0.0009, offset: 6.0,   candles: [], digits: [] },
+        { symbol: 'ANTUSD', name: 'ANT/USD',             price: 14.825,    prev: 14.825,    delta: 6.45,  decimals: 3, vol: 0.0022, offset: 0.15,  candles: [], digits: [] },
+        { symbol: 'EURUSD', name: 'EUR/USD',             price: 1.08642,   prev: 1.08642,   delta: 0.28,  decimals: 5, vol: 0.0002, offset: 0.0003,candles: [], digits: [] },
+        { symbol: 'BTCUSD', name: 'BTC/USD',             price: 88450.00,  prev: 88450.00,  delta: 1.85,  decimals: 2, vol: 0.0012, offset: 120,   candles: [], digits: [] },
+        { symbol: 'XAUUSD', name: 'Gold/USD',            price: 2674.85,   prev: 2674.85,   delta: 0.76,  decimals: 2, vol: 0.0008, offset: 3.2,   candles: [], digits: [] }
+      ],
+
+      activeContracts: [],
+      openCfds: [],
+      history: [],
+      notifications: [
+        { title: 'ANT has entered the chart', desc: 'ANT/USD is now live on Options & TradingView charts.', time: 'Just now' },
+        { title: 'Mobile Money Instant Deposits', desc: 'DusuPay Mobile Money is active for instant USD funding.', time: '12m ago' },
+        { title: 'Welcome to DERIV', desc: 'Tap your initials (SK) at top-left anytime to open Settings.', time: '1h ago' }
+      ]
+    };
+
+    const HERO_SLIDES = [
+      { title: 'Make your first<br/>deposit', cta: 'Deposit now', action: () => openCashierModal('deposit', 'MobileMoney') },
+      { title: 'Practice risk-free<br/>with $10k Demo', cta: 'Switch to Demo', action: () => setAccountMode('demo') }
+    ];
+
+    function getLastDigit(price, decimals) {
+      const s = Number(price).toFixed(decimals);
+      return parseInt(s.charAt(s.length - 1), 10);
+    }
+
+    function seedMarketData() {
+      const now = Math.floor(Date.now() / 1000);
+      appState.instruments.forEach(inst => {
+        let cur = inst.price * 0.996;
+        for (let i = 90; i >= 0; i--) {
+          const open = cur;
+          const close = Math.max(0.0001, open + open * inst.vol * (Math.random() - 0.49) * 2);
+          const high = Math.max(open, close) + Math.abs(open * inst.vol * Math.random());
+          const low = Math.min(open, close) - Math.abs(open * inst.vol * Math.random());
+          inst.candles.push({
+            time: now - i,
+            open: Number(open.toFixed(inst.decimals)),
+            high: Number(high.toFixed(inst.decimals)),
+            low: Number(low.toFixed(inst.decimals)),
+            close: Number(close.toFixed(inst.decimals))
+          });
+          if (i < 25) inst.digits.push(getLastDigit(close, inst.decimals));
+          cur = close;
+        }
+        inst.price = Number(cur.toFixed(inst.decimals));
+        inst.prev = inst.price;
+      });
+    }
+
+    function fmtNum(val, dec = 2) {
+      return Number(val).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+
+    function showToast(title, subtitle, tone = 'info') {
+      if (!appState.prefs.toasts && tone !== 'loss') return;
+      const box = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const accent = tone === 'win' ? 'border-l-4 border-[#00A79E]' : tone === 'loss' ? 'border-l-4 border-[#FF444F]' : 'border-l-4 border-[#FF9C13]';
+      el.className = `pointer-events-auto bg-[#16181A] text-white px-4 py-3 rounded-2xl shadow-2xl border border-white/10 ${accent}`;
+      el.innerHTML = `<p class="text-xs font-extrabold">${title}</p><p class="text-[11px] text-gray-300 mt-0.5">${subtitle}</p>`;
+      box.appendChild(el);
+      setTimeout(() => { if (el.parentElement) el.remove(); }, 3400);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // Hero Carousel, Privacy Eye, Alert Banner & Mode
+    function setHeroSlide(idx) {
+      appState.heroSlide = idx;
+      const slide = HERO_SLIDES[idx];
+      document.getElementById('hero-slide-title').innerHTML = slide.title;
+      document.getElementById('hero-slide-cta').textContent = slide.cta;
+      document.getElementById('hero-dot-0').className = idx === 0 ? 'h-1.5 w-10 rounded-full bg-[#00A79E] transition-all' : 'h-1.5 w-10 rounded-full bg-[#4A4D55] hover:bg-gray-400 transition-all';
+      document.getElementById('hero-dot-1').className = idx === 1 ? 'h-1.5 w-10 rounded-full bg-[#00A79E] transition-all' : 'h-1.5 w-10 rounded-full bg-[#4A4D55] hover:bg-gray-400 transition-all';
+    }
+
+    function handleHeroCTA() {
+      HERO_SLIDES[appState.heroSlide].action();
+    }
+
+    function togglePrivacyMask(forceVal = null) {
+      appState.privacyHidden = typeof forceVal === 'boolean' ? forceVal : !appState.privacyHidden;
+      document.getElementById('eye-icon-open').classList.toggle('hidden', appState.privacyHidden);
+      document.getElementById('eye-icon-closed').classList.toggle('hidden', !appState.privacyHidden);
+      document.getElementById('pref-hide-balances').checked = appState.privacyHidden;
+      syncBalancesUI();
+    }
+
+    function dismissAntBanner() {
+      document.getElementById('ant-promo-banner').classList.add('hidden');
+      document.getElementById('restore-ant-wrap').classList.remove('hidden');
+    }
+
+    function restoreAntBanner() {
+      document.getElementById('ant-promo-banner').classList.remove('hidden');
+      document.getElementById('restore-ant-wrap').classList.add('hidden');
+    }
+
+    function openSettingsModal() {
+      syncBalancesUI();
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function setAccountMode(mode) {
+      appState.accountMode = mode;
+      const dot = document.getElementById('settings-mode-dot');
+      const pill = document.getElementById('home-active-mode-pill');
+      const rBtn = document.getElementById('settings-btn-real');
+      const dBtn = document.getElementById('settings-btn-demo');
+
+      if (mode === 'real') {
+        dot.className = 'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#00A79E] border-2 border-[#16181A]';
+        pill.textContent = 'REAL • USD';
+        rBtn.className = 'p-3 rounded-2xl border-2 border-[#18191C] bg-[#F8F9FA] text-left transition';
+        dBtn.className = 'p-3 rounded-2xl border border-gray-200 bg-[#F8F9FA] text-left transition';
+      } else {
+        dot.className = 'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#FF9C13] border-2 border-[#16181A]';
+        pill.textContent = 'DEMO • USD';
+        dBtn.className = 'p-3 rounded-2xl border-2 border-[#FF9C13] bg-[#FFFBEB] text-left transition';
+        rBtn.className = 'p-3 rounded-2xl border border-gray-200 bg-[#F8F9FA] text-left transition';
+      }
+      syncBalancesUI();
+      renderActiveContracts();
+      renderOpenCfds();
+      renderPortfolio();
+    }
+
+    function resetDemoBalance() {
+      appState.balances.demo = { options: 10000.00, tv: 10000.00, mt5: 5000.00, mm: 2500.00, USDT: 2500.00, BTC: 0.0500, ANT: 420.00 };
+      syncBalancesUI();
+      showToast('Demo Balance Reset', 'Demo account restored to $10,000.00 USD.', 'win');
+    }
+
+    function syncBalancesUI() {
+      const mode = appState.accountMode;
+      const bal = appState.balances[mode];
+      const mask = appState.privacyHidden;
+
+      document.querySelectorAll('.balance-text').forEach(el => {
+        const key = el.dataset.acc;
+        el.textContent = mask ? '••••' : fmtNum(bal[key], 2);
+      });
+
+      document.getElementById('settings-real-bal').textContent = mask ? '•••• USD' : `$${fmtNum(appState.balances.real.options, 2)}`;
+      document.getElementById('settings-demo-bal').textContent = mask ? '•••• USD' : `$${fmtNum(appState.balances.demo.options, 2)}`;
+
+      const termTag = document.getElementById('term-mode-tag');
+      termTag.textContent = `${mode.toUpperCase()} USD`;
+      termTag.className = `block text-[9px] font-extrabold uppercase ${mode === 'real' ? 'text-[#00A79E]' : 'text-[#FF9C13]'}`;
+      document.getElementById('term-balance-tag').textContent = mask ? '••••' : `$${fmtNum(bal.options, 2)}`;
+      document.getElementById('cfd-margin-readout').textContent = mask ? '••••' : `$${fmtNum(bal.mt5, 2)}`;
+    }
+
+    // Navigation Tabs
+    function switchTab(tab, subOpt = null) {
+      appState.activeTab = tab;
+      const tabs = ['home', 'cfds', 'exchange', 'options', 'portfolio'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const nav = document.getElementById(`bnav-${t}`);
+        if (t === tab) {
+          view.classList.remove('hidden');
+          view.classList.add('flex');
+          nav.classList.remove('text-[#6E717A]');
+          nav.classList.add('text-[#FF444F]');
+        } else {
+          view.classList.add('hidden');
+          view.classList.remove('flex');
+          nav.classList.add('text-[#6E717A]');
+          nav.classList.remove('text-[#FF444F]');
+        }
+      });
+
+      if (tab === 'options') {
+        requestAnimationFrame(() => initTradingViewChart());
+        if (subOpt === 'tv_focus') {
+          showToast('TradingView Chart Active', 'Candles, Area, Heikin-Ashi & overlays ready.', 'info');
+        }
+      } else if (tab === 'cfds') {
+        updateCfdQuotes();
+        renderOpenCfds();
+      } else if (tab === 'exchange') {
+        updateSwapPreview();
+        renderExchangeMarkets();
+      } else if (tab === 'portfolio') {
+        renderPortfolio();
+      }
+    }
+
+    function launchSymbolInOptions(symbol) {
+      appState.selectedSymbol = symbol;
+      document.getElementById('terminal-asset-select').value = symbol;
+      switchTab('options');
+      handleAssetChange(symbol);
+    }
+
+    // TradingView Lightweight Charts Engine
+    let tvChart = null, mainSeries = null, smaSeries = null, bbUpSeries = null, bbLowSeries = null, barrierLine = null, usingFallback = false;
+
+    function getActiveInst() {
+      return appState.instruments.find(i => i.symbol === appState.selectedSymbol) || appState.instruments[0];
+    }
+
+    function initTradingViewChart() {
+      const container = document.getElementById('tv-chart-container');
+      const fallback = document.getElementById('fallback-chart-canvas');
+      if (!container) return;
+
+      if (typeof LightweightCharts === 'undefined') {
+        usingFallback = true;
+        container.classList.add('hidden');
+        fallback.classList.remove('hidden');
+        drawFallbackChart();
+        return;
+      }
+
+      if (tvChart) { tvChart.remove(); tvChart = null; }
+
+      const inst = getActiveInst();
+      tvChart = LightweightCharts.createChart(container, {
+        layout: { background: { type: 'solid', color: '#0E0E0E' }, textColor: '#9CA3AF', fontFamily: "'JetBrains Mono', monospace", fontSize: 10 },
+        grid: { vertLines: { color: 'rgba(255,255,255,0.05)' }, horzLines: { color: 'rgba(255,255,255,0.05)' } },
+        rightPriceScale: { borderColor: '#2A2D30' },
+        timeScale: { borderColor: '#2A2D30', timeVisible: true, secondsVisible: true },
+        width: container.clientWidth || 380,
+        height: container.clientHeight || 235
+      });
+
+      const priceFormat = { type: 'price', precision: inst.decimals, minMove: Number((1 / Math.pow(10, inst.decimals)).toFixed(inst.decimals)) };
+
+      if (appState.chartType === 'area') {
+        mainSeries = tvChart.addAreaSeries({ lineColor: '#00A79E', topColor: 'rgba(0,167,158,0.35)', bottomColor: 'rgba(0,167,158,0.0)', lineWidth: 2, priceFormat });
+        mainSeries.setData(inst.candles.map(c => ({ time: c.time, value: c.close })));
+      } else {
+        mainSeries = tvChart.addCandlestickSeries({ upColor: '#00A79E', downColor: '#FF444F', borderVisible: false, wickUpColor: '#00A79E', wickDownColor: '#FF444F', priceFormat });
+        const data = appState.chartType === 'heikin' ? computeHeikinAshi(inst.candles, inst.decimals) : inst.candles;
+        mainSeries.setData(data);
+      }
+
+      if (appState.indicators.sma20) {
+        smaSeries = tvChart.addLineSeries({ color: '#FF9C13', lineWidth: 1.5, priceLineVisible: false });
+        const sma = [];
+        for (let i = 19; i < inst.candles.length; i++) {
+          sma.push({ time: inst.candles[i].time, value: inst.candles.slice(i - 19, i + 1).reduce((s, c) => s + c.close, 0) / 20 });
+        }
+        smaSeries.setData(sma);
+      }
+
+      if (appState.indicators.bb) {
+        bbUpSeries = tvChart.addLineSeries({ color: '#A855F7', lineWidth: 1, lineStyle: 2, priceLineVisible: false });
+        bbLowSeries = tvChart.addLineSeries({ color: '#A855F7', lineWidth: 1, lineStyle: 2, priceLineVisible: false });
+        const up = [], low = [];
+        for (let i = 19; i < inst.candles.length; i++) {
+          const sl = inst.candles.slice(i - 19, i + 1).map(c => c.close);
+          const mean = sl.reduce((a, b) => a + b, 0) / 20;
+          const std = Math.sqrt(sl.reduce((a, b) => a + (b - mean) ** 2, 0) / 20);
+          up.push({ time: inst.candles[i].time, value: mean + 2 * std });
+          low.push({ time: inst.candles[i].time, value: mean - 2 * std });
+        }
+        bbUpSeries.setData(up);
+        bbLowSeries.setData(low);
+      }
+
+      barrierLine = null;
+      syncChartOverlays();
+      tvChart.timeScale().scrollToRealTime();
+    }
+
+    function computeHeikinAshi(candles, dec) {
+      const out = [];
+      for (let i = 0; i < candles.length; i++) {
+        const c = candles[i];
+        const close = (c.open + c.high + c.low + c.close) / 4;
+        const open = i === 0 ? (c.open + c.close) / 2 : (out[i - 1].open + out[i - 1].close) / 2;
+        out.push({ time: c.time, open: Number(open.toFixed(dec)), high: Number(Math.max(c.high, open, close).toFixed(dec)), low: Number(Math.min(c.low, open, close).toFixed(dec)), close: Number(close.toFixed(dec)) });
+      }
+      return out;
+    }
+
+    function syncChartOverlays() {
+      if (usingFallback || !mainSeries) return;
+      const inst = getActiveInst();
+      if (barrierLine) { try { mainSeries.removePriceLine(barrierLine); } catch (e) {} barrierLine = null; }
+      if (['higher_lower', 'touch_notouch'].includes(appState.contractCategory)) {
+        const offset = parseFloat(document.getElementById('barrier-offset-input').value) || 0;
+        barrierLine = mainSeries.createPriceLine({ price: Number((inst.price + offset).toFixed(inst.decimals)), color: '#FF9C13', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'BARRIER' });
+      }
+    }
+
+    function drawFallbackChart() {
+      const c = document.getElementById('fallback-chart-canvas');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      const w = c.clientWidth || 380, h = c.clientHeight || 235;
+      c.width = w; c.height = h;
+      ctx.clearRect(0, 0, w, h);
+      const inst = getActiveInst();
+      const slice = inst.candles.slice(-40);
+      const min = Math.min(...slice.map(x => x.low)), max = Math.max(...slice.map(x => x.high)), rng = max - min || 1, step = w / slice.length;
+      slice.forEach((bar, idx) => {
+        const x = idx * step + step * 0.2, up = bar.close >= bar.open;
+        ctx.fillStyle = up ? '#00A79E' : '#FF444F';
+        const yO = h - ((bar.open - min) / rng) * (h - 20) - 10, yC = h - ((bar.close - min) / rng) * (h - 20) - 10;
+        ctx.fillRect(x, Math.min(yO, yC), Math.max(3, step * 0.6), Math.max(2, Math.abs(yC - yO)));
+      });
+    }
+
+    function handleAssetChange(symbol) {
+      appState.selectedSymbol = symbol;
+      const inst = getActiveInst();
+      document.getElementById('barrier-offset-input').value = inst.offset;
+      updateSpotReadout();
+      renderDigitsVisualizer();
+      updateTicketCalculations();
+      initTradingViewChart();
+    }
+
+    function setChartType(ct) {
+      appState.chartType = ct;
+      document.querySelectorAll('.ctype-btn').forEach(b => { b.className = b.dataset.ctype === ct ? 'ctype-btn px-2 py-1 rounded bg-[#FF444F] text-white' : 'ctype-btn px-2 py-1 rounded text-gray-400'; });
+      initTradingViewChart();
+    }
+
+    function setChartTimeframe(tf) {
+      appState.timeframe = tf;
+      document.querySelectorAll('.tf-btn').forEach(b => { b.className = b.dataset.tf === tf ? 'tf-btn px-1.5 py-0.5 rounded bg-white/15 text-white' : 'tf-btn px-1.5 py-0.5 rounded text-gray-400'; });
+      initTradingViewChart();
+    }
+
+    function toggleIndicator(key) {
+      appState.indicators[key] = !appState.indicators[key];
+      document.getElementById(`ind-${key}`).className = appState.indicators[key] ? 'px-1.5 py-0.5 rounded bg-[#00A79E]/25 text-[#00A79E]' : 'px-1.5 py-0.5 rounded text-gray-400';
+      initTradingViewChart();
+    }
+
+    function updateSpotReadout() {
+      const inst = getActiveInst();
+      const priceEl = document.getElementById('term-live-price');
+      const isUp = inst.price >= inst.prev;
+      priceEl.textContent = fmtNum(inst.price, inst.decimals);
+      priceEl.className = `font-mono tabular-nums text-xs font-extrabold ${isUp ? 'text-[#00A79E]' : 'text-[#FF444F]'}`;
+      document.getElementById('term-live-delta').textContent = `${inst.delta >= 0 ? '+' : ''}${inst.delta.toFixed(2)}%`;
+      const last = inst.candles[inst.candles.length - 1];
+      if (last) {
+        document.getElementById('ro-open').textContent = fmtNum(last.open, inst.decimals);
+        document.getElementById('ro-high').textContent = fmtNum(last.high, inst.decimals);
+        document.getElementById('ro-low').textContent = fmtNum(last.low, inst.decimals);
+      }
+    }
+
+    // Binary Contract Modes (Rise/Fall, Higher/Lower, Touch/No Touch, Over/Under, Digits)
+    function setContractCategory(cat) {
+      appState.contractCategory = cat;
+      document.querySelectorAll('.ccat-btn').forEach(b => {
+        b.className = b.dataset.ccat === cat ? 'ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold bg-[#FF444F] text-white whitespace-nowrap' : 'ccat-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 whitespace-nowrap';
+      });
+      const wrap = document.getElementById('dynamic-contract-params'), barBox = document.getElementById('barrier-param-box'), digBox = document.getElementById('digits-param-box');
+      wrap.classList.add('hidden'); barBox.classList.add('hidden'); digBox.classList.add('hidden');
+      if (cat === 'higher_lower' || cat === 'touch_notouch') {
+        wrap.classList.remove('hidden'); barBox.classList.remove('hidden');
+      } else if (cat === 'over_under' || cat === 'digits') {
+        wrap.classList.remove('hidden'); digBox.classList.remove('hidden');
+        document.getElementById('digit-selector-label').textContent = cat === 'over_under' ? 'Over / Under Digit (0–9)' : 'Matches / Differs Digit (0–9)';
+        setDurationUnit('ticks');
+        renderDigitsVisualizer();
+      }
+      updateTicketCalculations();
+      syncChartOverlays();
+    }
+
+    function adjustBarrierOffset(dir) {
+      const inst = getActiveInst();
+      const inp = document.getElementById('barrier-offset-input');
+      const step = Math.max(inst.offset * 0.25, 1 / Math.pow(10, inst.decimals));
+      inp.value = Number(((parseFloat(inp.value) || 0) + dir * step).toFixed(inst.decimals));
+      updateTicketCalculations(); syncChartOverlays();
+    }
+
+    function selectDigit(d) {
+      appState.selectedDigit = d;
+      renderDigitsVisualizer(); updateTicketCalculations();
+    }
+
+    function renderDigitsVisualizer() {
+      const inst = getActiveInst();
+      const grid = document.getElementById('digit-buttons-grid'), bars = document.getElementById('digit-bars-container');
+      const latest = getLastDigit(inst.price, inst.decimals);
+      document.getElementById('live-last-digit').textContent = latest;
+      grid.innerHTML = Array.from({ length: 10 }, (_, d) => `<button type="button" onclick="selectDigit(${d})" class="py-1 rounded font-mono text-[11px] font-extrabold ${appState.selectedDigit === d ? 'bg-[#FF444F] text-white' : 'bg-[#16181A] text-gray-300 border border-[#2A2D30]'}">${d}</button>`).join('');
+      const counts = Array(10).fill(0);
+      inst.digits.forEach(d => { if (d >= 0 && d <= 9) counts[d]++; });
+      const maxC = Math.max(...counts, 1);
+      bars.innerHTML = counts.map((c, d) => {
+        const hPct = Math.max(15, Math.round((c / maxC) * 100));
+        const col = d === latest ? 'bg-[#00A79E]' : d === appState.selectedDigit ? 'bg-[#FF444F]' : 'bg-gray-600';
+        return `<div class="flex flex-col items-center justify-end h-full"><div class="w-full rounded-t ${col}" style="height:${hPct}%"></div><span class="text-[8px] font-mono text-gray-400">${d}</span></div>`;
+      }).join('');
+    }
+
+    function setDurationUnit(unit) {
+      appState.durationUnit = unit;
+      document.getElementById('unit-ticks-btn').className = unit === 'ticks' ? 'px-1.5 py-0.5 rounded bg-white/15 text-white' : 'px-1.5 py-0.5 rounded text-gray-400';
+      document.getElementById('unit-seconds-btn').className = unit === 'seconds' ? 'px-1.5 py-0.5 rounded bg-white/15 text-white' : 'px-1.5 py-0.5 rounded text-gray-400';
+      const grid = document.getElementById('duration-presets-grid'), opts = unit === 'ticks' ? [1, 3, 5, 7, 10] : [15, 30, 60, 120, 300];
+      appState.durationValue = opts[2];
+      grid.innerHTML = opts.map(v => `<button type="button" onclick="setDurationVal(${v})" data-dval="${v}" class="dval-btn py-1 rounded text-[10px] font-mono font-extrabold ${v === appState.durationValue ? 'bg-white/20 text-white' : 'bg-[#16181A] text-gray-400'}">${unit === 'ticks' ? v + 't' : (v < 60 ? v + 's' : (v / 60) + 'm')}</button>`).join('');
+    }
+
+    function setDurationVal(v) {
+      appState.durationValue = v;
+      document.querySelectorAll('.dval-btn').forEach(b => { b.className = Number(b.dataset.dval) === v ? 'dval-btn py-1 rounded text-[10px] font-mono font-extrabold bg-white/20 text-white' : 'dval-btn py-1 rounded text-[10px] font-mono font-extrabold bg-[#16181A] text-gray-400'; });
+    }
+
+    function adjustStake(delta) {
+      const inp = document.getElementById('binary-stake-input');
+      inp.value = Math.min(10000, Math.max(1, (parseFloat(inp.value) || 5) + delta));
+      updateTicketCalculations();
+    }
+
+    function getContractSpecs() {
+      const inst = getActiveInst(), cat = appState.contractCategory;
+      const offset = parseFloat(document.getElementById('barrier-offset-input').value) || 0;
+      const barrierPrice = Number((inst.price + offset).toFixed(inst.decimals));
+      document.getElementById('computed-barrier-price').textContent = fmtNum(barrierPrice, inst.decimals);
+      if (cat === 'rise_fall') return { primaryLabel: 'Rise', secondaryLabel: 'Fall', primaryPct: 95.4, secondaryPct: 95.4, barrierPrice: null };
+      if (cat === 'higher_lower') return { primaryLabel: 'Higher', secondaryLabel: 'Lower', primaryPct: 108.5, secondaryPct: 84.2, barrierPrice };
+      if (cat === 'touch_notouch') return { primaryLabel: 'Touch', secondaryLabel: 'No Touch', primaryPct: 118.0, secondaryPct: 76.5, barrierPrice };
+      if (cat === 'over_under') {
+        const d = appState.selectedDigit, overCnt = Math.max(0, 9 - d), underCnt = Math.max(0, d);
+        return {
+          primaryLabel: `Over ${d}`, secondaryLabel: `Under ${d}`,
+          primaryPct: overCnt > 0 ? Number((((10 / overCnt) - 1) * 95.4).toFixed(1)) : 0,
+          secondaryPct: underCnt > 0 ? Number((((10 / underCnt) - 1) * 95.4).toFixed(1)) : 0,
+          barrierPrice: null
+        };
+      }
+      return { primaryLabel: `Matches (${appState.selectedDigit})`, secondaryLabel: `Differs (${appState.selectedDigit})`, primaryPct: 890.0, secondaryPct: 10.2, barrierPrice: null };
+    }
+
+    function updateTicketCalculations() {
+      appState.stake = Math.max(1, parseFloat(document.getElementById('binary-stake-input').value) || 1);
+      const specs = getContractSpecs();
+      document.getElementById('payout-summary-mini').textContent = `+$${fmtNum(appState.stake * (specs.primaryPct / 100), 2)}`;
+      document.getElementById('exec-btn-primary-label').textContent = specs.primaryLabel;
+      document.getElementById('exec-btn-secondary-label').textContent = specs.secondaryLabel;
+      document.getElementById('exec-btn-primary-pct').textContent = `+${specs.primaryPct}%`;
+      document.getElementById('exec-btn-secondary-pct').textContent = `+${specs.secondaryPct}%`;
+    }
+
+    function placeBinaryContract(side) {
+      const mode = appState.accountMode, balObj = appState.balances[mode];
+      if (appState.stake > balObj.options) {
+        showToast('Insufficient Balance', mode === 'real' ? 'Deposit funds or switch to Demo mode.' : 'Reset Demo balance in Settings.', 'loss');
+        openCashierModal('deposit', 'MobileMoney');
+        return;
+      }
+      const inst = getActiveInst(), specs = getContractSpecs(), isPrim = side === 'PRIMARY', retPct = isPrim ? specs.primaryPct : specs.secondaryPct;
+      if (retPct <= 0) return;
+      balObj.options -= appState.stake; balObj.tv = balObj.options;
+      syncBalancesUI();
+      appState.activeContracts.unshift({
+        id: 'DV-' + Math.floor(1000 + Math.random() * 9000), mode, symbol: inst.symbol, name: inst.name,
+        cat: appState.contractCategory, side, label: isPrim ? specs.primaryLabel : specs.secondaryLabel,
+        stake: appState.stake, retPct, entry: inst.price, current: inst.price, barrier: specs.barrierPrice,
+        digit: appState.selectedDigit, touched: false, unit: appState.durationUnit, total: appState.durationValue, rem: appState.durationValue
+      });
+      renderActiveContracts();
+      showToast('Contract Opened', `${inst.name} • ${isPrim ? specs.primaryLabel : specs.secondaryLabel} ($${fmtNum(appState.stake, 2)})`, 'info');
+    }
+
+    function renderActiveContracts() {
+      const list = appState.activeContracts.filter(c => c.mode === appState.accountMode);
+      document.getElementById('active-contracts-count').textContent = list.length;
+      const box = document.getElementById('active-contracts-cards');
+      if (!list.length) { box.innerHTML = `<p class="text-[11px] text-gray-500 text-center py-3">No active contracts. Tap Rise or Fall to trade.</p>`; return; }
+      box.innerHTML = list.map(c => {
+        const inst = appState.instruments.find(i => i.symbol === c.symbol) || { decimals: 2 };
+        const pct = Math.min(100, Math.round(((c.total - c.rem) / c.total) * 100));
+        return `<div class="bg-[#0E0E0E] p-2.5 rounded-xl border border-[#2A2D30] flex items-center justify-between gap-2 text-xs">
+          <div><span class="font-extrabold ${c.side === 'PRIMARY' ? 'text-[#00A79E]' : 'text-[#FF444F]'}">${c.label}</span><span class="text-gray-400 ml-1">${c.name}</span><span class="block font-mono text-[10px] text-gray-400">Entry: ${fmtNum(c.entry, inst.decimals)} • Spot: ${fmtNum(c.current, inst.decimals)}</span></div>
+          <div class="text-right font-mono"><span class="block text-[11px] font-bold text-[#FF9C13]">${c.rem}${c.unit === 'ticks' ? 't' : 's'} left</span><div class="w-16 h-1 bg-white/10 rounded-full overflow-hidden mt-1"><div class="h-full bg-[#FF9C13]" style="width:${pct}%"></div></div></div>
+        </div>`;
+      }).join('');
+    }
+
+    // CFDs, Exchange & Portfolio
+    function updateCfdQuotes() {
+      const inst = appState.instruments.find(i => i.symbol === document.getElementById('cfd-symbol-select').value) || appState.instruments[0];
+      const spread = inst.price * 0.00015;
+      document.getElementById('cfd-bid-price').textContent = fmtNum(inst.price - spread, inst.decimals);
+      document.getElementById('cfd-ask-price').textContent = fmtNum(inst.price + spread, inst.decimals);
+    }
+
+    function placeCfdOrder(dir) {
+      const mode = appState.accountMode, balObj = appState.balances[mode], lots = Math.max(0.01, parseFloat(document.getElementById('cfd-lot-input').value) || 0.1), marginReq = Number((lots * 250).toFixed(2));
+      if (marginReq > balObj.mt5) { showToast('Insufficient MT5 Margin', `Required: $${fmtNum(marginReq, 2)}`, 'loss'); return; }
+      const inst = appState.instruments.find(i => i.symbol === document.getElementById('cfd-symbol-select').value) || appState.instruments[0];
+      balObj.mt5 -= marginReq; syncBalancesUI();
+      appState.openCfds.unshift({ id: 'MT5-' + Math.floor(10000 + Math.random() * 90000), mode, symbol: inst.symbol, name: inst.name, dir, lots, margin: marginReq, entry: inst.price, pnl: 0 });
+      renderOpenCfds();
+      showToast(`MT5 ${dir} Executed`, `${inst.name} (${lots} lots)`, 'info');
+    }
+
+    function closeCfdPosition(id) {
+      const idx = appState.openCfds.findIndex(p => p.id === id);
+      if (idx === -1) return;
+      const pos = appState.openCfds[idx], balObj = appState.balances[pos.mode];
+      balObj.mt5 = Math.max(0, balObj.mt5 + pos.margin + pos.pnl);
+      appState.history.unshift({ id: pos.id, mode: pos.mode, label: `MT5 ${pos.dir} (${pos.lots})`, name: pos.name, stake: pos.margin, won: pos.pnl >= 0, netPnl: pos.pnl, time: new Date().toLocaleTimeString([], { hour12: false }) });
+      appState.openCfds.splice(idx, 1); syncBalancesUI(); renderOpenCfds();
+      showToast('CFD Position Closed', `Realized P&L: ${pos.pnl >= 0 ? '+' : ''}$${fmtNum(pos.pnl, 2)}`, pos.pnl >= 0 ? 'win' : 'loss');
+    }
+
+    function renderOpenCfds() {
+      const list = appState.openCfds.filter(p => p.mode === appState.accountMode);
+      document.getElementById('open-cfd-count').textContent = list.length;
+      const box = document.getElementById('open-cfd-list');
+      if (!list.length) { box.innerHTML = `<div class="bg-white rounded-2xl p-4 border border-gray-200 text-center text-xs text-[#6E717A]">No open leveraged CFD positions.</div>`; return; }
+      box.innerHTML = list.map(p => `<div class="bg-white rounded-2xl p-3.5 border border-gray-200 flex items-center justify-between gap-2">
+        <div><span class="text-xs font-extrabold ${p.dir === 'BUY' ? 'text-[#00A79E]' : 'text-[#FF444F]'}">${p.dir} ${p.lots}</span><span class="text-xs font-bold text-[#18191C] ml-1">${p.name}</span><span class="block font-mono text-[10px] text-[#6E717A]">Entry: ${p.entry} • Margin: $${fmtNum(p.margin, 2)}</span></div>
+        <div class="flex items-center gap-2"><span class="font-mono text-xs font-extrabold ${p.pnl >= 0 ? 'text-[#00A79E]' : 'text-[#FF444F]'}">${p.pnl >= 0 ? '+' : ''}$${fmtNum(p.pnl, 2)}</span><button onclick="closeCfdPosition('${p.id}')" class="px-2.5 py-1 rounded-lg bg-[#16181A] text-white text-[11px] font-bold">Close</button></div>
+      </div>`).join('');
+    }
+
+    const CURRENCY_USD_RATES = { USD: 1, USDT: 1, BTC: 88450, ANT: 14.825 };
+    function updateSwapPreview() {
+      const mode = appState.accountMode, from = document.getElementById('swap-from-curr').value, to = document.getElementById('swap-to-curr').value, amt = parseFloat(document.getElementById('swap-amount-input').value) || 0;
+      const bal = from === 'USD' ? appState.balances[mode].options : (appState.balances[mode][from] || 0);
+      document.getElementById('swap-from-bal').textContent = `Bal: ${fmtNum(bal, from === 'BTC' ? 4 : 2)} ${from}`;
+      const rate = CURRENCY_USD_RATES[from] / CURRENCY_USD_RATES[to];
+      document.getElementById('swap-rate-label').textContent = `1 ${from} = ${fmtNum(rate, to === 'BTC' ? 6 : 4)} ${to}`;
+      document.getElementById('swap-receive-output').textContent = fmtNum(amt * rate, to === 'BTC' ? 6 : 2);
+    }
+
+    function flipSwapCurrencies() {
+      const f = document.getElementById('swap-from-curr'), t = document.getElementById('swap-to-curr'), tmp = f.value;
+      f.value = t.value; t.value = tmp; updateSwapPreview();
+    }
+
+    function executeWalletSwap() {
+      const mode = appState.accountMode, from = document.getElementById('swap-from-curr').value, to = document.getElementById('swap-to-curr').value, amt = parseFloat(document.getElementById('swap-amount-input').value) || 0;
+      if (amt <= 0 || from === to) return;
+      const balObj = appState.balances[mode], avail = from === 'USD' ? balObj.options : balObj[from];
+      if (amt > avail) { showToast('Insufficient Balance', `Not enough ${from}.`, 'loss'); return; }
+      if (from === 'USD') { balObj.options -= amt; balObj.tv = balObj.options; } else { balObj[from] -= amt; }
+      const received = amt * (CURRENCY_USD_RATES[from] / CURRENCY_USD_RATES[to]);
+      if (to === 'USD') { balObj.options += received; balObj.tv = balObj.options; } else { balObj[to] = (balObj[to] || 0) + received; }
+      syncBalancesUI(); updateSwapPreview(); renderExchangeMarkets();
+      showToast('Swap Complete', `${amt} ${from} → ${fmtNum(received, to === 'BTC' ? 6 : 2)} ${to}`, 'win');
+    }
+
+    function renderExchangeMarkets() {
+      document.getElementById('exchange-markets-list').innerHTML = appState.instruments.map(inst => `
+        <div onclick="launchSymbolInOptions('${inst.symbol}')" class="cursor-pointer bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-between hover:bg-gray-50">
+          <div><span class="block text-xs font-extrabold text-[#18191C]">${inst.name}</span><span class="text-[10px] font-mono text-[#6E717A]">${inst.symbol}</span></div>
+          <div class="text-right font-mono"><span class="block text-xs font-extrabold text-[#18191C]">${fmtNum(inst.price, inst.decimals)}</span><span class="text-[10px] font-bold ${inst.delta >= 0 ? 'text-[#00A79E]' : 'text-[#FF444F]'}">${inst.delta >= 0 ? '+' : ''}${inst.delta.toFixed(2)}%</span></div>
+        </div>
+      `).join('');
+    }
+
+    function renderPortfolio() {
+      const mode = appState.accountMode, bal = appState.balances[mode], total = bal.options + bal.mt5 + bal.mm;
+      const badge = document.getElementById('port-mode-badge');
+      badge.textContent = `${mode.toUpperCase()} ACCOUNT`;
+      badge.className = `text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${mode === 'real' ? 'bg-[#00A79E] text-white' : 'bg-[#FF9C13] text-[#18191C]'}`;
+      document.getElementById('port-total-usd').textContent = appState.privacyHidden ? '•••• USD' : `$${fmtNum(total, 2)} USD`;
+
+      const rows = appState.history.filter(h => h.mode === mode), wins = rows.filter(r => r.won).length, pnl = rows.reduce((s, r) => s + r.netPnl, 0);
+      document.getElementById('port-kpi-trades').textContent = rows.length;
+      document.getElementById('port-kpi-winrate').textContent = rows.length ? `${((wins / rows.length) * 100).toFixed(1)}%` : '0.0%';
+      const pnlEl = document.getElementById('port-kpi-pnl');
+      pnlEl.textContent = `${pnl >= 0 ? '+' : ''}$${fmtNum(pnl, 2)}`;
+      pnlEl.className = `font-mono text-xs ${pnl >= 0 ? 'text-[#00A79E]' : 'text-[#FF444F]'}`;
+
+      const list = document.getElementById('portfolio-history-list');
+      if (!rows.length) { list.innerHTML = `<div class="bg-white rounded-2xl p-5 border border-gray-200 text-center text-xs text-[#6E717A]">No settled trades yet in ${mode.toUpperCase()} mode.</div>`; return; }
+      list.innerHTML = rows.map(r => `<div class="bg-white rounded-2xl p-3.5 border border-gray-200 flex items-center justify-between text-xs">
+        <div><span class="font-extrabold text-[#18191C]">${r.label}</span><span class="text-[#6E717A] ml-1">${r.name}</span><span class="block font-mono text-[10px] text-[#6E717A]">${r.id} • ${r.time}</span></div>
+        <span class="font-mono font-extrabold ${r.won ? 'text-[#00A79E]' : 'text-[#FF444F]'}">${r.netPnl >= 0 ? '+' : ''}$${fmtNum(r.netPnl, 2)}</span>
+      </div>`).join('');
+    }
+
+    // Cashier, Amy, Search & Notifications
+    function openCashierModal(action = 'deposit', method = 'MobileMoney') {
+      appState.cashierAction = action;
+      document.getElementById('cashier-modal-title').textContent = action === 'deposit' ? 'Deposit funds' : 'Withdraw funds';
+      document.getElementById('cashier-submit-btn').textContent = action === 'deposit' ? 'Deposit now' : 'Confirm withdrawal';
+      document.getElementById('cashier-method-select').value = method;
+      document.getElementById('cashier-modal').classList.remove('hidden');
+    }
+
+    function submitCashierTx(e) {
+      e.preventDefault();
+      const amt = parseFloat(document.getElementById('cashier-amount-input').value) || 0, method = document.getElementById('cashier-method-select').value;
+      if (amt <= 0) return;
+      const bal = appState.balances[appState.accountMode];
+      if (appState.cashierAction === 'deposit') {
+        bal.options += amt; bal.tv = bal.options; bal.mt5 += amt * 0.5;
+        if (method === 'MobileMoney') bal.mm += amt;
+        showToast('Deposit Credited', `+$${fmtNum(amt, 2)} USD via ${method}`, 'win');
+      } else {
+        if (amt > bal.options) { showToast('Insufficient Funds', 'Withdrawal exceeds available USD.', 'loss'); return; }
+        bal.options -= amt; bal.tv = bal.options;
+        showToast('Withdrawal Submitted', `-$${fmtNum(amt, 2)} USD via ${method}`, 'info');
+      }
+      closeModal('cashier-modal'); syncBalancesUI(); renderPortfolio();
+    }
+
+    function openAmyModal() { document.getElementById('amy-modal').classList.remove('hidden'); }
+    function askAmyPrompt(text) {
+      const box = document.getElementById('amy-chat-box');
+      box.innerHTML += `<div class="bg-[#FF444F] text-white p-2.5 rounded-2xl rounded-tr-none ml-auto max-w-[80%] font-semibold">${text}</div>`;
+      let reply = 'Options contracts settle on exact tick/second expiry. Try Rise/Fall for directional moves or Over/Under with digit 5 for tick-digit analysis.';
+      if (text.toLowerCase().includes('indicator')) reply = 'Toggle SMA 20 or Bollinger Bands (BB) on the TradingView toolbar to spot trend direction and volatility squeezes.';
+      else if (text.toLowerCase().includes('risk') || text.toLowerCase().includes('demo')) reply = 'Tap "SK" at top-left to switch to Demo mode ($10,000) and test strategies before trading Real funds.';
+      setTimeout(() => { box.innerHTML += `<div class="bg-[#25282C] text-gray-200 p-3 rounded-2xl rounded-tl-none max-w-[88%] leading-relaxed">✨ ${reply}</div>`; box.scrollTop = box.scrollHeight; }, 220);
+    }
+    function submitAmyCustom(e) { e.preventDefault(); const inp = document.getElementById('amy-custom-input'); if (!inp.value.trim()) return; askAmyPrompt(inp.value.trim()); inp.value = ''; }
+
+    function openSearchModal() { document.getElementById('search-modal').classList.remove('hidden'); renderSearchResults(''); document.getElementById('global-search-input').focus(); }
+    function renderSearchResults(q) {
+      const term = q.trim().toLowerCase();
+      const actions = [
+        { title: 'Deposit Funds (Mobile Money)', sub: 'Cashier', fn: () => openCashierModal('deposit', 'MobileMoney') },
+        { title: 'Settings & Demo/Real Mode (SK)', sub: 'Preferences', fn: () => openSettingsModal() },
+        { title: 'Ask Amy Trading Assistant', sub: 'AI Copilot', fn: () => openAmyModal() }
+      ].filter(a => a.title.toLowerCase().includes(term) || a.sub.toLowerCase().includes(term));
+
+      const markets = appState.instruments.filter(i => i.name.toLowerCase().includes(term) || i.symbol.toLowerCase().includes(term)).map(m => ({
+        title: m.name, sub: `${m.symbol} • ${fmtNum(m.price, m.decimals)}`, fn: () => launchSymbolInOptions(m.symbol)
+      }));
+
+      const combined = [...actions, ...markets];
+      document.getElementById('global-search-results').innerHTML = combined.map((item, idx) => `
+        <div onclick="closeModal('search-modal'); searchActionRegistry[${idx}]();" class="cursor-pointer py-2.5 px-2 flex items-center justify-between hover:bg-gray-50">
+          <div><span class="block text-xs font-extrabold">${item.title}</span><span class="text-[10px] text-[#6E717A]">${item.sub}</span></div>
+          <span class="text-xs font-bold text-[#FF444F]">→</span>
+        </div>
+      `).join('');
+      window.searchActionRegistry = combined.map(x => x.fn);
+    }
+
+    function openNotificationsModal() {
+      document.getElementById('notifications-feed').innerHTML = appState.notifications.map(n => `<div class="py-2.5"><div class="flex justify-between font-extrabold"><span>${n.title}</span><span class="text-[10px] text-[#6E717A] font-mono">${n.time}</span></div><p class="text-[#6E717A] mt-0.5">${n.desc}</p></div>`).join('');
+      document.getElementById('notifications-modal').classList.remove('hidden');
+    }
+    function markNotificationsRead() { document.getElementById('notif-count-badge').classList.add('hidden'); closeModal('notifications-modal'); }
+
+    // 1-Second Tick & Contract Settlement Loop
+    function tickEngine() {
+      const now = Math.floor(Date.now() / 1000), activeInst = getActiveInst();
+      appState.instruments.forEach(inst => {
+        inst.prev = inst.price;
+        const move = inst.price * inst.vol * (Math.random() - 0.495) * 1.4;
+        inst.price = Number(Math.max(0.0001, inst.price + move).toFixed(inst.decimals));
+        inst.delta += (move / inst.prev) * 100;
+        inst.digits.push(getLastDigit(inst.price, inst.decimals));
+        if (inst.digits.length > 25) inst.digits.shift();
+        const last = inst.candles[inst.candles.length - 1];
+        if (!last || now - last.time >= 1) { inst.candles.push({ time: now, open: inst.price, high: inst.price, low: inst.price, close: inst.price }); if (inst.candles.length > 140) inst.candles.shift(); }
+        else { last.close = inst.price; last.high = Math.max(last.high, inst.price); last.low = Math.min(last.low, inst.price); }
+      });
+
+      if (appState.activeTab === 'options') {
+        if (tvChart && mainSeries && !usingFallback) {
+          const latest = activeInst.candles[activeInst.candles.length - 1];
+          if (appState.chartType === 'area') mainSeries.update({ time: latest.time, value: latest.close });
+          else mainSeries.update(latest);
+        } else if (usingFallback) drawFallbackChart();
+        updateSpotReadout();
+        if (['over_under', 'digits'].includes(appState.contractCategory)) renderDigitsVisualizer();
+      } else if (appState.activeTab === 'cfds') {
+        updateCfdQuotes();
+      } else if (appState.activeTab === 'exchange') {
+        renderExchangeMarkets();
+      }
+
+      appState.openCfds.forEach(p => {
+        const inst = appState.instruments.find(i => i.symbol === p.symbol);
+        if (!inst) return;
+        const diff = p.dir === 'BUY' ? (inst.price - p.entry) : (p.entry - inst.price);
+        p.pnl = Number(((diff / p.entry) * p.margin * 20).toFixed(2));
+      });
+      if (appState.activeTab === 'cfds') renderOpenCfds();
+
+      for (let i = appState.activeContracts.length - 1; i >= 0; i--) {
+        const c = appState.activeContracts[i], inst = appState.instruments.find(x => x.symbol === c.symbol);
+        if (!inst) continue;
+        c.current = inst.price; c.rem -= 1;
+        if (c.cat === 'touch_notouch' && ((c.entry <= c.barrier && c.current >= c.barrier) || (c.entry >= c.barrier && c.current <= c.barrier))) c.touched = true;
+        if (c.rem <= 0) {
+          let won = false; const lastD = getLastDigit(c.current, inst.decimals);
+          if (c.cat === 'rise_fall') won = c.side === 'PRIMARY' ? c.current > c.entry : c.current < c.entry;
+          else if (c.cat === 'higher_lower') won = c.side === 'PRIMARY' ? c.current > c.barrier : c.current < c.barrier;
+          else if (c.cat === 'touch_notouch') won = c.side === 'PRIMARY' ? c.touched : !c.touched;
+          else if (c.cat === 'over_under') won = c.side === 'PRIMARY' ? lastD > c.digit : lastD < c.digit;
+          else won = c.side === 'PRIMARY' ? lastD === c.digit : lastD !== c.digit;
+
+          const profit = Number((c.stake * (c.retPct / 100)).toFixed(2));
+          if (won) { appState.balances[c.mode].options += c.stake + profit; appState.balances[c.mode].tv = appState.balances[c.mode].options; }
+          appState.history.unshift({ id: c.id, mode: c.mode, label: c.label, name: c.name, stake: c.stake, won, netPnl: won ? profit : -c.stake, time: new Date().toLocaleTimeString([], { hour12: false }) });
+          appState.activeContracts.splice(i, 1);
+          syncBalancesUI();
+          showToast(won ? `Won +$${fmtNum(profit, 2)}` : `Lost -$${fmtNum(c.stake, 2)}`, `${c.name} • ${c.label}`, won ? 'win' : 'loss');
+        }
+      }
+      if (appState.activeTab === 'options') renderActiveContracts();
+    }
+
+    window.onload = function () {
+      seedMarketData();
+      syncBalancesUI();
+      setDurationUnit('ticks');
+      updateTicketCalculations();
+      setInterval(tickEngine, 1000);
+    };
+  </script>
+</body>
+</html>
