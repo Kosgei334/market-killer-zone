@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DERIV — Trader's Hub & Binary Terminal</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  :root {
+    --bg-canvas: #f5f6f8;
+    --bg-surface: #ffffff;
+    --bg-surface-soft: #f0f2f5;
+    --bg-dark: #111316;
+    --bg-dark-elevated: #1c1f24;
+    --bg-dark-hover: #262a31;
+    --text-primary: #181c20;
+    --text-secondary: #5e6670;
+    --text-muted: #8c95a0;
+    --text-on-dark: #ffffff;
+    --text-on-dark-muted: #a3abb6;
+    --brand-red: #ff444f;
+    --brand-red-hover: #e63641;
+    --brand-red-soft: rgba(255, 68, 79, 0.12);
+    --brand-teal: #00a79e;
+    --brand-amber: #ff9c13;
+    --border-light: #e4e7ec;
+    --border-dark: #2a2f37;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-pill: 999px;
+    --shadow-sm: 0 2px 8px rgba(17, 19, 22, 0.05);
+    --shadow-md: 0 8px 24px rgba(17, 19, 22, 0.08);
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    line-height: 1.45;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  button, input, select {
+    font-family: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+  }
+
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* Desktop Left Navigation Rail */
+  .desktop-sidebar {
+    display: none;
+    width: 224px;
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-light);
+    flex-direction: column;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 40;
+  }
+
+  .sidebar-brand-top {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-wordmark {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--brand-red);
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav-list {
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sidebar-nav-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.16s ease;
+    text-align: left;
+  }
+
+  .sidebar-nav-btn:hover {
+    background: var(--bg-surface-soft);
+    color: var(--text-primary);
+  }
+
+  .sidebar-nav-btn.active {
+    background: var(--brand-red-soft);
+    color: var(--brand-red);
+  }
+
+  .sidebar-footer {
+    padding: 14px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mode-pill-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-surface-soft);
+    padding: 3px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-light);
+  }
+
+  .mode-pill-btn {
+    padding: 6px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+  }
+
+  .mode-pill-btn.active.demo {
+    background: var(--brand-amber);
+    color: #111316;
+  }
+
+  .mode-pill-btn.active.real {
+    background: var(--brand-red);
+    color: #ffffff;
+  }
+
+  .sidebar-balance-box {
+    background: var(--bg-surface-soft);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar-balance-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .sidebar-balance-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Main Workspace Column */
+  .main-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 84px;
+  }
+
+  /* Top Dark Header matching screenshot layout */
+  .top-dark-header {
+    background: var(--bg-dark);
+    color: var(--text-on-dark);
+    padding: 12px 16px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 35;
+    border-bottom: 1px solid var(--border-dark);
+  }
+
+  .top-header-row {
+    max-width: 1480px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .avatar-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    color: var(--text-on-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+
+  .avatar-btn:hover {
+    background: var(--bg-dark-hover);
+  }
+
+  .icon-circle-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    color: var(--text-on-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.15s ease;
+  }
+
+  .icon-circle-btn:hover {
+    background: var(--bg-dark-hover);
+  }
+
+  .ask-amy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 15px;
+    border-radius: var(--radius-pill);
+    background: var(--bg-dark-elevated);
+    border: 1px solid #343a44;
+    color: var(--text-on-dark);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  .ask-amy-pill:hover {
+    background: var(--bg-dark-hover);
+    border-color: #4a5260;
+  }
+
+  .ask-amy-spark {
+    color: #c084fc;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-red);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-dark);
+  }
+
+  .desktop-header-controls {
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .desktop-acct-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .desktop-acct-chip .bal {
+    color: var(--text-on-dark);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .reset-demo-chip {
+    background: rgba(255, 156, 19, 0.16);
+    color: var(--brand-amber);
+    border: 1px solid rgba(255, 156, 19, 0.35);
+    border-radius: var(--radius-pill);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* Content Container */
+  .view-container {
+    max-width: 1480px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0 24px;
+  }
+
+  .view-section {
+    display: none;
+  }
+
+  .view-section.active {
+    display: block;
+  }
+
+  /* Dark Hero Card (Make your first deposit + red candlesticks chart icon) */
+  .hero-dark-wrapper {
+    background: var(--bg-dark);
+    padding: 6px 14px 20px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+  }
+
+  .hero-dark-card {
+    max-width: 1452px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #16191e 0%, #1d2128 60%, #24181c 100%);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 540px;
+  }
+
+  .hero-title {
+    color: var(--text-on-dark);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-subtitle {
+    color: var(--text-on-dark-muted);
+    font-size: 13px;
+  }
+
+  .hero-carousel-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hero-dot {
+    height: 4px;
+    border-radius: 99px;
+    background: #3d434d;
+    transition: all 0.2s ease;
+  }
+
+  .hero-dot.active {
+    width: 34px;
+    background: var(--brand-teal);
+  }
+
+  .hero-dot:not(.active) {
+    width: 24px;
+  }
+
+  .btn-deposit-red {
+    background: var(--brand-red);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 4px 14px rgba(255, 68, 79, 0.35);
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .btn-deposit-red:hover {
+    background: var(--brand-red-hover);
+  }
+
+  .btn-deposit-red:active {
+    transform: scale(0.98);
+  }
+
+  /* Ways to deposit strip */
+  .ways-strip-wrap {
+    padding: 14px 16px 8px;
+  }
+
+  .ways-strip-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ways-strip-card::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ways-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .way-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-surface-soft);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .way-pill:hover {
+    border-color: #cbd2dc;
+    background: #e8ebef;
+  }
+
+  .way-dusu-tag {
+    font-size: 10px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Section Headings & Cards */
+  .hub-section {
+    padding: 14px 16px 4px;
+  }
+
+  .hub-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .hub-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .hub-section-link {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brand-red);
+  }
+
+  /* My trading accounts (Options & TradingView cards) */
+  .accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .trading-acct-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+    text-align: left;
+  }
+
+  .trading-acct-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: #d0d7e2;
+  }
+
+  .acct-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .acct-badge-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .acct-badge-options {
+    background: linear-gradient(135deg, #ff5862, #e12d39);
+    color: #ffffff;
+  }
+
+  .acct-badge-tv {
+    background: #111316;
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: -0.03em;
+  }
+
+  .acct-badge-cfd {
+    background: #eef2f6;
+    color: var(--text-primary);
+  }
+
+  .acct-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .acct-balance {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .acct-balance span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-left: 2px;
+  }
+
+  /* Dismissible Alert Banner ("ANT has entered the chart") */
+  .alert-banner-dark {
+    background: var(--bg-dark);
+    color: var(--text-on-dark);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .alert-banner-text {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .alert-banner-sub {
+    font-size: 12px;
+    color: var(--text-on-dark-muted);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .alert-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-dark-elevated);
+    color: var(--text-on-dark-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  /* Market Watch & Quick Trade Cards */
+  .markets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .market-tile {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .market-tile-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .market-symbol {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .market-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--bg-surface-soft);
+    color: var(--text-secondary);
+  }
+
+  .market-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .market-price {
+    font-size: 16px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chg-pos {
+    color: var(--brand-teal);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .chg-neg {
+    color: var(--brand-red);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Bottom Navigation Bar (Home, CFDs, Exchange, Options, Portfolio) */
+  .bottom-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 45;
+    box-shadow: 0 -4px 16px rgba(17, 19, 22, 0.05);
+  }
+
+  .bottom-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .bottom-nav-btn.active {
+    color: var(--brand-red);
+  }
+
+  .dxn-badge {
+    border: 1.5px solid currentColor;
+    border-radius: 4px;
+    padding: 0 3px;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  /* Options / TradingView Terminal Workspace */
+  .terminal-shell {
+    background: var(--bg-dark);
+    color: var(--text-on-dark);
+    min-height: calc(100vh - 60px);
+    padding: 14px 16px 28px;
+  }
+
+  .terminal-top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+
+  .symbol-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .dark-select {
+    background: var(--bg-dark);
+    color: var(--text-on-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .live-spot-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live-spot-price {
+    font-size: 17px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tf-pill-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-dark);
+    padding: 3px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-dark);
+  }
+
+  .tf-btn {
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-on-dark-muted);
+  }
+
+  .tf-btn.active {
+    background: var(--bg-dark-elevated);
+    color: var(--text-on-dark);
+  }
+
+  .terminal-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .chart-panel {
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dark);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chart-type-pills {
+    display: flex;
+    gap: 6px;
+  }
+
+  .chart-type-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-on-dark-muted);
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+  }
+
+  .chart-type-btn.active {
+    color: #ffffff;
+    border-color: var(--brand-red);
+    background: rgba(255, 68, 79, 0.16);
+  }
+
+  #tvChartContainer {
+    width: 100%;
+    height: 410px;
+  }
+
+  .order-ticket-panel {
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .contract-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    background: var(--bg-dark);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-dark);
+  }
+
+  .contract-tab-btn {
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-on-dark-muted);
+  }
+
+  .contract-tab-btn.active {
+    background: var(--bg-dark-elevated);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  .ticket-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ticket-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-on-dark-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .ticket-input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+  }
+
+  .ticket-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-on-dark);
+    font-size: 15px;
+    font-weight: 800;
+    padding: 10px 6px;
+    outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .digit-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .digit-btn {
+    padding: 8px 0;
+    border-radius: var(--radius-sm);
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    color: var(--text-on-dark);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .digit-btn.selected {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #ffffff;
+  }
+
+  .digit-hist-bar {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    align-items: end;
+    height: 36px;
+    background: var(--bg-dark);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-dark);
+  }
+
+  .digit-hist-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 2px;
+  }
+
+  .digit-hist-fill {
+    width: 100%;
+    border-radius: 2px;
+    background: var(--brand-teal);
+    min-height: 3px;
+  }
+
+  .digit-hist-lbl {
+    font-size: 9px;
+    color: var(--text-on-dark-muted);
+    font-weight: 700;
+  }
+
+  .trade-cta-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-trade-up {
+    background: var(--brand-teal);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 12px 10px;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .btn-trade-down {
+    background: var(--brand-red);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 12px 10px;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .btn-trade-up:disabled,
+  .btn-trade-down:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .payout-summary-box {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+  }
+
+  .payout-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .contracts-table-wrap {
+    margin-top: 14px;
+    background: var(--bg-dark-elevated);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    overflow-x: auto;
+  }
+
+  table.deriv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  table.deriv-table th,
+  table.deriv-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-dark);
+    white-space: nowrap;
+  }
+
+  .light-table-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+  }
+
+  .light-table-card table.deriv-table th,
+  .light-table-card table.deriv-table td {
+    border-bottom-color: var(--border-light);
+    color: var(--text-primary);
+  }
+
+  /* Modal & Drawer */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 19, 22, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 80;
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .modal-input {
+    width: 100%;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-surface-soft);
+  }
+
+  .toast-banner {
+    position: fixed;
+    bottom: 76px;
+    right: 16px;
+    background: var(--bg-dark);
+    color: #ffffff;
+    border: 1px solid #353b45;
+    padding: 11px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    z-index: 95;
+    display: none;
+  }
+
+  .toast-banner.show {
+    display: block;
+  }
+
+  @media (min-width: 960px) {
+    .desktop-sidebar {
+      display: flex;
+    }
+
+    .bottom-nav-bar {
+      display: none;
+    }
+
+    .main-column {
+      padding-bottom: 24px;
+    }
+
+    .desktop-header-controls {
+      display: flex;
+    }
+
+    .hero-title {
+      font-size: 32px;
+    }
+
+    .accounts-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .toast-banner {
+      bottom: 24px;
+    }
+  }
+
+  @media (max-width: 959px) {
+    .terminal-main-grid {
+      grid-template-columns: 1fr;
+    }
+
+    #tvChartContainer {
+      height: 310px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- PC / Desktop Left Navigation Rail -->
+  <aside class="desktop-sidebar">
+    <div>
+      <div class="sidebar-brand-top">
+        <div class="brand-lockup">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <rect width="28" height="28" rx="7" fill="#FF444F"/>
+            <path d="M18.6 6.5V13.1C17.4 11.9 15.8 11.3 14 11.3C10.3 11.3 7.5 14.1 7.5 17.8C7.5 21.5 10.3 24.3 14 24.3C17.8 24.3 20.5 21.5 20.5 17.7V6.5H18.6ZM14.2 22.1C11.7 22.1 9.8 20.2 9.8 17.8C9.8 15.4 11.7 13.5 14.2 13.5C16.7 13.5 18.6 15.4 18.6 17.8C18.6 20.2 16.7 22.1 14.2 22.1Z" fill="#FFFFFF"/>
+          </svg>
+          <span class="brand-wordmark">DERIV</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav-list" aria-label="Main navigation">
+        <button class="sidebar-nav-btn active" data-nav="home" onclick="switchTab('home')">
+          <span>🏠</span>
+          <span>Home</span>
+        </button>
+        <button class="sidebar-nav-btn" data-nav="cfds" onclick="switchTab('cfds')">
+          <span>📊</span>
+          <span>CFDs</span>
+        </button>
+        <button class="sidebar-nav-btn" data-nav="exchange" onclick="switchTab('exchange')">
+          <span class="dxn-badge">DXN</span>
+          <span>Exchange</span>
+        </button>
+        <button class="sidebar-nav-btn" data-nav="options" onclick="switchTab('options')">
+          <span>⚡</span>
+          <span>Options &amp; TV</span>
+        </button>
+        <button class="sidebar-nav-btn" data-nav="portfolio" onclick="switchTab('portfolio')">
+          <span>💼</span>
+          <span>Portfolio</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="mode-pill-row">
+        <button id="sideDemoBtn" class="mode-pill-btn active demo" onclick="setAccountMode('demo')">Demo</button>
+        <button id="sideRealBtn" class="mode-pill-btn real" onclick="setAccountMode('real')">Real</button>
+      </div>
+      <div class="sidebar-balance-box">
+        <div>
+          <div class="sidebar-balance-label" id="sideModeLabel">Demo Balance</div>
+          <div class="sidebar-balance-val" id="sideBalanceVal">10,000.00 USD</div>
+        </div>
+        <button id="sideResetBtn" class="reset-demo-chip" onclick="resetDemoBalance()">Reset</button>
+      </div>
+      <button class="btn-deposit-red" style="width:100%;padding:9px 14px;font-size:13px;" onclick="openModal('cashier')">
+        Cashier / Deposit
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area (Mobile + PC Responsive) -->
+  <div class="main-column">
+    <!-- Top Dark Bar: Initials (SK) on left, Search, Ask Amy, Eye, Notification Bell -->
+    <header class="top-dark-header">
+      <div class="top-header-row">
+        <div class="header-left-group">
+          <button class="avatar-btn" title="Profile &amp; Settings" onclick="openModal('profile')">SK</button>
+          <button class="icon-circle-btn" title="Search markets &amp; tools" onclick="openModal('search')" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <button class="ask-amy-pill" onclick="openModal('amy')">
+            <span class="ask-amy-spark">✦</span>
+            <span>Ask Amy</span>
+          </button>
+        </div>
+
+        <div class="desktop-header-controls">
+          <div class="mode-pill-row" style="background:#111316;border-color:#2a2f37;">
+            <button id="topDemoBtn" class="mode-pill-btn active demo" onclick="setAccountMode('demo')">Demo</button>
+            <button id="topRealBtn" class="mode-pill-btn real" onclick="setAccountMode('real')">Real</button>
+          </div>
+          <div class="desktop-acct-chip">
+            <span id="topBalanceText">10,000.00 USD</span>
+            <button id="topResetBtn" class="reset-demo-chip" onclick="resetDemoBalance()">Reset</button>
+          </div>
+        </div>
+
+        <div class="header-right-group">
+          <button class="icon-circle-btn" title="Toggle balance visibility" onclick="toggleBalancePrivacy()" aria-label="Toggle privacy">
+            <svg id="eyeIconSvg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+          <button class="icon-circle-btn" title="Notifications" onclick="openModal('notifications')" aria-label="Notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notif-badge" id="notifCountBadge">15</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="view-container">
+      <!-- HOME VIEW -->
+      <section id="view-home" class="view-section active">
+        <div class="hero-dark-wrapper">
+          <div class="hero-dark-card">
+            <div class="hero-copy">
+              <h1 class="hero-title" id="heroTitleText">Make your first deposit</h1>
+              <p class="hero-subtitle" id="heroSubText">Fund your DERIV account via Mobile Money, bank transfer, or crypto and trade Options, CFDs, and TradingView markets.</p>
+              <div class="hero-carousel-dots">
+                <span class="hero-dot active" id="dot0" onclick="setHeroSlide(0)"></span>
+                <span class="hero-dot" id="dot1" onclick="setHeroSlide(1)"></span>
+                <span class="hero-dot" id="dot2" onclick="setHeroSlide(2)"></span>
+              </div>
+              <button class="btn-deposit-red" onclick="openModal('cashier')">Deposit now</button>
+            </div>
+
+            <!-- Red 3D Candlesticks Chart Graphic matching screenshot -->
+            <div aria-hidden="true" style="flex-shrink:0;">
+              <svg width="128" height="108" viewBox="0 0 128 108" fill="none">
+                <path d="M22 18V82C22 85.3 24.7 88 28 88H106" stroke="#8C95A0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Candle 1 -->
+                <line x1="46" y1="22" x2="46" y2="72" stroke="#FF444F" stroke-width="4" stroke-linecap="round"/>
+                <rect x="37" y="31" width="18" height="31" rx="5" fill="#FF444F"/>
+                <!-- Candle 2 -->
+                <line x1="71" y1="16" x2="71" y2="66" stroke="#FF444F" stroke-width="4" stroke-linecap="round"/>
+                <rect x="62" y="25" width="18" height="31" rx="5" fill="#FF5C66"/>
+                <!-- Candle 3 -->
+                <line x1="96" y1="28" x2="96" y2="76" stroke="#FF444F" stroke-width="4" stroke-linecap="round"/>
+                <rect x="87" y="36" width="18" height="31" rx="5" fill="#FF444F"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ways to deposit strip -->
+        <div class="ways-strip-wrap">
+          <div class="ways-strip-card">
+            <span class="ways-label">Ways to deposit</span>
+            <button class="way-pill" onclick="openModal('cashier', 'Mobile Money')">
+              <span class="way-dusu-tag">DusuPay</span>
+              <span>Mobile Money</span>
+            </button>
+            <button class="way-pill" onclick="openModal('cashier', 'Bank Transfer')">
+              <span>🏦 Bank</span>
+            </button>
+            <button class="way-pill" onclick="openModal('cashier', 'Crypto / USDT')">
+              <span>₮ Crypto</span>
+            </button>
+            <button class="way-pill" onclick="openModal('cashier', 'Card')">
+              <span>💳 Card</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- My trading accounts -->
+        <div class="hub-section">
+          <div class="hub-section-header">
+            <h2 class="hub-section-title">My trading accounts</h2>
+            <button class="hub-section-link" onclick="switchTab('options')">Open Terminal →</button>
+          </div>
+          <div class="accounts-grid">
+            <button class="trading-acct-card" onclick="switchTab('options')">
+              <div class="acct-card-top">
+                <div class="acct-badge-icon acct-badge-options" aria-hidden="true">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="14" y1="10" x2="21" y2="3"></line>
+                    <polyline points="9 21 3 21 3 15"></polyline>
+                    <line x1="10" y1="14" x2="3" y2="21"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="acct-title">Options</div>
+              <div class="acct-balance" id="acctOptionsBal">0.00 <span>USD</span></div>
+            </button>
+
+            <button class="trading-acct-card" onclick="switchTab('options')">
+              <div class="acct-card-top">
+                <div class="acct-badge-icon acct-badge-tv" aria-hidden="true">TV</div>
+              </div>
+              <div class="acct-title">TradingView</div>
+              <div class="acct-balance" id="acctTvBal">0.00 <span>USD</span></div>
+            </button>
+
+            <button class="trading-acct-card" onclick="switchTab('cfds')">
+              <div class="acct-card-top">
+                <div class="acct-badge-icon acct-badge-cfd" aria-hidden="true">📈</div>
+              </div>
+              <div class="acct-title">Deriv MT5 / CFDs</div>
+              <div class="acct-balance" id="acctCfdBal">0.00 <span>USD</span></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dismissible alert banner ("ANT has entered the chart") -->
+        <div class="hub-section" id="antAlertSection">
+          <div class="alert-banner-dark">
+            <div onclick="switchTab('options')" style="cursor:pointer;">
+              <div class="alert-banner-text">ANT has entered the chart</div>
+              <div class="alert-banner-sub">Volatility 100 Index • Tap to launch live TradingView binary chart</div>
+            </div>
+            <button class="alert-close-btn" onclick="dismissAntAlert()" aria-label="Dismiss alert">✕</button>
+          </div>
+        </div>
+
+        <!-- Live Market Watch -->
+        <div class="hub-section">
+          <div class="hub-section-header">
+            <h2 class="hub-section-title">Live markets</h2>
+            <button class="hub-section-link" onclick="switchTab('options')">Trade all →</button>
+          </div>
+          <div class="markets-grid" id="homeMarketsGrid"></div>
+        </div>
+      </section>
+
+      <!-- OPTIONS & TRADINGVIEW TERMINAL VIEW -->
+      <section id="view-options" class="view-section">
+        <div class="terminal-shell">
+          <div class="terminal-top-bar">
+            <div class="symbol-picker-group">
+              <select id="symbolSelect" class="dark-select" onchange="changeSymbol(this.value)">
+                <option value="R_100">Volatility 100 Index (R_100)</option>
+                <option value="R_50">Volatility 50 Index (R_50)</option>
+                <option value="R_25">Volatility 25 Index (R_25)</option>
+                <option value="BOOM1000">Boom 1000 Index</option>
+                <option value="CRASH1000">Crash 1000 Index</option>
+                <option value="EURUSD">EUR/USD</option>
+              </select>
+              <div class="live-spot-box">
+                <span class="live-spot-price" id="terminalSpotPrice">1,245.68</span>
+                <span id="terminalSpotChange" class="chg-pos">+0.42%</span>
+                <span style="font-size:11px;color:var(--text-on-dark-muted);">Last digit: <strong id="terminalLastDigit" style="color:#fff;">8</strong></span>
+              </div>
+            </div>
+
+            <div class="tf-pill-group">
+              <button class="tf-btn active" data-tf="1m" onclick="changeTimeframe('1m')">1m</button>
+              <button class="tf-btn" data-tf="5m" onclick="changeTimeframe('5m')">5m</button>
+              <button class="tf-btn" data-tf="15m" onclick="changeTimeframe('15m')">15m</button>
+              <button class="tf-btn" data-tf="1h" onclick="changeTimeframe('1h')">1h</button>
+            </div>
+          </div>
+
+          <div class="terminal-main-grid">
+            <div class="chart-panel">
+              <div class="chart-toolbar">
+                <div class="chart-type-pills">
+                  <button class="chart-type-btn active" data-ctype="candlestick" onclick="setChartSeriesType('candlestick')">Candlestick</button>
+                  <button class="chart-type-btn" data-ctype="area" onclick="setChartSeriesType('area')">Area</button>
+                  <button class="chart-type-btn" data-ctype="line" onclick="setChartSeriesType('line')">Line</button>
+                </div>
+                <div style="font-size:12px;color:var(--text-on-dark-muted);">
+                  TradingView Lightweight Charts • Live Tick Stream
+                </div>
+              </div>
+              <div id="tvChartContainer"></div>
+            </div>
+
+            <aside class="order-ticket-panel">
+              <div class="contract-tabs">
+                <button class="contract-tab-btn active" data-ctype="rise_fall" onclick="setContractType('rise_fall')">Rise / Fall</button>
+                <button class="contract-tab-btn" data-ctype="higher_lower" onclick="setContractType('higher_lower')">Higher / Lower</button>
+                <button class="contract-tab-btn" data-ctype="touch_no_touch" onclick="setContractType('touch_no_touch')">Touch / No Touch</button>
+                <button class="contract-tab-btn" data-ctype="over_under" onclick="setContractType('over_under')">Over / Under</button>
+              </div>
+
+              <div class="ticket-field">
+                <label class="ticket-label">
+                  <span>Duration (Ticks)</span>
+                  <span id="expiryDisplayLbl">5 ticks (~5s)</span>
+                </label>
+                <select id="durationSelect" class="dark-select" onchange="updateOrderTicketSummary()">
+                  <option value="5">5 Ticks</option>
+                  <option value="10">10 Ticks</option>
+                  <option value="15">15 Ticks</option>
+                  <option value="20">20 Ticks</option>
+                </select>
+              </div>
+
+              <div class="ticket-field" id="barrierFieldWrap" style="display:none;">
+                <label class="ticket-label">
+                  <span>Barrier Offset</span>
+                  <span id="barrierValLbl">+0.45</span>
+                </label>
+                <input type="number" step="0.05" id="barrierOffsetInput" class="dark-select" value="0.45" oninput="updateOrderTicketSummary()" />
+              </div>
+
+              <div class="ticket-field" id="digitFieldWrap" style="display:none;">
+                <label class="ticket-label">
+                  <span>Prediction Digit (0–9)</span>
+                  <span id="selectedDigitLbl">Selected: 5</span>
+                </label>
+                <div class="digit-grid" id="digitGrid"></div>
+                <div class="ticket-label" style="margin-top:4px;">
+                  <span>Last 25 ticks digit distribution</span>
+                </div>
+                <div class="digit-hist-bar" id="digitHistBar"></div>
+              </div>
+
+              <div class="ticket-field">
+                <label class="ticket-label">
+                  <span>Stake (USD)</span>
+                  <span>Min $1.00</span>
+                </label>
+                <div class="ticket-input-wrap">
+                  <span style="color:var(--text-on-dark-muted);font-weight:700;">$</span>
+                  <input type="number" id="stakeInput" class="ticket-input" value="10.00" min="1" step="1" oninput="updateOrderTicketSummary()" />
+                </div>
+              </div>
+
+              <div class="payout-summary-box">
+                <div class="payout-row">
+                  <span style="color:var(--text-on-dark-muted);">Payout Rate</span>
+                  <strong id="payoutRateText" style="color:var(--brand-teal);">95.4%</strong>
+                </div>
+                <div class="payout-row">
+                  <span style="color:var(--text-on-dark-muted);">Est. Payout</span>
+                  <strong id="estPayoutText">$19.54</strong>
+                </div>
+                <div class="payout-row">
+                  <span style="color:var(--text-on-dark-muted);">Est. Profit</span>
+                  <strong id="estProfitText" style="color:var(--brand-teal);">+$9.54</strong>
+                </div>
+              </div>
+
+              <div class="trade-cta-pair">
+                <button id="buyUpBtn" class="btn-trade-up" onclick="placeBinaryContract('up')">
+                  <span id="upBtnTitle">Rise</span>
+                  <span id="upBtnSub" style="font-size:11px;opacity:0.9;">95.4%</span>
+                </button>
+                <button id="buyDownBtn" class="btn-trade-down" onclick="placeBinaryContract('down')">
+                  <span id="downBtnTitle">Fall</span>
+                  <span id="downBtnSub" style="font-size:11px;opacity:0.9;">95.4%</span>
+                </button>
+              </div>
+            </aside>
+          </div>
+
+          <div class="contracts-table-wrap">
+            <h3 style="font-size:15px;font-weight:800;margin-bottom:10px;">Active &amp; Recent Binary Contracts</h3>
+            <table class="deriv-table">
+              <thead>
+                <tr>
+                  <th>Market</th>
+                  <th>Contract</th>
+                  <th>Stake</th>
+                  <th>Entry</th>
+                  <th>Ticks Left</th>
+                  <th>Est. Payout / Result</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="contractsTableBody">
+                <tr>
+                  <td colspan="7" style="color:var(--text-on-dark-muted);text-align:center;">No binary contracts placed yet. Choose Rise/Fall, Higher/Lower, Touch/No Touch, or Over/Under above.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CFDS VIEW -->
+      <section id="view-cfds" class="view-section">
+        <div class="hub-section">
+          <div class="hub-section-header">
+            <h2 class="hub-section-title">CFDs &amp; Synthetic Indices</h2>
+          </div>
+          <div class="accounts-grid">
+            <div class="trading-acct-card">
+              <div class="acct-title">Derived Standard</div>
+              <p style="font-size:12px;color:var(--text-secondary);">24/7 synthetic indices, tight spreads, up to 1:1000 leverage.</p>
+              <div class="acct-balance" id="cfdStdBal">0.00 <span>USD</span></div>
+              <button class="btn-deposit-red" style="padding:8px 14px;font-size:12px;" onclick="openModal('cashier')">Transfer Funds</button>
+            </div>
+            <div class="trading-acct-card">
+              <div class="acct-title">Financial STP</div>
+              <p style="font-size:12px;color:var(--text-secondary);">Major &amp; minor forex pairs, commodities, and global stock indices.</p>
+              <div class="acct-balance">0.00 <span>USD</span></div>
+              <button class="btn-deposit-red" style="padding:8px 14px;font-size:12px;" onclick="openModal('cashier')">Transfer Funds</button>
+            </div>
+            <div class="trading-acct-card">
+              <div class="acct-title">Swap-Free</div>
+              <p style="font-size:12px;color:var(--text-secondary);">Overnight swap-free trading across eligible currency and synthetic pairs.</p>
+              <div class="acct-balance">0.00 <span>USD</span></div>
+              <button class="btn-deposit-red" style="padding:8px 14px;font-size:12px;" onclick="openModal('cashier')">Transfer Funds</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXCHANGE VIEW -->
+      <section id="view-exchange" class="view-section">
+        <div class="hub-section">
+          <div class="hub-section-header">
+            <h2 class="hub-section-title">DXN Spot Exchange</h2>
+          </div>
+          <div class="light-table-card">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Instant spot conversion and order book preview for supported pairs.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+              <select id="dxnPairSelect" class="modal-input" style="max-width:180px;">
+                <option value="BTC/USD">BTC / USD</option>
+                <option value="ETH/USD">ETH / USD</option>
+                <option value="USDT/USD">USDT / USD</option>
+              </select>
+              <input type="number" id="dxnAmountInput" class="modal-input" style="max-width:180px;" value="100" min="1" />
+              <button class="btn-deposit-red" onclick="executeDxnSwap()">Instant Convert</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO VIEW -->
+      <section id="view-portfolio" class="view-section">
+        <div class="hub-section">
+          <div class="hub-section-header">
+            <h2 class="hub-section-title">Portfolio &amp; Statement</h2>
+            <button class="btn-deposit-red" style="padding:8px 16px;font-size:12px;" onclick="openModal('cashier')">Deposit / Withdraw</button>
+          </div>
+          <div class="light-table-card" style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+              <div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:700;">ACTIVE WALLET BALANCE</div>
+                <div id="portfolioBalanceBig" style="font-size:24px;font-weight:900;margin-top:2px;">10,000.00 USD</div>
+              </div>
+              <div style="display:flex;gap:16px;">
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);font-weight:700;">SETTLED TRADES</div>
+                  <div id="portfolioTradeCount" style="font-size:16px;font-weight:800;">0</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);font-weight:700;">NET P&amp;L</div>
+                  <div id="portfolioNetPnl" style="font-size:16px;font-weight:800;color:var(--brand-teal);">$0.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="light-table-card">
+            <h3 style="font-size:15px;font-weight:800;margin-bottom:10px;">Statement History</h3>
+            <table class="deriv-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Type</th>
+                  <th>Details</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="statementTableBody">
+                <tr>
+                  <td colspan="4" style="color:var(--text-muted);text-align:center;">No transactions or settled trades yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar (Home, CFDs, Exchange, Options, Portfolio) -->
+<nav class="bottom-nav-bar" aria-label="Bottom navigation">
+  <button class="bottom-nav-btn active" data-nav="home" onclick="switchTab('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z"/>
+    </svg>
+    <span>Home</span>
+  </button>
+  <button class="bottom-nav-btn" data-nav="cfds" onclick="switchTab('cfds')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="7" y1="4" x2="7" y2="20"></line>
+      <rect x="4.5" y="7" width="5" height="9" rx="1" fill="currentColor" fill-opacity="0.2"></rect>
+      <line x1="17" y1="4" x2="17" y2="20"></line>
+      <rect x="14.5" y="8" width="5" height="8" rx="1" fill="currentColor" fill-opacity="0.2"></rect>
+    </svg>
+    <span>CFDs</span>
+  </button>
+  <button class="bottom-nav-btn" data-nav="exchange" onclick="switchTab('exchange')">
+    <span class="dxn-badge">DXN</span>
+    <span>Exchange</span>
+  </button>
+  <button class="bottom-nav-btn" data-nav="options" onclick="switchTab('options')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 3 21 3 21 9"></polyline>
+      <line x1="14" y1="10" x2="21" y2="3"></line>
+      <polyline points="9 21 3 21 3 15"></polyline>
+      <line x1="10" y1="14" x2="3" y2="21"></line>
+    </svg>
+    <span>Options</span>
+  </button>
+  <button class="bottom-nav-btn" data-nav="portfolio" onclick="switchTab('portfolio')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="6" width="20" height="14" rx="2"></rect>
+      <path d="M16 13h2"></path>
+      <path d="M2 10h20"></path>
+    </svg>
+    <span>Portfolio</span>
+  </button>
+</nav>
+
+<!-- Modal Dialog -->
+<div id="modalBackdrop" class="modal-backdrop" onclick="handleBackdropClick(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Cashier</h3>
+      <button onclick="closeModal()" style="font-size:18px;font-weight:700;color:var(--text-secondary);">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastBanner" class="toast-banner"></div>
+
+<script>
+  const state = {
+    activeTab: 'home',
+    accountMode: 'demo',
+    balances: { demo: 10000.00, real: 0.00 },
+    hideBalances: false,
+    antDismissed: false,
+    heroIndex: 0,
+    symbol: 'R_100',
+    timeframe: '1m',
+    chartSeriesType: 'candlestick',
+    contractType: 'rise_fall',
+    selectedDigit: 5,
+    lastDigits: [8, 3, 6, 1, 9, 4, 7, 2, 5, 8, 0, 6, 4, 9, 2, 7, 5, 3, 1, 8, 6, 4, 2, 7, 8],
+    contracts: [],
+    statements: [],
+    netPnl: 0,
+    markets: {
+      R_100: { name: 'Volatility 100 Index', tag: 'Synthetic', price: 1245.68, prev: 1240.40, step: 0.55 },
+      R_50: { name: 'Volatility 50 Index', tag: 'Synthetic', price: 418.24, prev: 416.90, step: 0.25 },
+      R_25: { name: 'Volatility 25 Index', tag: 'Synthetic', price: 892.15, prev: 894.00, step: 0.18 },
+      BOOM1000: { name: 'Boom 1000 Index', tag: 'Boom/Crash', price: 3412.80, prev: 3398.10, step: 1.4 },
+      CRASH1000: { name: 'Crash 1000 Index', tag: 'Boom/Crash', price: 2190.45, prev: 2204.20, step: 1.2 },
+      EURUSD: { name: 'EUR / USD', tag: 'Forex', price: 1.08420, prev: 1.08210, step: 0.00025 }
+    }
+  };
+
+  let tvChart = null;
+  let mainSeries = null;
+  let currentCandle = null;
+
+  function showToast(msg) {
+    const el = document.getElementById('toastBanner');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  function formatMoney(val) {
+    if (state.hideBalances) return '•••••• USD';
+    return `${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+  }
+
+  function formatPrice(sym, val) {
+    return sym === 'EURUSD' ? Number(val).toFixed(5) : Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function refreshAllBalances() {
+    const activeBal = state.balances[state.accountMode];
+    const formatted = formatMoney(activeBal);
+    const shortFormatted = state.hideBalances ? '••••••' : Number(activeBal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    document.getElementById('topBalanceText').textContent = formatted;
+    document.getElementById('sideBalanceVal').textContent = formatted;
+    document.getElementById('sideModeLabel').textContent = `${state.accountMode.toUpperCase()} Balance`;
+    document.getElementById('portfolioBalanceBig').textContent = formatted;
+
+    document.getElementById('acctOptionsBal').innerHTML = `${shortFormatted} <span>USD</span>`;
+    document.getElementById('acctTvBal').innerHTML = `${shortFormatted} <span>USD</span>`;
+    document.getElementById('acctCfdBal').innerHTML = `${shortFormatted} <span>USD</span>`;
+    document.getElementById('cfdStdBal').innerHTML = `${shortFormatted} <span>USD</span>`;
+
+    const isDemo = state.accountMode === 'demo';
+    document.getElementById('topDemoBtn').classList.toggle('active', isDemo);
+    document.getElementById('topRealBtn').classList.toggle('active', !isDemo);
+    document.getElementById('sideDemoBtn').classList.toggle('active', isDemo);
+    document.getElementById('sideRealBtn').classList.toggle('active', !isDemo);
+    document.getElementById('topResetBtn').style.display = isDemo ? 'inline-block' : 'none';
+    document.getElementById('sideResetBtn').style.display = isDemo ? 'inline-block' : 'none';
+  }
+
+  function setAccountMode(mode) {
+    state.accountMode = mode;
+    refreshAllBalances();
+    showToast(`Switched to ${mode.toUpperCase()} account`);
+  }
+
+  function resetDemoBalance() {
+    state.balances.demo = 10000.00;
+    refreshAllBalances();
+    showToast('Demo balance reset to 10,000.00 USD');
+  }
+
+  function toggleBalancePrivacy() {
+    state.hideBalances = !state.hideBalances;
+    refreshAllBalances();
+  }
+
+  function setHeroSlide(idx) {
+    state.heroIndex = idx;
+    const slides = [
+      { title: 'Make your first deposit', sub: 'Fund your DERIV account via Mobile Money, bank transfer, or crypto and trade Options, CFDs, and TradingView markets.' },
+      { title: 'Binary & Digital Options', sub: 'Trade Rise/Fall, Higher/Lower, Touch/No Touch, and Over/Under contracts on live synthetic indices.' },
+      { title: 'TradingView charts built in', sub: 'Analyze candlestick action, timeframes, and real-time tick digits directly inside DERIV.' }
+    ];
+    document.getElementById('heroTitleText').textContent = slides[idx].title;
+    document.getElementById('heroSubText').textContent = slides[idx].sub;
+    [0, 1, 2].forEach(i => document.getElementById(`dot${i}`).classList.toggle('active', i === idx));
+  }
+
+  function dismissAntAlert() {
+    state.antDismissed = true;
+    document.getElementById('antAlertSection').style.display = 'none';
+  }
+
+  function switchTab(tab) {
+    state.activeTab = tab;
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    const target = document.getElementById(`view-${tab}`);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.sidebar-nav-btn, .bottom-nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.nav === tab);
+    });
+
+    if (tab === 'options') {
+      ensureChartInitialized();
+      resizeTvChart();
+      renderDigitUI();
+      updateOrderTicketSummary();
+    }
+  }
+
+  function renderHomeMarkets() {
+    const grid = document.getElementById('homeMarketsGrid');
+    grid.innerHTML = Object.entries(state.markets).map(([sym, m]) => {
+      const pct = (((m.price - m.prev) / m.prev) * 100).toFixed(2);
+      const pos = Number(pct) >= 0;
+      return `
+        <div class="market-tile" onclick="changeSymbol('${sym}'); switchTab('options');" style="cursor:pointer;">
+          <div class="market-tile-top">
+            <span class="market-symbol">${sym}</span>
+            <span class="market-tag">${m.tag}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">${m.name}</div>
+          <div class="market-price-row">
+            <span class="market-price">${formatPrice(sym, m.price)}</span>
+            <span class="${pos ? 'chg-pos' : 'chg-neg'}">${pos ? '+' : ''}${pct}%</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function ensureChartInitialized() {
+    const container = document.getElementById('tvChartContainer');
+    if (!container || tvChart || typeof LightweightCharts === 'undefined') return;
+
+    tvChart = LightweightCharts.createChart(container, {
+      width: container.clientWidth || 680,
+      height: container.clientHeight || 410,
+      layout: {
+        background: { type: 'solid', color: '#1c1f24' },
+        textColor: '#a3abb6',
+      },
+      grid: {
+        vertLines: { color: '#272c34' },
+        horzLines: { color: '#272c34' },
+      },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      rightPriceScale: { borderColor: '#2a2f37' },
+      timeScale: { borderColor: '#2a2f37', timeVisible: true, secondsVisible: true },
+    });
+
+    createMainSeries();
+    seedInitialCandles();
+  }
+
+  function createMainSeries() {
+    if (!tvChart) return;
+    if (mainSeries) {
+      tvChart.removeSeries(mainSeries);
+      mainSeries = null;
+    }
+    if (state.chartSeriesType === 'area') {
+      mainSeries = tvChart.addAreaSeries({
+        lineColor: '#FF444F',
+        topColor: 'rgba(255, 68, 79, 0.35)',
+        bottomColor: 'rgba(255, 68, 79, 0.02)',
+        lineWidth: 2,
+      });
+    } else if (state.chartSeriesType === 'line') {
+      mainSeries = tvChart.addLineSeries({ color: '#00A79E', lineWidth: 2 });
+    } else {
+      mainSeries = tvChart.addCandlestickSeries({
+        upColor: '#00A79E',
+        downColor: '#FF444F',
+        borderUpColor: '#00A79E',
+        borderDownColor: '#FF444F',
+        wickUpColor: '#00A79E',
+        wickDownColor: '#FF444F',
+      });
+    }
+  }
+
+  function seedInitialCandles() {
+    if (!mainSeries) return;
+    const m = state.markets[state.symbol];
+    const nowSec = Math.floor(Date.now() / 1000);
+    const data = [];
+    let price = m.price * 0.996;
+    for (let i = 60; i >= 1; i--) {
+      const t = nowSec - i * 60;
+      const open = price;
+      const delta = (Math.random() - 0.48) * m.step * 3;
+      const close = Math.max(0.0001, open + delta);
+      const high = Math.max(open, close) + Math.random() * m.step * 1.4;
+      const low = Math.min(open, close) - Math.random() * m.step * 1.4;
+      price = close;
+      data.push({ time: t, open, high, low, close, value: close });
+    }
+    m.price = price;
+    currentCandle = { ...data[data.length - 1], time: nowSec };
+    if (state.chartSeriesType === 'candlestick') {
+      mainSeries.setData(data.map(({ time, open, high, low, close }) => ({ time, open, high, low, close })));
+    } else {
+      mainSeries.setData(data.map(({ time, close }) => ({ time, value: close })));
+    }
+  }
+
+  function resizeTvChart() {
+    if (!tvChart) return;
+    const container = document.getElementById('tvChartContainer');
+    if (container && container.clientWidth > 0) {
+      tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight || 410 });
+    }
+  }
+
+  function setChartSeriesType(type) {
+    state.chartSeriesType = type;
+    document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.toggle('active', b.dataset.ctype === type));
+    createMainSeries();
+    seedInitialCandles();
+  }
+
+  function changeSymbol(sym) {
+    state.symbol = sym;
+    const sel = document.getElementById('symbolSelect');
+    if (sel) sel.value = sym;
+    seedInitialCandles();
+    updateSpotHeader();
+  }
+
+  function changeTimeframe(tf) {
+    state.timeframe = tf;
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.toggle('active', b.dataset.tf === tf));
+    seedInitialCandles();
+    showToast(`Timeframe set to ${tf}`);
+  }
+
+  function setContractType(ctype) {
+    state.contractType = ctype;
+    document.querySelectorAll('.contract-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.ctype === ctype));
+    document.getElementById('barrierFieldWrap').style.display =
+      (ctype === 'higher_lower' || ctype === 'touch_no_touch') ? 'flex' : 'none';
+    document.getElementById('digitFieldWrap').style.display =
+      ctype === 'over_under' ? 'flex' : 'none';
+    renderDigitUI();
+    updateOrderTicketSummary();
+  }
+
+  function selectPredictionDigit(d) {
+    state.selectedDigit = d;
+    renderDigitUI();
+    updateOrderTicketSummary();
+  }
+
+  function renderDigitUI() {
+    const grid = document.getElementById('digitGrid');
+    if (grid) {
+      grid.innerHTML = Array.from({ length: 10 }, (_, d) => `
+        <button class="digit-btn ${state.selectedDigit === d ? 'selected' : ''}" onclick="selectPredictionDigit(${d})">${d}</button>
+      `).join('');
+    }
+    const lbl = document.getElementById('selectedDigitLbl');
+    if (lbl) lbl.textContent = `Selected: ${state.selectedDigit}`;
+
+    const hist = document.getElementById('digitHistBar');
+    if (hist) {
+      const counts = Array(10).fill(0);
+      state.lastDigits.forEach(d => counts[d]++);
+      const maxC = Math.max(1, ...counts);
+      hist.innerHTML = counts.map((c, d) => {
+        const pct = Math.max(10, Math.round((c / maxC) * 100));
+        return `
+          <div class="digit-hist-col" title="Digit ${d}: ${c} ticks">
+            <div class="digit-hist-fill" style="height:${pct}%;"></div>
+            <span class="digit-hist-lbl">${d}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function getContractPayoutRate(side) {
+    if (state.contractType === 'over_under') {
+      const d = state.selectedDigit;
+      const winCount = side === 'up' ? (9 - d) : d;
+      if (winCount <= 0) return null;
+      return Math.min(960, Math.round((9.4 / winCount) * 100)) / 10;
+    }
+    if (state.contractType === 'touch_no_touch') return 112.0;
+    if (state.contractType === 'higher_lower') return 98.5;
+    return 95.4;
+  }
+
+  function updateOrderTicketSummary() {
+    const stake = Math.max(1, Number(document.getElementById('stakeInput')?.value || 10));
+    const dur = Number(document.getElementById('durationSelect')?.value || 5);
+    document.getElementById('expiryDisplayLbl').textContent = `${dur} ticks (~${dur}s)`;
+
+    const offset = Number(document.getElementById('barrierOffsetInput')?.value || 0.45);
+    document.getElementById('barrierValLbl').textContent = `${offset >= 0 ? '+' : ''}${offset.toFixed(2)}`;
+
+    let upTitle = 'Rise';
+    let downTitle = 'Fall';
+    if (state.contractType === 'higher_lower') {
+      upTitle = 'Higher';
+      downTitle = 'Lower';
+    } else if (state.contractType === 'touch_no_touch') {
+      upTitle = 'Touch';
+      downTitle = 'No Touch';
+    } else if (state.contractType === 'over_under') {
+      upTitle = `Over ${state.selectedDigit}`;
+      downTitle = `Under ${state.selectedDigit}`;
+    }
+
+    const upRate = getContractPayoutRate('up');
+    const downRate = getContractPayoutRate('down');
+
+    const buyUpBtn = document.getElementById('buyUpBtn');
+    const buyDownBtn = document.getElementById('buyDownBtn');
+    document.getElementById('upBtnTitle').textContent = upTitle;
+    document.getElementById('downBtnTitle').textContent = downTitle;
+
+    if (upRate === null) {
+      buyUpBtn.disabled = true;
+      document.getElementById('upBtnSub').textContent = 'N/A';
+    } else {
+      buyUpBtn.disabled = false;
+      document.getElementById('upBtnSub').textContent = `${upRate.toFixed(1)}%`;
+    }
+
+    if (downRate === null) {
+      buyDownBtn.disabled = true;
+      document.getElementById('downBtnSub').textContent = 'N/A';
+    } else {
+      buyDownBtn.disabled = false;
+      document.getElementById('downBtnSub').textContent = `${downRate.toFixed(1)}%`;
+    }
+
+    const activeRate = upRate ?? downRate ?? 95.4;
+    const estProfit = stake * (activeRate / 100);
+    const estPayout = stake + estProfit;
+    document.getElementById('payoutRateText').textContent = `${activeRate.toFixed(1)}%`;
+    document.getElementById('estPayoutText').textContent = `$${estPayout.toFixed(2)}`;
+    document.getElementById('estProfitText').textContent = `+$${estProfit.toFixed(2)}`;
+  }
+
+  function placeBinaryContract(side) {
+    const rate = getContractPayoutRate(side);
+    if (rate === null) return;
+    const stake = Number(document.getElementById('stakeInput').value);
+    if (!stake || stake < 1) {
+      showToast('Enter a valid stake of at least $1.00');
+      return;
+    }
+    const bal = state.balances[state.accountMode];
+    if (bal < stake) {
+      showToast('Insufficient balance. Open Cashier to deposit or reset Demo.');
+      return;
+    }
+
+    state.balances[state.accountMode] -= stake;
+    refreshAllBalances();
+
+    const m = state.markets[state.symbol];
+    const ticks = Number(document.getElementById('durationSelect').value);
+    const barrierOffset = Number(document.getElementById('barrierOffsetInput').value || 0.45);
+    const label = side === 'up'
+      ? (state.contractType === 'over_under' ? `Over ${state.selectedDigit}` : state.contractType === 'touch_no_touch' ? 'Touch' : state.contractType === 'higher_lower' ? 'Higher' : 'Rise')
+      : (state.contractType === 'over_under' ? `Under ${state.selectedDigit}` : state.contractType === 'touch_no_touch' ? 'No Touch' : state.contractType === 'higher_lower' ? 'Lower' : 'Fall');
+
+    const contract = {
+      id: Date.now() + Math.random(),
+      symbol: state.symbol,
+      contractType: state.contractType,
+      side,
+      label,
+      digitTarget: state.selectedDigit,
+      stake,
+      payoutRate: rate,
+      entryPrice: m.price,
+      barrierPrice: m.price + barrierOffset,
+      touchedBarrier: false,
+      ticksRemaining: ticks,
+      status: 'Open',
+      resultAmount: 0
+    };
+
+    state.contracts.unshift(contract);
+    renderContractsTable();
+    showToast(`Opened ${label} on ${state.symbol} ($${stake.toFixed(2)})`);
+  }
+
+  function evaluateContract(c, spotPrice, lastDigit) {
+    if (c.contractType === 'over_under') {
+      return c.side === 'up' ? lastDigit > c.digitTarget : lastDigit < c.digitTarget;
+    }
+    if (c.contractType === 'touch_no_touch') {
+      return c.side === 'up' ? c.touchedBarrier : !c.touchedBarrier;
+    }
+    if (c.contractType === 'higher_lower') {
+      return c.side === 'up' ? spotPrice > c.barrierPrice : spotPrice < c.barrierPrice;
+    }
+    return c.side === 'up' ? spotPrice > c.entryPrice : spotPrice < c.entryPrice;
+  }
+
+  function stepContractsOnTick(sym, spotPrice, lastDigit) {
+    let changed = false;
+    for (const c of state.contracts) {
+      if (c.status !== 'Open' || c.symbol !== sym) continue;
+      changed = true;
+      if (c.side === 'up' && c.barrierPrice >= c.entryPrice && spotPrice >= c.barrierPrice) c.touchedBarrier = true;
+      if (c.side === 'up' && c.barrierPrice < c.entryPrice && spotPrice <= c.barrierPrice) c.touchedBarrier = true;
+
+      c.ticksRemaining -= 1;
+      if (c.ticksRemaining <= 0) {
+        c.ticksRemaining = 0;
+        const won = evaluateContract(c, spotPrice, lastDigit);
+        if (won) {
+          const totalReturn = c.stake + c.stake * (c.payoutRate / 100);
+          const profit = totalReturn - c.stake;
+          state.balances[state.accountMode] += totalReturn;
+          state.netPnl += profit;
+          c.status = 'Won';
+          c.resultAmount = profit;
+          state.statements.unshift({
+            time: new Date().toLocaleTimeString(),
+            type: 'Binary Win',
+            details: `${c.symbol} • ${c.label}`,
+            amount: `+$${profit.toFixed(2)}`
+          });
+        } else {
+          state.netPnl -= c.stake;
+          c.status = 'Lost';
+          c.resultAmount = -c.stake;
+          state.statements.unshift({
+            time: new Date().toLocaleTimeString(),
+            type: 'Binary Loss',
+            details: `${c.symbol} • ${c.label}`,
+            amount: `-$${c.stake.toFixed(2)}`
+          });
+        }
+        refreshAllBalances();
+        renderPortfolioStats();
+      }
+    }
+    if (changed) renderContractsTable();
+  }
+
+  function renderContractsTable() {
+    const tbody = document.getElementById('contractsTableBody');
+    if (!tbody) return;
+    if (!state.contracts.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="color:var(--text-on-dark-muted);text-align:center;">No binary contracts placed yet.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = state.contracts.slice(0, 12).map(c => {
+      const est = (c.stake * (1 + c.payoutRate / 100)).toFixed(2);
+      const resText = c.status === 'Open'
+        ? `$${est}`
+        : (c.resultAmount >= 0 ? `<span style="color:var(--brand-teal);font-weight:800;">+$${c.resultAmount.toFixed(2)}</span>` : `<span style="color:var(--brand-red);font-weight:800;">-$${Math.abs(c.resultAmount).toFixed(2)}</span>`);
+      return `
+        <tr>
+          <td><strong>${c.symbol}</strong></td>
+          <td>${c.label}</td>
+          <td>$${c.stake.toFixed(2)}</td>
+          <td>${formatPrice(c.symbol, c.entryPrice)}</td>
+          <td>${c.ticksRemaining}</td>
+          <td>${resText}</td>
+          <td><strong>${c.status}</strong></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderPortfolioStats() {
+    const settled = state.statements.filter(s => s.type.startsWith('Binary'));
+    document.getElementById('portfolioTradeCount').textContent = String(settled.length);
+    const pnlEl = document.getElementById('portfolioNetPnl');
+    pnlEl.textContent = `${state.netPnl >= 0 ? '+' : '-'}$${Math.abs(state.netPnl).toFixed(2)}`;
+    pnlEl.style.color = state.netPnl >= 0 ? 'var(--brand-teal)' : 'var(--brand-red)';
+
+    const sBody = document.getElementById('statementTableBody');
+    if (!state.statements.length) {
+      sBody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;">No transactions or settled trades yet.</td></tr>`;
+      return;
+    }
+    sBody.innerHTML = state.statements.slice(0, 20).map(row => `
+      <tr>
+        <td>${row.time}</td>
+        <td><strong>${row.type}</strong></td>
+        <td>${row.details}</td>
+        <td><strong>${row.amount}</strong></td>
+      </tr>
+    `).join('');
+  }
+
+  function executeDxnSwap() {
+    const pair = document.getElementById('dxnPairSelect').value;
+    const amt = Number(document.getElementById('dxnAmountInput').value);
+    if (!amt || amt <= 0) return;
+    state.statements.unshift({
+      time: new Date().toLocaleTimeString(),
+      type: 'DXN Spot',
+      details: `Converted $${amt.toFixed(2)} on ${pair}`,
+      amount: `$${amt.toFixed(2)}`
+    });
+    renderPortfolioStats();
+    showToast(`DXN order executed for ${pair}`);
+  }
+
+  function updateSpotHeader() {
+    const m = state.markets[state.symbol];
+    const pct = (((m.price - m.prev) / m.prev) * 100).toFixed(2);
+    const pos = Number(pct) >= 0;
+    const priceEl = document.getElementById('terminalSpotPrice');
+    const chgEl = document.getElementById('terminalSpotChange');
+    if (priceEl) priceEl.textContent = formatPrice(state.symbol, m.price);
+    if (chgEl) {
+      chgEl.textContent = `${pos ? '+' : ''}${pct}%`;
+      chgEl.className = pos ? 'chg-pos' : 'chg-neg';
+    }
+    const digitsOnly = formatPrice(state.symbol, m.price).replace(/\D/g, '');
+    const ld = Number(digitsOnly.slice(-1) || 0);
+    const ldEl = document.getElementById('terminalLastDigit');
+    if (ldEl) ldEl.textContent = String(ld);
+    return ld;
+  }
+
+  function runLiveMarketTick() {
+    Object.entries(state.markets).forEach(([sym, m]) => {
+      const change = (Math.random() - 0.49) * m.step;
+      m.price = Math.max(0.0001, m.price + change);
+      const digitsOnly = formatPrice(sym, m.price).replace(/\D/g, '');
+      const ld = Number(digitsOnly.slice(-1) || 0);
+
+      if (sym === state.symbol) {
+        state.lastDigits.push(ld);
+        if (state.lastDigits.length > 25) state.lastDigits.shift();
+        updateSpotHeader();
+        if (state.contractType === 'over_under') renderDigitUI();
+
+        if (mainSeries && currentCandle) {
+          const nowSec = Math.floor(Date.now() / 1000);
+          if (nowSec - currentCandle.time >= 5) {
+            currentCandle = {
+              time: nowSec,
+              open: currentCandle.close,
+              high: Math.max(currentCandle.close, m.price),
+              low: Math.min(currentCandle.close, m.price),
+              close: m.price
+            };
+          } else {
+            currentCandle.close = m.price;
+            currentCandle.high = Math.max(currentCandle.high, m.price);
+            currentCandle.low = Math.min(currentCandle.low, m.price);
+          }
+          if (state.chartSeriesType === 'candlestick') {
+            mainSeries.update({
+              time: currentCandle.time,
+              open: currentCandle.open,
+              high: currentCandle.high,
+              low: currentCandle.low,
+              close: currentCandle.close
+            });
+          } else {
+            mainSeries.update({ time: currentCandle.time, value: currentCandle.close });
+          }
+        }
+      }
+
+      stepContractsOnTick(sym, m.price, ld);
+    });
+
+    if (state.activeTab === 'home') renderHomeMarkets();
+  }
+
+  function openModal(kind, presetMethod) {
+    const backdrop = document.getElementById('modalBackdrop');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+
+    if (kind === 'cashier') {
+      title.textContent = 'DERIV Cashier';
+      body.innerHTML = `
+        <p style="font-size:13px;color:var(--text-secondary);">Active account: <strong>${state.accountMode.toUpperCase()}</strong></p>
+        <label style="font-size:12px;font-weight:700;">Payment Method</label>
+        <select id="cashierMethod" class="modal-input">
+          <option ${presetMethod === 'Mobile Money' ? 'selected' : ''}>Mobile Money (DusuPay)</option>
+          <option ${presetMethod === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+          <option ${presetMethod === 'Crypto / USDT' ? 'selected' : ''}>Crypto / USDT</option>
+          <option ${presetMethod === 'Card' ? 'selected' : ''}>Debit / Credit Card</option>
+        </select>
+        <label style="font-size:12px;font-weight:700;">Amount (USD)</label>
+        <input type="number" id="cashierAmount" class="modal-input" value="250" min="1" />
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+          <button class="btn-deposit-red" onclick="applyCashierAction('deposit')">Deposit</button>
+          <button style="background:var(--bg-surface-soft);color:var(--text-primary);font-weight:700;border-radius:var(--radius-pill);padding:10px;" onclick="applyCashierAction('withdraw')">Withdraw</button>
+        </div>
+      `;
+    } else if (kind === 'profile') {
+      title.textContent = 'SK • Account & Settings';
+      body.innerHTML = `
+        <p style="font-size:13px;color:var(--text-secondary);">Trader initials: <strong>SK</strong> • Mode: <strong>${state.accountMode.toUpperCase()}</strong></p>
+        <div class="mode-pill-row">
+          <button class="mode-pill-btn active demo" onclick="setAccountMode('demo'); closeModal();">Demo Account</button>
+          <button class="mode-pill-btn real" onclick="setAccountMode('real'); closeModal();">Real Account</button>
+        </div>
+        <button class="btn-deposit-red" onclick="resetDemoBalance(); closeModal();">Reset Demo Balance ($10,000)</button>
+      `;
+    } else if (kind === 'amy') {
+      title.textContent = '✦ Ask Amy';
+      body.innerHTML = `
+        <p style="font-size:13px;color:var(--text-secondary);">Ask Amy helps you navigate DERIV markets, Over/Under digits, and TradingView timeframes.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="way-pill" style="justify-content:flex-start;" onclick="closeModal(); changeSymbol('R_100'); switchTab('options');">→ Go to Volatility 100 Index chart</button>
+          <button class="way-pill" style="justify-content:flex-start;" onclick="closeModal(); setContractType('over_under'); switchTab('options');">→ Open Over / Under digit trader</button>
+          <button class="way-pill" style="justify-content:flex-start;" onclick="closeModal(); openModal('cashier');">→ Deposit funds via Mobile Money</button>
+        </div>
+      `;
+    } else if (kind === 'notifications') {
+      title.textContent = 'Notifications (15)';
+      body.innerHTML = `
+        <div style="font-size:13px;display:flex;flex-direction:column;gap:10px;">
+          <div><strong>ANT has entered the chart</strong><div style="color:var(--text-secondary);font-size:12px;">Volatility 100 Index tick stream active.</div></div>
+          <div><strong>Mobile Money ready</strong><div style="color:var(--text-secondary);font-size:12px;">Instant deposits available in Cashier.</div></div>
+        </div>
+      `;
+    } else {
+      title.textContent = 'Search Markets & Sections';
+      body.innerHTML = `
+        <input type="text" id="quickSearchInput" class="modal-input" placeholder="Type R_100, BOOM1000, EURUSD, Options..." oninput="filterQuickSearch(this.value)" />
+        <div id="quickSearchResults" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
+      `;
+      filterQuickSearch('');
+    }
+
+    backdrop.classList.add('open');
+  }
+
+  function filterQuickSearch(q) {
+    const term = (q || '').toLowerCase();
+    const items = [
+      { label: 'Volatility 100 Index (R_100)', action: () => { changeSymbol('R_100'); switchTab('options'); } },
+      { label: 'Boom 1000 Index (BOOM1000)', action: () => { changeSymbol('BOOM1000'); switchTab('options'); } },
+      { label: 'Crash 1000 Index (CRASH1000)', action: () => { changeSymbol('CRASH1000'); switchTab('options'); } },
+      { label: 'EUR / USD', action: () => { changeSymbol('EURUSD'); switchTab('options'); } },
+      { label: 'Portfolio & Statement', action: () => switchTab('portfolio') },
+      { label: 'Cashier / Mobile Money', action: () => openModal('cashier') }
+    ].filter(x => x.label.toLowerCase().includes(term));
+
+    const box = document.getElementById('quickSearchResults');
+    if (box) {
+      box.innerHTML = '';
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'way-pill';
+        btn.style.justifyContent = 'flex-start';
+        btn.textContent = item.label;
+        btn.onclick = () => { closeModal(); item.action(); };
+        box.appendChild(btn);
+      });
+    }
+  }
+
+  function applyCashierAction(kind) {
+    const amt = Number(document.getElementById('cashierAmount').value);
+    const method = document.getElementById('cashierMethod').value;
+    if (!amt || amt <= 0) {
+      showToast('Enter a valid positive amount');
+      return;
+    }
+    if (kind === 'deposit') {
+      state.balances[state.accountMode] += amt;
+      state.statements.unshift({
+        time: new Date().toLocaleTimeString(),
+        type: 'Deposit',
+        details: `${method} (${state.accountMode.toUpperCase()})`,
+        amount: `+$${amt.toFixed(2)}`
+      });
+      showToast(`Deposited $${amt.toFixed(2)} via ${method}`);
+    } else {
+      if (state.balances[state.accountMode] < amt) {
+        showToast('Insufficient balance for withdrawal');
+        return;
+      }
+      state.balances[state.accountMode] -= amt;
+      state.statements.unshift({
+        time: new Date().toLocaleTimeString(),
+        type: 'Withdrawal',
+        details: `${method} (${state.accountMode.toUpperCase()})`,
+        amount: `-$${amt.toFixed(2)}`
+      });
+      showToast(`Withdrew $${amt.toFixed(2)} via ${method}`);
+    }
+    refreshAllBalances();
+    renderPortfolioStats();
+    closeModal();
+  }
+
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target.id === 'modalBackdrop') closeModal();
+  }
+
+  window.addEventListener('resize', resizeTvChart);
+
+  refreshAllBalances();
+  renderHomeMarkets();
+  renderDigitUI();
+  updateOrderTicketSummary();
+  setInterval(runLiveMarketTick, 1000);
+</script>
+</body>
+</html>
